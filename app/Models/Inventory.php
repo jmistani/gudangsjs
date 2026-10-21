@@ -46,7 +46,7 @@ class Inventory extends Model implements HasMedia
         $totalvalue = Money::IDR(0);
         foreach($this->stockMutations as $sm) {
             $stock += $sm->amount;
-            $totalvalue =  $totalvalue->add($sm->price->multiply($sm->amount));
+            $totalvalue =  $totalvalue->add($sm->total);
         }
         if($stock != 0) {   
             $avgvalue = $totalvalue->divide($stock); 
