@@ -23,13 +23,13 @@
 
         body {
         position: relative;
-        width: 20cm;  
-        height: 26cm; 
-        margin: 0 auto; 
+        width: 20cm;
+        height: 26cm;
+        margin: 0 auto;
         color: #001028;
-        background: #FFFFFF; 
-        font-family: Arial, sans-serif; 
-        font-size: 12px; 
+        background: #FFFFFF;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
         font-family: Arial;
         }
 
@@ -82,7 +82,7 @@
 
         #project div,
         #company div {
-        white-space: nowrap;        
+        white-space: nowrap;
         }
 
         table {
@@ -94,7 +94,7 @@
 
         table tr:nth-child(2n-1) td {
         background: #F5F5F5 !important;
-        -webkit-print-color-adjust: exact; 
+        -webkit-print-color-adjust: exact;
         }
 
         table th,
@@ -107,7 +107,7 @@
         padding: 5px 20px;
         color: #5D6975;
         border-bottom: 1px solid #C1CED9;
-        white-space: nowrap;        
+        white-space: nowrap;
         font-weight: normal;
         }
 
@@ -161,7 +161,7 @@
 <body>
     <header class="clearfix">
         <div id="logo">
-            <img src=" {{ asset('images/logo/logovnl.png') }} ">
+            <!-- <img src=" {{ asset('images/logo/logovnl.png') }} "> -->
         </div>
         <h1>{{ $receiveData['code'] }}</h1>
         <div id="company" class="clearfix">

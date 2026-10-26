@@ -32,8 +32,8 @@
               md="2"
             >
               <b-button
-                size="sm"
                 v-ripple.400="'rgba(113, 102, 240, 0.15)'"
+                size="sm"
                 variant="primary"
                 pill
                 :to="{name: 'inventory-receive-add'}"
@@ -47,9 +47,9 @@
               xl="10"
               md="10"
             >
-                <b-table
-                small
+              <b-table
                 ref="refReceiveTable"
+                small
                 :items="inventoryReceiveData"
                 :fields="inventoryReceiveFields"
                 class="mb-0"
@@ -57,25 +57,32 @@
                 striped
                 show-empty
                 empty-text="No matching records found"
-              > 
+              >
                 <template v-slot:table-busy>
-                    <spinner message="Loading ..."></spinner>
+                  <spinner message="Loading ..." />
                 </template>
                 <template #cell(name)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.stockable.name }}</span>
+                    <span class="font-weight-bolder mb-25">{{ data.item.stockable ? data.item.stockable.name : '-' }}</span>
                   </div>
                 </template>
 
                 <template #cell(giver)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.second_reference.giver }}</span>
+                    <span class="font-weight-bolder mb-25">{{ data.item.second_reference ? (data.item.second_reference.giver || '-') : '-' }}</span>
                   </div>
                 </template>
 
                 <template #cell(post_date)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.reference.post_date | formatDate }}</span>
+                    <span
+                      v-if="data.item.reference && data.item.reference.post_date"
+                      class="font-weight-bolder mb-25"
+                    >
+                      {{ data.item.reference.post_date | formatDate }}
+                    </span>
+
+                    <span v-else>-</span>
                   </div>
                 </template>
 
@@ -87,19 +94,21 @@
 
                 <template #cell(unit)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.stockable.unit }}</span>
+                    <span class="font-weight-bolder mb-25">{{ data.item.stockable ? data.item.stockable.unit : '-' }}</span>
                   </div>
                 </template>
 
                 <template #cell(price)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.price.amount | formatCurrencyWithPrefix }}</span>
+                    <span v-if="data.item.price && data.item.price.amount != null" class="font-weight-bolder mb-25">{{ data.item.price.amount | formatCurrencyWithPrefix }}</span>
+                    <span v-else>-</span>
                   </div>
                 </template>
 
                 <template #cell(action)="data">
                   <b-link
-                    :to="{ name: 'display-inventory-receive', params: { id: data.item.second_reference.id }  }"
+                    v-if="data.item.second_reference && data.item.second_reference.id"
+                    :to="{ name: 'display-inventory-receive', params: { id: data.item.second_reference.id } }"
                     class="font-weight-bold"
                   >
                     <span class="text-truncate overflow-hidden">
@@ -145,7 +154,6 @@
                           </b-form-group>
                         </b-col>
 
-
                         <b-col
                           cols="12"
                           class="d-flex justify-content-between mt-1"
@@ -155,7 +163,7 @@
                               variant="outline-danger"
                               @click="removeTicketReceive(data.item.id)"
                             >
-                              Hapus 
+                              Hapus
                             </b-button>
                           </div>
                         </b-col>
@@ -183,15 +191,14 @@
             <b-col
               xl="2"
               md="2"
-            >
-            </b-col>
+            />
             <b-col
               xl="2"
               md="2"
             >
               <b-button
-                size="sm"
                 v-ripple.400="'rgba(113, 102, 240, 0.15)'"
+                size="sm"
                 variant="primary"
                 pill
                 :to="{ name:'inventory-consume-add' }"
@@ -205,9 +212,9 @@
               xl="10"
               md="10"
             >
-                <b-table
-                small
+              <b-table
                 ref="refConsumeTable"
+                small
                 :items="inventoryConsumeData"
                 :fields="inventoryConsumeFields"
                 class="mb-0"
@@ -215,22 +222,25 @@
                 striped
                 show-empty
                 empty-text="No matching records found"
-              > 
+              >
                 <template #cell(name)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.stockable.name }}</span>
+                    <span class="font-weight-bolder mb-25">{{ data.item.stockable ? data.item.stockable.name : '-' }}</span>
                   </div>
                 </template>
 
                 <template #cell(giver)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.second_reference.receiver }}</span>
+                    <span class="font-weight-bolder mb-25">{{ data.item.second_reference ? (data.item.second_reference.receiver || '-') : '-' }}</span>
                   </div>
                 </template>
 
                 <template #cell(post_date)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.reference.post_date | formatDate }}</span>
+                    <span v-if="data.item.reference && data.item.reference.post_date" class="font-weight-bolder mb-25">
+                      {{ data.item.reference.post_date | formatDate }}
+                    </span>
+                    <span v-else>-</span>
                   </div>
                 </template>
 
@@ -242,13 +252,14 @@
 
                 <template #cell(unit)="data">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-bolder mb-25">{{ data.item.stockable.unit }}</span>
+                    <span class="font-weight-bolder mb-25">{{ data.item.stockable ? data.item.stockable.unit : '-' }}</span>
                   </div>
                 </template>
 
                 <template #cell(action)="data">
                   <b-link
-                    :to="{ name: 'display-inventory-consume', params: { id: data.item.second_reference.id }  }"
+                    v-if="data.item.second_reference && data.item.second_reference.id"
+                    :to="{ name: 'display-inventory-consume', params: { id: data.item.second_reference.id } }"
                     class="font-weight-bold"
                   >
                     <span class="text-truncate overflow-hidden">
@@ -267,48 +278,47 @@
                     triggers="click"
                     placement="lefttop"
                   >
-                      <b-row>
+                    <b-row>
 
-                        <!-- Field: Discount -->
-                        <b-col cols="12">
-                          <b-form-group
-                            label="Tiket"
-                            :label-for="`dashboard-consume-${data.item.id}-tiket`"
-                          >
-                            <v-select
-                              :id="`dashboard-consume-${data.item.id}-tiket`"
-                              :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                              v-model="data.item.second_reference_id"
-                              :options="refTicketOptions"
-                              label="name"
-                              :clearable="false"
-                              class="mb-0 item-selector-title"
-                              :reduce="refTicketOptions => refTicketOptions.id"
-                              @input="assignTicketConsume(data.item.id,data.item.second_reference_id)"
-                              style="width: 200px !important;"
-                            >
-                              <template #option="{ name }">
-                                {{ name | titlecase }}
-                              </template>
-                            </v-select>
-                          </b-form-group>
-                        </b-col>
-
-
-                        <b-col
-                          cols="12"
-                          class="d-flex justify-content-between mt-1"
+                      <!-- Field: Discount -->
+                      <b-col cols="12">
+                        <b-form-group
+                          label="Tiket"
+                          :label-for="`dashboard-consume-${data.item.id}-tiket`"
                         >
-                          <div v-if="data.item.second_reference_id">
-                            <b-button
-                              variant="outline-danger"
-                              @click="removeTicketConsume(data.item.id)"
-                            >
-                              Hapus 
-                            </b-button>
-                          </div>
-                        </b-col>
-                      </b-row>
+                          <v-select
+                            :id="`dashboard-consume-${data.item.id}-tiket`"
+                            v-model="data.item.second_reference_id"
+                            :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                            :options="refTicketOptions"
+                            label="name"
+                            :clearable="false"
+                            class="mb-0 item-selector-title"
+                            :reduce="refTicketOptions => refTicketOptions.id"
+                            style="width: 200px !important;"
+                            @input="assignTicketConsume(data.item.id,data.item.second_reference_id)"
+                          >
+                            <template #option="{ name }">
+                              {{ name | titlecase }}
+                            </template>
+                          </v-select>
+                        </b-form-group>
+                      </b-col>
+
+                      <b-col
+                        cols="12"
+                        class="d-flex justify-content-between mt-1"
+                      >
+                        <div v-if="data.item.second_reference_id">
+                          <b-button
+                            variant="outline-danger"
+                            @click="removeTicketConsume(data.item.id)"
+                          >
+                            Hapus
+                          </b-button>
+                        </div>
+                      </b-col>
+                    </b-row>
                   </b-popover>
                 </template>
               </b-table>
@@ -332,15 +342,14 @@
             <b-col
               xl="2"
               md="2"
-            >
-            </b-col>
+            />
             <b-col
               xl="2"
               md="2"
             >
               <b-button
-                size="sm"
                 v-ripple.400="'rgba(113, 102, 240, 0.15)'"
+                size="sm"
                 variant="primary"
                 pill
                 :to="{ name: 'inventory-ticket-add' }"
@@ -354,58 +363,59 @@
               xl="6"
               md="6"
             >
-            <b-table
-              small
-              ref="refTicketTable"
-              :items="ticketData"
-              :fields="ticketFields"
-              class="mb-0 mt-10"
-              responsive
-              striped
-              show-empty
-              empty-text="No matching records found"
-            > 
-              <!-- code -->
-              <template #cell(code)="data">
-                <div class="d-flex flex-column">
-                  <span class="font-weight-bolder mb-25">{{ data.item.code }}</span>
-                </div>
-              </template>
+              <b-table
+                ref="refTicketTable"
+                small
+                :items="ticketData"
+                :fields="ticketFields"
+                class="mb-0 mt-10"
+                responsive
+                striped
+                show-empty
+                empty-text="No matching records found"
+              >
+                <!-- code -->
+                <template #cell(code)="data">
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-bolder mb-25">{{ data.item.code }}</span>
+                  </div>
+                </template>
 
-              <!-- code -->
-              <template #cell(post_date)="data">
-                <div class="d-flex flex-column">
-                  <span class="font-weight-bolder mb-25">{{ data.item.post_date | formatDateWithTime }}</span>
-                </div>
-              </template>
+                <!-- code -->
+                <template #cell(post_date)="data">
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-bolder mb-25">{{ data.item.post_date | formatDateWithTime }}</span>
+                  </div>
+                </template>
 
-              <!-- status -->
-              <template #cell(status)="data">
-                <div class="d-flex align-items-center">
-                  <b-avatar
-                    class="mr-1" size="18"
-                    :variant="data.item.status == 'open' ? 'success' : 'danger'"
+                <!-- status -->
+                <template #cell(status)="data">
+                  <div class="d-flex align-items-center">
+                    <b-avatar
+                      class="mr-1"
+                      size="18"
+                      :variant="data.item.status == 'open' ? 'success' : 'danger'"
+                    >
+                      <feather-icon
+                        size="15"
+                        :icon="data.item.status == 'open' ? 'CheckIcon' : 'XIcon'"
+                      />
+                    </b-avatar>
+                    <span>{{ data.item.status }}</span>
+                  </div>
+                </template>
+
+                <template #cell(action)="data">
+                  <b-link
+                    :to="{ name: 'display-ticket', params: { id: data.item.id } }"
+                    class="font-weight-bold"
                   >
-                    <feather-icon
-                      size="15"
-                      :icon="data.item.status == 'open' ? 'CheckIcon' : 'XIcon'"
-                    />
-                  </b-avatar>
-                  <span>{{ data.item.status }}</span>
-                </div>
-              </template>
-
-              <template #cell(action)="data">
-                <b-link
-                  :to="{ name: 'display-ticket', params: { id: data.item.id } }" 
-                  class="font-weight-bold"
-                >
-                  <span class="text-truncate overflow-hidden">
-                    View
-                  </span>
-                </b-link>
-              </template>
-            </b-table>
+                    <span class="text-truncate overflow-hidden">
+                      View
+                    </span>
+                  </b-link>
+                </template>
+              </b-table>
             </b-col>
           </b-row>
           <b-row class="match-height">
@@ -426,14 +436,17 @@
 <script>
 import {
   BCard, BRow, BCol, BFormInput, BButton, BTable, BMedia, BAvatar, BLink, BPopover,
-  BBadge, BDropdown, BDropdownItem, BPagination, BTooltip,VBToggle, BTabs, BTab, BFormGroup,
+  BBadge, BDropdown, BDropdownItem, BPagination, BTooltip, VBToggle, BTabs, BTab, BFormGroup,
 } from 'bootstrap-vue'
 import { avatarText } from '@core/utils/filter'
 import vSelect from 'vue-select'
-import { ref, onUnmounted, computed, watch } from '@vue/composition-api'
+import {
+  ref, onUnmounted, computed, watch,
+} from '@vue/composition-api'
+import Ripple from 'vue-ripple-directive'
 import store from '@/store'
 import gudangStoreModule from '../gudangStoreModule'
-import Ripple from 'vue-ripple-directive'
+
 export default {
   components: {
     BCard,
@@ -462,23 +475,26 @@ export default {
     'b-toggle': VBToggle,
     Ripple,
   },
+  mounted() {
+    this.fetchAllTickets()
+  },
   methods: {
-    assignTicketReceive(smID,val) {
-      if(val) {
-        store.dispatch('app-inventory/assignTicketToStockMutation', { 
-          stockMutationID:  smID,
-          ticketID: val
+    assignTicketReceive(smID, val) {
+      if (val) {
+        store.dispatch('app-inventory/assignTicketToStockMutation', {
+          stockMutationID: smID,
+          ticketID: val,
         }).then(response => {
           this.$refs[`form-receive-popover-${smID}`].$emit('close')
         }).catch(error => {
         })
       }
     },
-    assignTicketConsume(smID,val) {
-      if(val) {
-        store.dispatch('app-inventory/assignTicketToStockMutation', { 
-          stockMutationID:  smID,
-          ticketID: val
+    assignTicketConsume(smID, val) {
+      if (val) {
+        store.dispatch('app-inventory/assignTicketToStockMutation', {
+          stockMutationID: smID,
+          ticketID: val,
         }).then(response => {
           this.$refs[`form-consume-popover-${smID}`].$emit('close')
         }).catch(error => {
@@ -486,28 +502,25 @@ export default {
       }
     },
     removeTicketReceive(smID) {
-        store.dispatch('app-inventory/removeTicketFromStockMutation', { 
-          stockMutationID:  smID
-        }).then(response => {
-          this.refetchDataReceive()
-          this.refetchDataConsume()
-          this.$refs[`form-receive-popover-${smID}`].$emit('close')
-        }).catch(error => {
-        })
+      store.dispatch('app-inventory/removeTicketFromStockMutation', {
+        stockMutationID: smID,
+      }).then(response => {
+        this.refetchDataReceive()
+        this.refetchDataConsume()
+        this.$refs[`form-receive-popover-${smID}`].$emit('close')
+      }).catch(error => {
+      })
     },
     removeTicketConsume(smID) {
-        store.dispatch('app-inventory/removeTicketFromStockMutation', { 
-          stockMutationID:  smID
-        }).then(response => {
-          this.refetchDataReceive()
-          this.refetchDataConsume()
-          this.$refs[`form-consume-popover-${smID}`].$emit('close')
-        }).catch(error => {
-        })
+      store.dispatch('app-inventory/removeTicketFromStockMutation', {
+        stockMutationID: smID,
+      }).then(response => {
+        this.refetchDataReceive()
+        this.refetchDataConsume()
+        this.$refs[`form-consume-popover-${smID}`].$emit('close')
+      }).catch(error => {
+      })
     },
-  },
-  mounted() {
-    this.fetchAllTickets()
   },
   setup() {
     const INVENTORY_APP_STORE_MODULE_NAME = 'app-inventory'
@@ -522,51 +535,65 @@ export default {
 
     const ticketData = (ctx, callback) => {
       store.dispatch('app-inventory/fetchAllTickets')
-        .then((response) => {
-            callback(response.data.payload)
+        .then(response => {
+          const records = response.data && response.data.payload
+          callback(Array.isArray(records) ? records : [])
+        })
+        .catch(error => {
+          console.error('fetchAllTickets failed:', error)
+          callback([])
         })
     }
 
     const ticketFields = ref([
-      {label: 'Kode', key: 'code'},
-      {label: 'Nama', key: 'name'},
+      { label: 'Kode', key: 'code' },
+      { label: 'Nama', key: 'name' },
       // {label: 'Tgl post', key: 'post_date'},
-      {label: 'Status', key: 'status'},
-      {label: 'Aksi', key: 'action'}
+      { label: 'Status', key: 'status' },
+      { label: 'Aksi', key: 'action' },
     ])
 
     const inventoryReceiveData = (ctx, callback) => {
       store.dispatch('app-inventory/fetchReceivesDB')
-        .then((response) => {
-            callback(response.data.payload)
+        .then(response => {
+          const records = response.data && response.data.payload
+          callback(Array.isArray(records) ? records : [])
+        })
+        .catch(error => {
+          console.error('fetchReceivesDB failed:', error)
+          callback([])
         })
     }
 
     const inventoryReceiveFields = ref([
-      {label: 'Nama Barang', key: 'name'},
-      {label: 'Tanggal', key: 'post_date'},
-      {label: 'Diterima dari', key: 'giver'},
-      {label: 'Jumlah', key: 'amount'},
-      {label: 'Satuan', key: 'unit'},
-      {label: 'Harga', key: 'price'},
-      {label: 'Aksi', key: 'action'}
+      { label: 'Nama Barang', key: 'name' },
+      { label: 'Tanggal', key: 'post_date' },
+      { label: 'Diterima dari', key: 'giver' },
+      { label: 'Jumlah', key: 'amount' },
+      { label: 'Satuan', key: 'unit' },
+      { label: 'Harga', key: 'price' },
+      { label: 'Aksi', key: 'action' },
     ])
-
 
     const inventoryConsumeData = (ctx, callback) => {
       store.dispatch('app-inventory/fetchConsumesDB')
-        .then((response) => {
-            callback(response.data.payload)
+        .then(response => {
+          const records = response.data && response.data.payload
+          callback(Array.isArray(records) ? records : [])
+        })
+        .catch(error => {
+          console.error('fetchConsumesDB failed:', error)
+          callback([])
         })
     }
-    
+
     const inventoryConsumeFields = ref([
-      {label: 'Nama Barang', key: 'name'},
-      {label: 'Tanggal', key: 'post_date'},
-      {label: 'Penerima', key: 'giver'},
-      {label: 'Jumlah', key: 'amount'},
-      {label: 'Satuan', key: 'unit'},
-      {label: 'Aksi', key: 'action'}
+      { label: 'Nama Barang', key: 'name' },
+      { label: 'Tanggal', key: 'post_date' },
+      { label: 'Penerima', key: 'giver' },
+      { label: 'Jumlah', key: 'amount' },
+      { label: 'Satuan', key: 'unit' },
+      { label: 'Aksi', key: 'action' },
     ])
 
     const refTicketTable = ref(null)
@@ -586,50 +613,37 @@ export default {
     const tiket = ref({
 
     })
-    
+
     const dataMeta = computed(() => {
-        const localItemsCountT = refTicketTable.value ? refTicketTable.value.localItems.length : 0
-        return {
-            fromt: perPageT.value * (currentPageT.value - 1) + (localItemsCountT ? 1 : 0),
-            tot: perPageT.value * (currentPageT.value - 1) + localItemsCountT,
-            oft: totalTickets.value,
-        }
+      const localItemsCountT = refTicketTable.value ? refTicketTable.value.localItems.length : 0
+      return {
+        fromt: perPageT.value * (currentPageT.value - 1) + (localItemsCountT ? 1 : 0),
+        tot: perPageT.value * (currentPageT.value - 1) + localItemsCountT,
+        oft: totalTickets.value,
+      }
     })
 
     const refetchDataReceive = () => {
-        refReceiveTable.value.refresh()
+      if (refReceiveTable.value) refReceiveTable.value.refresh()
     }
     const refetchDataConsume = () => {
-        refConsumeTable.value.refresh()
+      if (refConsumeTable.value) refConsumeTable.value.refresh()
     }
     const refetchDataT = () => {
-        refTicketTable.value.refresh()
+      if (refTicketTable.value) refTicketTable.value.refresh()
     }
     watch([currentPageT, perPageT, searchQueryT, codeFilterT, dateFilterT], () => {
-        refetchData()
+      refetchDataT()
     })
-
-    const onDeleteT = (params) => {
-      store.dispatch('app-inventory/removeTicket', params)
-        .then(() => {
-          emit('refetch-data-ticket')
-        })
-    }
-    function fetchAllTickets()  {
+    function fetchAllTickets() {
       store
         .dispatch('app-inventory/fetchTicketOptions')
-        .then((response) => {
-            refTicketOptions.value = response.data.payload
+        .then(response => {
+          refTicketOptions.value = response.data.payload
         })
-        .catch(() => {
-            toast({
-                component: ToastificationContent,
-                props: {
-                    title: "Error fetching tickets",
-                    icon: 'AlertTriangleIcon',
-                    variant: 'danger',
-                },
-            })
+        .catch(error => {
+          console.error('Error fetching ticket options:', error)
+          refTicketOptions.value = []
         })
     }
     return {

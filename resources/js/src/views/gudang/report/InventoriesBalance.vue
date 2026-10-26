@@ -18,7 +18,7 @@
                         name="Tanggal"
                         rules="required"
                      >
-                        <b-form-datepicker  
+                        <b-form-datepicker
                            :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
                            locale="id"
                            v-model="refReport.per_date"
@@ -58,7 +58,7 @@
         </b-col>
      </b-row>
       <iframe
-         id="printDiv" 
+         id="printDiv"
          ref="reportContent"
          :src="refReportURL"
          width="100%"
@@ -111,12 +111,12 @@ export default {
               extraCss: '',
               extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
             },
-            tableData: [ 
+            tableData: [
             { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
             { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
             { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' }
             ],
-         tableColumns: [ 
+         tableColumns: [
             {key:'nama', label:'Nama'},
             {key:'email', label:'Email'},
             {key:'telp', label:'Telp'}
@@ -145,7 +145,7 @@ export default {
             var prtContent = document.getElementById("reportContent");
             var iFrameBody = this.$refs.reportContent.contentWindow.document
 //            doc.fromHTML(iFrameBody, 15, vOffset)
-            
+
             var WinPrint = window.open(this.reportURL, '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
 //            WinPrint.document.close();
             WinPrint.focus();
@@ -163,17 +163,17 @@ export default {
          // }
     },
   setup(props, { emit }) {
-     
+
    const prefilledForm = ref({
         per_date: null,
         bygroup: 1
     })
-    
+
     const blankForm = ref({
         per_date: null,
         bygroup: 1
     })
-    
+
     const refReport = ref(JSON.parse(JSON.stringify(prefilledForm.value)))
     const refReportURL = ref('')
     const resetReportForm = () => {
@@ -184,7 +184,7 @@ export default {
     }
     const onSubmit = () => {
       //check for expired token here
-      refReportURL.value = `https://gudangsjs.serasijayasejati.com/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
+      refReportURL.value = `https://gudangsjs.local/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
     }
 
 
@@ -193,7 +193,7 @@ export default {
          getValidationState,
          resetForm,
       } = formValidation(resetReportForm,clearReportForm)
-    
+
     return {
       refReport,
       refReportURL,
@@ -204,7 +204,7 @@ export default {
       getValidationState,
       resetForm,
     }
-    
+
     }
 
 }

@@ -27,20 +27,39 @@ Route::group(['namespace' => 'api'], function () {
     Route::post('users/admin-save-user', [RolePermissionController::class, 'saveUser']);
   });
 
-  
-Route::group(['prefix' => 'auth'], function () {
-  Route::get('me', [AuthController::class, 'me'])->name('me')->name('profile');
-  Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('register', [AuthController::class, 'register'])->name('register');
+// Public routes
+Route::post('/auth/login', [AuthController::class, 'login']);
 
-    Route::group(['middleware' => 'auth:sanctum'], function() {
-      Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-      Route::get('user', [AuthController::class, 'user'])->name('user');
-      Route::get('refresh', [AuthController::class, 'refresh'])->name('refresh');
-    });
+// Enable registration only if your application permits it
+// Route::post('/auth/register', [AuthController::class, 'register']);
+
+// Refresh route must remain outside auth:api
+// so eligible expired JWTs can be refreshed
+Route::post('/refresh', [AuthController::class, 'refresh']);
+
+// Protected routes
+Route::middleware('auth:api')->group(function () {
+    Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Add your existing permission middleware as appropriate
+    // Route::get('/auth/users', [AuthController::class, 'users']);
 });
 
-Route::group(['namespace' => 'api', 'middleware' => 'auth:sanctum'], function() {
+// Route::group(['prefix' => 'auth'], function () {
+//   Route::get('me', [AuthController::class, 'me'])->name('me')->name('profile');
+//   Route::post('login', [AuthController::class, 'login'])->name('login');
+//     Route::post('register', [AuthController::class, 'register'])->name('register');
+
+//     Route::group(['middleware' => 'auth:api'], function() {
+//       Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+//       Route::get('user', [AuthController::class, 'user'])->name('user');
+//       Route::get('refresh', [AuthController::class, 'refresh'])->name('refresh');
+//     });
+// });
+
+Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('users/roles-permissions/{username}', [RolePermissionController::class, 'rolePermissions']);
   Route::get('users/pageData', [RolePermissionController::class, 'pageData']);
   Route::get('users', [AuthController::class, 'users'])->name('users');
@@ -103,7 +122,7 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:sanctum'], function() 
 
   Route::get('inventory-groups/all', 'InventoryGroupController@all');
   Route::resource('inventory-groups', 'InventoryGroupController');
-  
+
   Route::get('inventory-units/all', 'InventoryUnitController@all');
   Route::resource('inventory-units', 'InventoryUnitController');
 
@@ -121,7 +140,7 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:sanctum'], function() 
     Route::get('validation/supplier/name/{name}', 'ValidationController@uniqueSupplierName');
     Route::get('validation/inventory-group/name/{name}', 'ValidationController@uniqueGroupBarang');
     Route::get('validation/inventory-unit/name/{name}', 'ValidationController@uniqueUnitBarang');
-  
+
     Route::group(['prefix' => 'inventory-consume'], function () {
       Route::get('codeExists/{code}', 'ConsumeJournalController@codeExists');
     });

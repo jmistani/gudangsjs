@@ -17,6 +17,7 @@ return [
 
     'paths' => [
         'api/*',
+        'api/auth/*',
         'login',
         'logout',
         'register',
@@ -30,7 +31,10 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*', 'localhost'],
+    'allowed_origins' => [
+        'http://gudangsjs.local',
+        'https://gudangsjs.local',
+    ],
 
     'allowed_origins_patterns' => [],
 
@@ -40,6 +44,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 
 ];

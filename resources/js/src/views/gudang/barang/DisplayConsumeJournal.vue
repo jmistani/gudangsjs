@@ -14,7 +14,7 @@
         </b-col>
      </b-row>
       <iframe
-         id="printDiv" 
+         id="printDiv"
          ref="reportContent"
          :src="this.reportURL"
          width="100%"
@@ -42,12 +42,12 @@ export default {
               extraCss: '',
               extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
             },
-            tableData: [ 
+            tableData: [
             { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
             { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
             { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' }
             ],
-         tableColumns: [ 
+         tableColumns: [
             {key:'nama', label:'Nama'},
             {key:'email', label:'Email'},
             {key:'telp', label:'Telp'}
@@ -60,7 +60,7 @@ export default {
    },
    mounted() {
       this.invConsumeID = router.currentRoute.params.id
-      this.reportURL = `https://gudangsjs.serasijayasejati.com/api/inventory-consumes/showPDF/${this.invConsumeID}`
+      this.reportURL = `https://gudangsjs.local/api/inventory-consumes/showPDF/${this.invConsumeID}`
    },
    methods: {
         /*
@@ -74,7 +74,7 @@ export default {
             var prtContent = document.getElementById("reportContent");
             var iFrameBody = this.$refs.reportContent.contentWindow.document
 //            doc.fromHTML(iFrameBody, 15, vOffset)
-            
+
             var WinPrint = window.open(this.reportURL, '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
 //            WinPrint.document.close();
             WinPrint.focus();
@@ -88,7 +88,7 @@ export default {
             return false;
          }
     },
- 
+
     components: {
       BTable,
       BCard,

@@ -1,237 +1,337 @@
+
 <template>
   <div class="container">
-      <validation-observer
-         #default="{ handleSubmit }"
-         ref="refFormObserver"
-      >
-      <!-- Body -->
-      <div class="d-flex justify-content-between align-items-center content-sidebar-header px-2 py-1">
-         <b-form
-            @submit.prevent="handleSubmit(onSubmit)"
-            @reset.prevent="resetForm"
-         >
-            <b-row>
-               <b-col cols="6">
-                  <b-form-group
-                     label="Tanggal Awal"
-                     label-for="date-start"
-                  >
-                     <validation-provider
-                        #default="validationContext"
-                        name="TanggalAwal"
-                        rules="required"
-                     >
-                        <b-form-datepicker
-                           id="date-start"  
-                           :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-                           locale="id"
-                           v-model="refReport.per_date_start"
-                           :format="formatDate"
-                        ></b-form-datepicker>
-                        <b-form-invalid-feedback :state="validationContext.errors.length > 1" class="text-danger">
-                           {{ validationContext.errors[0] }}
-                        </b-form-invalid-feedback>
-                     </validation-provider>
-                  </b-form-group>
-               </b-col>               
-               <b-col cols="6">
-                  <b-form-group
-                     label="Tanggal Akhir"
-                     label-for="date-end"
-                  >
-                     <validation-provider
-                        #default="validationContext"
-                        name="TanggalAkhir"
-                        rules="required"
-                     >
-                        <b-form-datepicker
-                           id="date-end"  
-                           :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-                           locale="id"
-                           v-model="refReport.per_date_end"
-                           :format="formatDate"
-                        ></b-form-datepicker>
-                        <b-form-invalid-feedback :state="validationContext.errors.length > 1" class="text-danger">
-                           {{ validationContext.errors[0] }}
-                        </b-form-invalid-feedback>
-                     </validation-provider>
-                  </b-form-group>
-               </b-col>
+    <b-row class="mb-2">
+      <b-col cols="12">
+        <b-button-toolbar class="d-flex justify-content-center">
+          <b-button-group>
+            <b-button
+              size="sm"
+              variant="primary"
+              :disabled="!pdfReady || pdfLoading"
+              @click="printPDF"
+            >
+              Print
+            </b-button>
+            <b-button
+              size="sm"
+              variant="outline-primary"
+              :disabled="!pdfReady"
+              @click="openPDF"
+            >
+              Buka PDF
+            </b-button>
+            <b-button
+              size="sm"
+              variant="outline-primary"
+              :disabled="!pdfReady"
+              @click="downloadPDF"
+            >
+              Download
+            </b-button>
+            <b-button
+              size="sm"
+              variant="outline-secondary"
+              @click="$router.go(-1)"
+            >
+              Kembali
+            </b-button>
+          </b-button-group>
+        </b-button-toolbar>
+      </b-col>
+    </b-row>
 
-               <b-col md="12">
-                  <b-form-group>
-                     <b-button  type=submit class="primary">Tampilkan</b-button>
-                  </b-form-group>
-               </b-col>
-            </b-row>
-         </b-form>
-      </div>
-      </validation-observer>
-     <b-row class="mx-0">
-         <b-col md="12">
-            <div class="mb-2">
-               <b-button-toolbar class="d-flex justify-content-center" aria-label="Inventory Consume">
-                  <!-- <b-button variant="info" v-print="printObj">Print</b-button> -->
-                  <b-button-group class="mx-0">
-                     <b-button  size="sm" class="mb-0" pill variant="primary" @click="printFrame('printDiv')">Print</b-button>
-                        <b-button  size="sm" class="mb-0" pill variant="outline-primary" @click="$router.go(-1)">Kembali</b-button>
-                  </b-button-group>
-               </b-button-toolbar>
-            </div>
-        </b-col>
-     </b-row>
-      <iframe
-         id="printDiv" 
-         ref="reportContent"
-         :src="refReportURL"
-         width="100%"
-         height="500"
-         frameborder="0">
-      </iframe>
-   </div>
+    <div v-if="pdfLoading" class="text-center py-3">
+      <b-spinner variant="primary" />
+      <p class="mt-2">Memuat PDF...</p>
+    </div>
+
+    <b-alert :show="!!pdfError" variant="danger">
+      {{ pdfError }}
+    </b-alert>
+
+    <iframe
+      ref="pdfFrame"
+      title="Bukti Penerimaan Barang"
+      :src="pdfURL || 'about:blank'"
+      width="100%"
+      height="650"
+      frameborder="0"
+      @load="onPDFLoaded"
+    />
+  </div>
 </template>
-<script>
 
-import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import formValidation from '@core/comp-functions/forms/form-validation'
-import {BForm, BFormGroup, BFormCheckbox, BCard, BCardBody, BButtonGroup, BButton, BRow, BCol,
-    BAvatar, BTable, BButtonToolbar, BFormDatepicker, BFormInvalidFeedback} from 'bootstrap-vue'
-import { required } from '@validations'
-import { ref } from '@vue/composition-api'
-import VueHtml2pdf from 'vue-html2pdf'
-import Print from 'vue-iframe-print'
-import router from '@/router'
-import axios from 'axios'
+<script>
+import axios from '@axios'
+
+import {
+  BRow,
+  BCol,
+  BButton,
+  BButtonGroup,
+  BButtonToolbar,
+  BSpinner,
+  BAlert,
+} from 'bootstrap-vue'
 
 export default {
-   components: {
-      BForm,
-      BTable,
-      BCard,
-      BCardBody,
-      BButtonGroup,
-      BAvatar,
-      BRow,
-      BCol,
-      BButton,
-      VueHtml2pdf,
-      BButtonToolbar,
-      BFormDatepicker,
-      BFormCheckbox,
-      BFormInvalidFeedback,
-      ValidationProvider,
-      ValidationObserver,
-      required,
-      BFormGroup,
-   },
-   data() {
-      return {
-            bygroup: true,
-            reportURL: '',
-            printObj: {
-              id: "printDiv",
-              popTitle: 'vue-iframe-print',
-              extraCss: '',
-              extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
-            },
-            tableData: [ 
-            { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
-            { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
-            { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' }
-            ],
-         tableColumns: [ 
-            {key:'nama', label:'Nama'},
-            {key:'email', label:'Email'},
-            {key:'telp', label:'Telp'}
-          ],
-         reportContent: '',
-      }
-   },
-   directives:{
-      'print': Print,
-   },
-   mounted() {
-      this.reportURL = ''
-   },
-   methods: {
-      formatDate (date) {
-         return moment(date).format('DD-MM-YYYY')
-      },
-        /*
-            Generate Report using refs and calling the
-            refs function generatePdf()
-        */
-        generateReport () {
-            this.$refs.html2Pdf.generatePdf()
-        },
-         print() {
-            var prtContent = document.getElementById("reportContent");
-            var iFrameBody = this.$refs.reportContent.contentWindow.document
-//            doc.fromHTML(iFrameBody, 15, vOffset)
-            
-            var WinPrint = window.open(this.reportURL, '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
-//            WinPrint.document.close();
-            WinPrint.focus();
-            setTimeout(function(){mywindow.print();},10);
-            WinPrint.close();
-         },
-         printFrame(id) {
-            var frm = document.getElementById(id).contentWindow;
-            frm.focus();// focus on contentWindow is needed on some ie versions
-            frm.print();
-            return false;
-         },
+  name: 'InventoryReceivePDF',
+
+  components: {
+    BRow,
+    BCol,
+    BButton,
+    BButtonGroup,
+    BButtonToolbar,
+    BSpinner,
+    BAlert,
+  },
+
+  props: {
+    receiveId: {
+      type: [String, Number],
+      default: null,
     },
-  setup(props, { emit }) {
-     
-   const prefilledForm = ref({
-        per_date_start: null,
-        per_date_end: null
-    })
-    
-    const blankForm = ref({
-        per_date_start: null,
-        per_date_end: null
-    })
-    
-    const refReport = ref(JSON.parse(JSON.stringify(prefilledForm.value)))
-    const refReportURL = ref('')
-    const resetReportForm = () => {
-      refReport.value = JSON.parse(JSON.stringify(prefilledForm.value))
-    }
-    const clearReportForm = () => {
-      refReport.value = JSON.parse(JSON.stringify(blankForm.value))
-    }
-    const onSubmit = () => {
-       axios.get('https://gudangsjs.serasijayasejati.com/sanctum/csrf-cookie').then(response => {
-       })
-       //check for expired token
-       refReportURL.value = `https://gudangsjs.serasijayasejati.com/api/inventory/report/inventory-mutation/${refReport.value.per_date_start}/${refReport.value.per_date_end}`
-      //  if(refReportURL.value.status != 200)
-      //         router.push({ name: 'login' })
-    }
+  },
 
-   const {
-         refFormObserver,
-         getValidationState,
-         resetForm,
-      } = formValidation(resetReportForm,clearReportForm)
-    
+  data() {
     return {
-      refReport,
-      refReportURL,
-      onSubmit,
-      required,
-
-      refFormObserver,
-      getValidationState,
-      resetForm,
+      pdfURL: '',
+      pdfReady: false,
+      pdfLoading: false,
+      pdfError: '',
+      pendingRevokeURL: '',
+      requestId: 0,
     }
-    
+  },
+
+  computed: {
+    documentId() {
+      return this.receiveId || this.$route.params.id
+    },
+  },
+
+  watch: {
+    documentId: {
+      immediate: true,
+      handler(id) {
+        if (
+          id !== null &&
+          id !== undefined &&
+          String(id).trim() !== ''
+        ) {
+          this.loadPDF(id)
+        } else {
+          this.pdfError =
+            'ID penerimaan barang tidak ditemukan.'
+        }
+      },
+    },
+  },
+  mounted() {
+    console.log('InventoryReceivePDF component mounted')
+  },
+  beforeDestroy() {
+    this.requestId += 1
+
+    if (this.pdfURL) {
+      URL.revokeObjectURL(this.pdfURL)
     }
 
+    if (this.pendingRevokeURL) {
+      URL.revokeObjectURL(this.pendingRevokeURL)
+    }
+  },
+
+  methods: {
+    async loadPDF(id) {
+      console.log('InventoryReceivePDF loadPDF called:', id)
+
+      const currentRequest = ++this.requestId
+
+      this.pdfLoading = true
+      this.pdfReady = false
+      this.pdfError = ''
+
+      try {
+        // Read JWT token from Vuexy localStorage
+        const token = localStorage.getItem('accessToken')
+
+        if (
+          !token ||
+          token === 'undefined' ||
+          token === 'null'
+        ) {
+          throw new Error(
+            'JWT token tidak ditemukan. Silakan login kembali.'
+          )
+        }
+
+        // Request PDF through authenticated Axios
+        const response = await axios.get(
+          `/inventory-receives/showPDF/${encodeURIComponent(id)}`,
+          {
+            responseType: 'blob',
+            headers: {
+              Accept: 'application/pdf, application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+
+        if (currentRequest !== this.requestId) {
+          return
+        }
+
+        // Detect unexpected login redirect
+        const finalURL =
+          response.request &&
+          response.request.responseURL
+            ? response.request.responseURL
+            : ''
+
+        console.log('PDF status:', response.status)
+        console.log('PDF final URL:', finalURL)
+        console.log(
+          'PDF Content-Type:',
+          response.headers['content-type']
+        )
+
+        if (
+          /\/login(?:[/?#]|$)|\/auth-login(?:[/?#]|$)/i.test(finalURL)
+        ) {
+          throw new Error(
+            'Server mengalihkan permintaan PDF ke halaman login.'
+          )
+        }
+
+        // Verify that Laravel returned a real PDF
+        const contentType = String(
+          response.headers['content-type'] || ''
+        ).toLowerCase()
+
+        const signature = await response.data
+          .slice(0, 5)
+          .text()
+
+        if (currentRequest !== this.requestId) {
+          return
+        }
+
+        if (
+          !contentType.includes('application/pdf') ||
+          signature !== '%PDF-'
+        ) {
+          throw new Error(
+            `Respons bukan PDF. Content-Type: ${
+              contentType || 'tidak ada'
+            }`
+          )
+        }
+
+        // Create a browser-local PDF URL
+        const nextURL = URL.createObjectURL(
+          new Blob(
+            [response.data],
+            { type: 'application/pdf' }
+          )
+        )
+
+        if (this.pendingRevokeURL) {
+          URL.revokeObjectURL(this.pendingRevokeURL)
+        }
+
+        this.pendingRevokeURL = this.pdfURL
+        this.pdfURL = nextURL
+
+      } catch (error) {
+        if (currentRequest !== this.requestId) {
+          return
+        }
+
+        const status =
+          error.response && error.response.status
+
+        if (status === 401) {
+          this.pdfError =
+            'JWT tidak valid atau sudah kedaluwarsa. Silakan login kembali.'
+        } else if (status === 403) {
+          this.pdfError =
+            'Anda tidak memiliki izin untuk melihat PDF ini.'
+        } else {
+          this.pdfError =
+            error.message || 'Gagal memuat PDF.'
+        }
+
+        console.error(
+          'Inventory Receive PDF error:',
+          error
+        )
+
+      } finally {
+        if (currentRequest === this.requestId) {
+          this.pdfLoading = false
+        }
+      }
+    },
+
+    onPDFLoaded() {
+      if (!this.pdfURL) return
+
+      this.pdfReady = true
+
+      if (this.pendingRevokeURL) {
+        URL.revokeObjectURL(this.pendingRevokeURL)
+        this.pendingRevokeURL = ''
+      }
+    },
+
+    openPDF() {
+      if (!this.pdfReady) return
+
+      window.open(
+        this.pdfURL,
+        '_blank',
+        'noopener,noreferrer'
+      )
+    },
+
+    downloadPDF() {
+      if (!this.pdfReady) return
+
+      const link = document.createElement('a')
+
+      link.href = this.pdfURL
+      link.download =
+        `inventory-receive-${this.documentId}.pdf`
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    },
+
+    printPDF() {
+      if (!this.pdfReady) return
+
+      try {
+        const frame = this.$refs.pdfFrame
+
+        frame.contentWindow.focus()
+        frame.contentWindow.print()
+
+      } catch (error) {
+        this.pdfError =
+          'Tidak bisa print dari iframe. Gunakan Buka PDF lalu print dari browser.'
+      }
+    },
+  },
 }
 </script>
 
-<style lang="scss">
-@import '@core/scss/inventory-consume.scss';
+<style scoped>
+iframe {
+  display: block;
+  border: 0;
+}
+</style>

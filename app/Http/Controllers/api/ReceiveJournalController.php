@@ -36,8 +36,8 @@ class ReceiveJournalController extends Controller
         $receivejournal = ReceiveJournal::with('journalhead','stockMutations');
         $receivejournal = $receivejournal->orderBy($orderby, $sortdesc)
                         ->paginate(request('perPage'),'*', 'page',request('page'));
-        
-        return $this->response->successResponse($receivejournal);    
+
+        return $this->response->successResponse($receivejournal);
     }
 
     /**
@@ -87,7 +87,7 @@ class ReceiveJournalController extends Controller
          $data['total'] = 0;
         foreach($rj->stockMutations as $key => $sm) {
             $subtotal = $sm->price->getAmount() * $sm->amount;
-            $data['items'][] = array( 
+            $data['items'][] = array(
                 'stock' => "true",
                 'inventory' => $sm->stockable,
                 'qty' => $sm->amount,
@@ -102,7 +102,7 @@ class ReceiveJournalController extends Controller
         foreach($rj->nonstockInventories as $key => $ns) {
             $subtotal = $sm->price->getAmount() * $sm->amount;
             $data['items'][] = array(
-                'stock' => "false", 
+                'stock' => "false",
                 'inventory' => $ns->name,
                 'qty' => $ns->amount,
                 'unit' => $ns->unit,
@@ -122,7 +122,7 @@ class ReceiveJournalController extends Controller
         //         $inventory->stockMutations[$key]['journalhead'] = $sm->journalhead;
         //     }
         // }
-        
+
          return $this->response->successResponse($data);
     }
 
@@ -161,21 +161,45 @@ class ReceiveJournalController extends Controller
     }
 
     public function showPDF($id)
-    {
-        $data['receiveData'] = ReceiveJournal::with('stockMutations','nonstockInventories')->where('id', $id)->first();
+{
+    $receiveData = ReceiveJournal::with([
+        'stockMutations',
+        'nonstockInventories'
+    ])->findOrFail($id);
 
-        return view('pdfreport.inventory-receive',$data);
-        $pdf = PDF::loadView('pdfreport.inventory-receive',$data);
-        //return base64_encode($pdf->output());
-//        return $pdf->download();
-//         $filename = 'inventory-receive-'.$id.'.pdf';
-//         return $this->response->pdfFileResponse(
-//                  [
-//                     'pdf' => base64_encode($pdf->output()),
-//                     'filename' => $filename,
-//                 ],
-//                 200);
+    $data = [
+        'receiveData' => $receiveData
+    ];
+
+    $pdf = PDF::loadView(
+        'pdfreport.inventory-receive',
+        $data
+    );
+
+    $pdf->setPaper('a4', 'portrait');
+
+    return $pdf->stream(
+        'inventory-receive-' . $id . '.pdf'
+    );
     }
+
+
+//     public function showPDF($id)
+//     {
+//         $data['receiveData'] = ReceiveJournal::with('stockMutations','nonstockInventories')->where('id', $id)->first();
+
+//         return view('pdfreport.inventory-receive',$data);
+//         $pdf = PDF::loadView('pdfreport.inventory-receive',$data);
+//         //return base64_encode($pdf->output());
+// //        return $pdf->download();
+// //         $filename = 'inventory-receive-'.$id.'.pdf';
+// //         return $this->response->pdfFileResponse(
+// //                  [
+// //                     'pdf' => base64_encode($pdf->output()),
+// //                     'filename' => $filename,
+// //                 ],
+// //                 200);
+//     }
 
     public function codeExists($code)
     {
@@ -183,6 +207,6 @@ class ReceiveJournalController extends Controller
 
         if($invreceive != null)
             return true;
-        return false;        
+        return false;
     }
 }

@@ -47,3 +47,7 @@ yarn-error.log*
 
 # Docs
 /docs/.temp
+composer.lockaa
+composer.lock
+composer.lock
+package-lock.json

@@ -1,200 +1,266 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use Validator;
+
 use App\Helpers\ResponseHelper;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Session;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+
 class AuthController extends Controller
 {
+    private $response;
 
-   private $response;
+    public function __construct(ResponseHelper $response)
+    {
+        $this->response = $response;
+    }
 
-   public function __construct(ResponseHelper $response)
-   {
-       $this->response = $response;
-   }
-
-   /**
-    * Create user
-    *
-    * @param  [string] name
-    * @param  [string] email
-    * @param  [string] password
-    * @param  [string] password_confirmation
-    * @return [string] message
-    */
+    /**
+     * Register a new user.
+     * POST /api/auth/register
+     */
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email'=>'required|string|unique:users',
-            'password'=>'required|string',
-            'c_password' => 'required|same:password'
+        $data = $request->validate([
+            'username' => [
+                'required',
+                'string',
+                'max:191',
+                'unique:users,username',
+            ],
+            'name' => 'required|string|max:191',
+            'email' => 'required|email|max:191|unique:users,email',
+            'password' => 'required|string|min:8',
+            'c_password' => 'required|same:password',
         ]);
 
-        $user = new User([
-            'name'  => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
+        $user = User::create([
+            'username' => $data['username'],
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
         ]);
 
-        if($user->save()){
-            $tokenResult = $user->createToken('Personal Access Token');
-            $token = $tokenResult->plainTextToken;
+        $token = auth('api')->login($user);
+
+        return response()->json([
+            'message' => 'Successfully created user!',
+            'accessToken' => $token,
+            'token_type' => 'Bearer',
+            'userData' => $this->buildData($user),
+        ], 201);
+    }
+
+    /**
+     * Login using username and password.
+     * POST /api/auth/login
+     */
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+            'remember_me' => 'sometimes|boolean',
+        ]);
+
+        // JWT authentication only needs username/password
+        $loginCredentials = [
+            'username' => $credentials['username'],
+            'password' => $credentials['password'],
+        ];
+
+        $token = auth('api')->attempt($loginCredentials);
+
+        if (!$token) {
+            return response()->json([
+                'message' => 'Invalid username or password',
+            ], 401);
+        }
+
+        $user = auth('api')->user();
+
+        return $this->response->successResponse([
+            'accessToken' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => auth('api')
+                ->factory()
+                ->getTTL() * 60,
+            'userData' => $this->buildData($user),
+        ]);
+    }
+
+    /**
+     * Refresh JWT access token.
+     * POST /api/auth/refresh
+     *
+     * Requires Authorization: Bearer <token>
+     */
+    public function refresh(Request $request)
+    {
+        try {
+            $guard = auth('api');
+
+            $newToken = $guard->refresh();
 
             return response()->json([
-            'message' => 'Successfully created user!',
-            'accessToken'=> $token,
-            ],201);
-        }
-        else{
-            return response()->json(['error'=>'Provide proper details']);
+                'accessToken' => $newToken,
+                'token_type' => 'Bearer',
+                'expires_in' => $guard
+                    ->factory()
+                    ->getTTL() * 60,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Unable to refresh token',
+            ], 401);
         }
     }
 
-/**
- * Login user and create token
-*
-* @param  [string] email
-* @param  [string] password
-* @param  [boolean] remember_me
-*/
+    /**
+     * Get authenticated user.
+     * GET /api/auth/user
+     */
+    public function user(Request $request)
+    {
+        $user = auth('api')->user();
 
-   public function login(Request $request)
-   {
-      $request->validate([
-      'username' => 'required|',
-      'password' => 'required|string',
-      'remember_me' => 'boolean'
-      ]);
-
-      $credentials = request(['username','password']);
-      if(!Auth::attempt($credentials))
-      {
-         return response()->json([
-               'message' => 'Unauthorized'
-         ],200);
-      }
-
-      $user = $request->user();
-      $user = $this->buildData($user);
-      $tokenResult = $user->createToken('Personal Access Token');
-      $token = $tokenResult->plainTextToken;
-
-      return $this->response->successResponse([
-      'accessToken' =>$token,
-      'token_type' => 'Bearer',
-      'userData' => $user
-      ]);
-   }
-   
-   public function refresh(Request $request)
-   {
-       $user = $request->user();
-       $user->tokens()->delete();
-       return response()->json(['token' => $user->createToken($user->name)->plainTextToken]);
-   }
-
-   public function buildData($user)
-   {
-      $permissions = $user->getAllPermissions()->pluck('name');
-      $abilities = [];
-      foreach ($permissions as $perm)
-      {
-         $str= explode(" ",$perm); 
-         $ability = ["action" => $str[0], "subject" => $str[1]];
-         //array_push($ability, $abilities);
-         $abilities[] = $ability;
-      }
-      $user['ability'] = $abilities;
-      $user['role'] = $user->getRoleNames();
-      return $user;
-   }
-   /**
-    * Get the authenticated User
-   *
-   * @return [json] user object
-   */
-  public function user(Request $request)
-  {
-   $user = $request->user();
-     if($user != null)
-        $user = $this->buildData($user);
-     return response()->json($user);
-  }
-
-  
-   /**
-    * Get the authenticated User
-   *
-   * @return [json] user object
-   */
-  public function me(Request $request)
-  {
-   $user = $request->user();
-     if($user != null)
-        $user = $this->buildData($user);
-      else
-         return response()->json([
-            'message' => 'Unauthorized'
-         ],401);
-
-     return response()->json($user);
-  }
-
-  public function users(Request $request)
-  {
-      //public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null);
-      $user = User::latest();
-      if ($request->q) {
-          $user = $user->where('name', 'LIKE', '%'. $request->q .'%');
-      }
-      if ($request->sortBy) {
-          $user = $user->orderBy($request->sortBy, $request->sortDesc ? 'DESC' : 'ASC');
-      }
-      $user = $user->paginate($request->perPage, '*', 'page', $request->page);
-
-      foreach($user as $key => $u)
-      {
-         $user[$key] = $this->buildData($u);
-      }
-      return $this->response->successResponse($user);
-  }
-
-  /**
-    * Logout user (Revoke the token)
-   *
-   * @return [string] message
-   */
-   public function logout(Request $request)
-   {
-      // $user = $request->user();
-      // if($user != null) {
-      //    $user = $this->buildData($user);
-      //    $user->tokens()->delete();
-      //    $user->forgetCachedPermissions();
-      // }
-
-        try {
-            Session::flush();
-            $success = true;
-            $message = 'Successfully logged out';
-        } catch (\Illuminate\Database\QueryException $ex) {
-            $success = false;
-            $message = $ex->getMessage();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 401);
         }
-      
-        if($success) 
-         return $this->response->successResponse([
-            'message' => $message
-         ]);
-         else
-         return $this->response->failedResponse([
-            'message' => $message
-         ]);
-   }
+
+        return response()->json(
+            $this->buildData($user)
+        );
+    }
+
+    /**
+     * Get authenticated user.
+     * GET /api/auth/me
+     */
+    public function me(Request $request)
+    {
+        $user = auth('api')->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        return response()->json(
+            $this->buildData($user)
+        );
+    }
+
+    /**
+     * Build user data with Spatie permissions.
+     */
+    public function buildData($user)
+    {
+        $permissions = $user->getAllPermissions()
+            ->pluck('name');
+
+        $abilities = [];
+
+        foreach ($permissions as $permission) {
+            $parts = explode(' ', $permission, 2);
+
+            if (count($parts) === 2) {
+                $abilities[] = [
+                    'action' => $parts[0],
+                    'subject' => $parts[1],
+                ];
+            }
+        }
+
+        $user->setAttribute('ability', $abilities);
+
+        $user->setAttribute(
+            'role',
+            $user->getRoleNames()
+        );
+
+        return $user;
+    }
+
+    /**
+     * List users with searching, sorting and pagination.
+     * GET /api/auth/users
+     */
+    public function users(Request $request)
+    {
+        $validated = $request->validate([
+            'q' => 'nullable|string|max:191',
+            'sortBy' => [
+                'nullable',
+                Rule::in([
+                    'id',
+                    'username',
+                    'name',
+                    'email',
+                    'created_at',
+                ]),
+            ],
+            'sortDesc' => 'nullable|boolean',
+            'perPage' => 'nullable|integer|min:1|max:100',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $query = User::query();
+
+        if (!empty($validated['q'])) {
+            $query->where(
+                'name',
+                'LIKE',
+                '%' . $validated['q'] . '%'
+            );
+        }
+
+        $sortBy = $validated['sortBy']
+            ?? 'created_at';
+
+        $sortDesc = $request->boolean('sortDesc');
+
+        $query->orderBy(
+            $sortBy,
+            $sortDesc ? 'DESC' : 'ASC'
+        );
+
+        $perPage = $validated['perPage'] ?? 15;
+
+        $users = $query->paginate($perPage);
+
+        $users->getCollection()->transform(
+            function ($user) {
+                return $this->buildData($user);
+            }
+        );
+
+        return $this->response->successResponse($users);
+    }
+
+    /**
+     * Logout and invalidate current JWT.
+     * POST /api/auth/logout
+     */
+    public function logout(Request $request)
+    {
+        try {
+            auth('api')->logout();
+
+            return $this->response->successResponse([
+                'message' => 'Successfully logged out',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Logout failed or token invalid',
+            ], 401);
+        }
+    }
 }

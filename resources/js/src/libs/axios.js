@@ -1,18 +1,32 @@
 import Vue from 'vue'
-
-// axios
 import axios from 'axios'
 
-
 const axiosIns = axios.create({
-    // You can add your headers here ===
-    // === === === === === === === === === ==
-    baseURL: 'https://gudangsjs.serasijayasejati.com/api/',
-    timeout: 1200000,
-    // headers: {'X-Custom-Header': 'foobar'}
-    withCredentials: true,
+  baseURL: 'https://gudangsjs.local/api/',
+  timeout: 1200000,
+
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+
+  withCredentials: false,
 })
-axiosIns.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+// Attach JWT Bearer token to every API request
+axiosIns.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('accessToken')
+
+    if (token && token !== 'undefined' && token !== 'null') {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    return config
+  },
+  error => Promise.reject(error),
+)
+
 Vue.prototype.$http = axiosIns
 
 export default axiosIns
