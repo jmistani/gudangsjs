@@ -25,6 +25,12 @@
             >
               Rekalkulasi Stok
             </b-button>
+            <b-button
+              variant="outline-primary"
+              :to="{ name: 'inventory-archived-mutations', query: { inventory_id: $route.params.id } }"
+            >
+              Arsip Mutasi
+            </b-button>
             <b-card-text class="font-small-3">
               Nilai per {{ inventoryData.unit || '-' }}:
               {{ moneyAmount(inventoryData.avg_value) | formatCurrencyWithPrefix }}
