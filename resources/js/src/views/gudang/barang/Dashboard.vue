@@ -76,10 +76,10 @@
                 <template #cell(post_date)="data">
                   <div class="d-flex flex-column">
                     <span
-                      v-if="data.item.reference && data.item.reference.post_date"
+                      v-if="data.item && data.item.post_date"
                       class="font-weight-bolder mb-25"
                     >
-                      {{ data.item.reference.post_date | formatDate }}
+                      {{ data.item.post_date | formatDate }}
                     </span>
 
                     <span v-else>-</span>
@@ -237,8 +237,8 @@
 
                 <template #cell(post_date)="data">
                   <div class="d-flex flex-column">
-                    <span v-if="data.item.reference && data.item.reference.post_date" class="font-weight-bolder mb-25">
-                      {{ data.item.reference.post_date | formatDate }}
+                    <span v-if="data.item && data.item.post_date" class="font-weight-bolder mb-25">
+                      {{ data.item.post_date | formatDate }}
                     </span>
                     <span v-else>-</span>
                   </div>

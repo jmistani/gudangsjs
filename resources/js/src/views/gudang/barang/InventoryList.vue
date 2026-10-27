@@ -32,7 +32,7 @@
               plain
               class="radio-inventory-category-filter"
             >
-              Semua 
+              Semua
             </b-form-radio>
             <b-form-radio
               v-model="bagianFilter"
@@ -71,7 +71,7 @@
               placeholder="Tag Filter..."
             />
             <b-button
-              v-b-toggle.sidebar-add-new-inventory
+              @click="isAddNewInventorySidebarActive = true"
               variant="primary"
             >
               Tambah Barang
@@ -111,7 +111,7 @@
       </template>
 
       <template #cell(name)="data">
-          {{ data.item.name | titlecase }} 
+          {{ data.item.name | titlecase }}
       </template>
 
       <template #cell(category)="data">
@@ -122,12 +122,15 @@
       </template>
 
       <template #cell(unit)="data">
-          {{ data.item.unit | capital }} 
+          {{ data.item.unit | capital }}
       </template>
 
       <template #cell(tags)="data">
           <ul>
-            <li v-for="tag in JSON.parse(data.item.tags)">{{tag | lowercase }} <feather-icon :ref="`remove-tag-${data.item.id}-${tag}`" size="16" icon="XIcon" class="cursor-pointer" @click="removeTag(data.item.id,tag)"/></li>
+            <li v-for="(tag, index) in parseTags(data.item.tags)" :key="`${data.item.id}-${index}`">
+              {{ tag | lowercase }}
+              <feather-icon size="16" icon="XIcon" class="cursor-pointer" @click="removeTag(data.item.id, tag)" />
+            </li>
           </ul>
       </template>
 
@@ -147,9 +150,9 @@
             triggers="click"
             @refetch-data="refetchData"
           >
-            <b-form 
-              :id="`form-inv-list-tag-${data.item.id}`" 
-              :name="`form-inv-list-tag-${data.item.id}`" 
+            <b-form
+              :id="`form-inv-list-tag-${data.item.id}`"
+              :name="`form-inv-list-tag-${data.item.id}`"
               @submit.prevent="addTag(data.item.id, newTagData[`${data.item.id}`])"
             >
               <b-row>
@@ -162,7 +165,6 @@
                     <b-form-input
                       v-model="newTagData[`${data.item.id}`]"
                       :id="`new-tag-data-${data.item.id}`"
-                      :value="null"
                       type="text"
                     />
                   </b-form-group>
@@ -177,7 +179,7 @@
                     type="submit"
 
                   >
-                    Apply 
+                    Apply
                   </b-button>
                   <b-button
                     variant="outline-secondary"
@@ -194,7 +196,7 @@
             size="16"
             icon="ImageIcon"
             class="cursor-pointer"
-            v-b-toggle.sidebar-add-image-inventory 
+            @click="openImageSidebar(data.item.id)"
           />
           <feather-icon
             size="16"
@@ -217,7 +219,7 @@
                 class="align-middle text-body"
               />
             </template>
-            <b-dropdown-item v-b-toggle.sidebar-edit-inventory @click="handleEdit(data.item.id)">
+            <b-dropdown-item @click="handleEdit(data.item.id)">
               <feather-icon icon="EditIcon" />
               <span class="align-middle ml-50">Edit</span>
             </b-dropdown-item>
@@ -270,12 +272,12 @@
 
       </b-row>
     </div>
-    <sidebar-add-new-inventory 
+    <sidebar-add-new-inventory
       :is-add-new-inventory-sidebar-active.sync="isAddNewInventorySidebarActive"
       @sidebar-response="sidebarResponse"
       @refetch-data="refetchData"
     />
-    <sidebar-edit-inventory 
+    <sidebar-edit-inventory
       :is-edit-inventory-sidebar-active.sync="isEditInventorySidebarActive"
       @refetch-data="refetchData"
       :editid="editid"
@@ -284,13 +286,14 @@
       :is-add-image-inventory-sidebar-active.sync="isAddImageInventorySidebarActive"
       @refetch-data="refetchData"
       :editid="editid"
-    />  </b-card>
+    />
+  </b-card>
 </template>
 
 <script>
 import {
   BForm, BFormGroup, BCard, BRow, BCol, BFormInput, BButton, BTable, BMedia, BAvatar, BLink,
-  BBadge, BDropdown, BDropdownItem, BPagination, BTooltip,VBToggle,BPopover,
+  BBadge, BDropdown, BDropdownItem, BPagination, BTooltip,BPopover,
   BFormRadio,
 } from 'bootstrap-vue'
 import vSelect from 'vue-select'
@@ -301,11 +304,9 @@ import SidebarEditInventory from '../sidebar/SidebarEditInventory.vue'
 import SidebarAddImageInventory from '../sidebar/SidebarAddImageInventory.vue'
 import gudangStoreModule from '../gudangStoreModule'
 import useInventoryList from './useInventoryList'
-import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
 
 export default {
   components: {
-    ToastificationContent,
     SidebarAddImageInventory,
     SidebarAddNewInventory,
     SidebarEditInventory,
@@ -330,38 +331,62 @@ export default {
 
     vSelect,
   },
-  directives: {
-    'b-toggle': VBToggle,
-  },
   methods: {
-    addTag (identifier, tagData) {
-      store.dispatch('app-inventory/addTagInventory', {id: identifier, tag: tagData })
-        .then(response => {
-          if(response.data.payload == "OK") {
-              this.$refs["popover-tag-"+identifier].$emit('close')
-              this.$refs["popover-tag-"+identifier].$emit('refetch-data')
-          }            
-        })
-    },
-    removeTag (identifier, tagData) {
-      if (confirm("Yakin akan menghapus data ?")) {
-        store.dispatch('app-inventory/removeTagInventory', {id: identifier, tag: tagData })
-          .then(response => {
-            if(response.data.payload == "OK") {
-              this.refetchData()
-            }            
-         })
+    parseTags(value) {
+      if (Array.isArray(value)) return value
+      if (!value) return []
+      try {
+        const parsed = JSON.parse(value)
+        return Array.isArray(parsed) ? parsed : []
+      } catch (error) {
+        console.warn('Invalid inventory tags JSON:', error)
+        return []
       }
     },
-    closeTag (identifier) {
-        this.$refs["popover-tag-"+identifier].$emit('close')
+    async addTag(identifier, tagData) {
+      const tag = typeof tagData === 'string' ? tagData.trim() : ''
+      if (!tag) return
+      try {
+        const response = await store.dispatch('app-inventory/addTagInventory', {
+          id: identifier,
+          tag,
+        })
+        if (response.data && response.data.payload === 'OK') {
+          this.closeTag(identifier)
+          this.$set(this.newTagData, String(identifier), '')
+          this.refetchData()
+        }
+      } catch (error) {
+        console.error('Failed to add tag:', error)
+      }
+    },
+    async removeTag(identifier, tagData) {
+      if (!window.confirm('Yakin akan menghapus tag?')) return
+      try {
+        const response = await store.dispatch('app-inventory/removeTagInventory', {
+          id: identifier,
+          tag: tagData,
+        })
+        if (response.data && response.data.payload === 'OK') this.refetchData()
+      } catch (error) {
+        console.error('Failed to remove tag:', error)
+      }
+    },
+    closeTag(identifier) {
+      const popover = this.$refs[`popover-tag-${identifier}`]
+      if (popover) popover.$emit('close')
     },
     handleEdit(identifier) {
-        this.$refs['editid'] = identifier
+      this.editid = identifier
+      this.isEditInventorySidebarActive = true
+    },
+    openImageSidebar(identifier) {
+      this.editid = identifier
+      this.isAddImageInventorySidebarActive = true
     },
     clearEditID() {
-       this.$refs['editid'] = null
-    } 
+      this.editid = null
+    },
   },
   setup(prop, { emit }) {
     const INVENTORY_APP_STORE_MODULE_NAME = 'app-inventory'
@@ -374,12 +399,13 @@ export default {
       if (store.hasModule(INVENTORY_APP_STORE_MODULE_NAME)) store.unregisterModule(INVENTORY_APP_STORE_MODULE_NAME)
     })
 
-    const editid = ref()
+    const editid = ref(null)
     const tagOptions = ref([])
     store.dispatch('app-inventory/listFormData')
-      .then((response) => {
-        tagOptions.value = response.data.payload.tags
+      .then(response => {
+        tagOptions.value = (response.data && response.data.payload && response.data.payload.tags) || []
       })
+      .catch(error => console.error('Failed to load inventory tags:', error))
     const isAddNewInventorySidebarActive = ref(false)
     const isEditInventorySidebarActive = ref(false)
     const isAddImageInventorySidebarActive = ref(false)

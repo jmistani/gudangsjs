@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Exceptions;
-
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -33,8 +33,36 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->reportable(function (
+            \PHPOpenSourceSaver\JWTAuth\Exceptions\SecretMissingException $e
+        ) {
+            \Illuminate\Support\Facades\Log::error(
+                'Intermittent JWT SecretMissingException',
+                [
+                    'url' => request()->path(),
+                    'process_id' => getmypid(),
+                    'secret_present' => !empty(config('jwt.secret')),
+                    'config_cached' => app()->configurationIsCached(),
+                    'algorithm' => config('jwt.algo'),
+                    'base_path' => base_path(),
+                ]
+            );
         });
     }
+
+    protected function unauthenticated(
+    $request,
+    AuthenticationException $exception
+) {
+    if ($request->is('api/*') || $request->expectsJson()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthenticated. JWT token missing, invalid, or expired.',
+        ], 401);
+    }
+
+    return redirect()->guest(
+        $exception->redirectTo() ?? route('login')
+    );
+}
 }

@@ -37,8 +37,8 @@ class ConsumeJournalController extends Controller
 
         $consumejournal = $consumejournal->orderBy($orderby, $sortdesc)
                         ->paginate(request('perPage'),'*', 'page',request('page'));
-        
-        return $this->response->successResponse($consumejournal);    
+
+        return $this->response->successResponse($consumejournal);
     }
 
     /**
@@ -88,7 +88,7 @@ class ConsumeJournalController extends Controller
                 $inventory->stockMutations[$key]['journalhead'] = $sm->journalhead;
             }
         }
-        
+
          return $this->response->successResponse($inventory);
     }
 
@@ -131,22 +131,20 @@ class ConsumeJournalController extends Controller
         return 'code';
     }
 
+
     public function showPDF($id)
     {
-        $data['consumeData'] = ConsumeJournal::with('stockMutations')->where('id', $id)->first();
+        $consumeData = ConsumeJournal::with('stockMutations')
+            ->findOrFail($id);
 
-        return view('pdfreport.inventory-consume',$data);
-        $pdf = PDF::loadView('pdfreport.inventory-consume',$data);
-        //return base64_encode($pdf->output());
-//        return $pdf->download();
-//         $filename = 'inventory-consume-'.$id.'.pdf';
-//         return $this->response->pdfFileResponse(
-//                  [
-//                     'pdf' => base64_encode($pdf->output()),
-//                     'filename' => $filename,
-//                 ],
-//                 200);
-     }
+        $pdf = PDF::loadView('pdfreport.inventory-consume', [
+            'consumeData' => $consumeData,
+        ]);
+
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->stream('inventory-consume-' . $id . '.pdf');
+    }
 
     public function codeExists($code)
     {
@@ -154,6 +152,6 @@ class ConsumeJournalController extends Controller
 
         if($invconsume != null)
             return true;
-        return false;        
+        return false;
     }
 }

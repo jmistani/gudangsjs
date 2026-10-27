@@ -21,6 +21,21 @@ use App\Models\User;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::get('/debug-jwt-config', function () {
+    $cachePath = app()->getCachedConfigPath();
+
+    return response()->json([
+        'jwt_secret_loaded' => !empty(config('jwt.secret')),
+        'jwt_algorithm' => config('jwt.algo'),
+        'php_version' => PHP_VERSION,
+        'process_id' => getmypid(),
+        'config_cached' => app()->configurationIsCached(),
+        'cache_file_exists' => file_exists($cachePath),
+        'cache_path' => $cachePath,
+        'base_path' => base_path(),
+        'environment' => app()->environment(),
+    ]);
+});
 
 Route::group(['namespace' => 'api'], function () {
     Route::get('validation/username/{username}', [ValidationController::class, 'usernameValidation']);
@@ -82,7 +97,7 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('inventories/formReceiveData', 'InventoryController@formReceiveData');
   Route::get('inventories/listFormData', 'InventoryController@listFormData');
   Route::get('inventories/consumeFormData', 'InventoryController@consumeFormData');
-  Route::post('inventories/{$id}/add-image', 'InventoryController@addImage');
+  Route::post('inventories/{id}/add-image', 'InventoryController@addImage');
   Route::get('inventories/receives', 'InventoryController@receives');
   Route::get('inventories/consumes', 'InventoryController@consumes');
   Route::get('inventories/receivesDB', 'InventoryController@receivesDB');
