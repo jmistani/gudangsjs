@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
         <div>
           <h3 class="mb-25">Arsip Mutasi Stok</h3>
-          <small class="text-muted">Tanggal arsip berasal dari tanggal dibuatnya batch arsip, bukan tanggal transaksi.</small>
+          <small class="text-muted">Tanggal arsip berasal dari waktu proses pengarsipan (archived_at), terpisah dari tanggal transaksi.</small>
         </div>
         <b-button variant="outline-primary" :disabled="loading" @click="loadData">
           <feather-icon icon="RefreshCwIcon" class="mr-50" />Muat Ulang
@@ -34,9 +34,19 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col cols="12" md="5">
-          <b-form-group label="Cari nama, kode, deskripsi, atau ID">
-            <b-form-input v-model.trim="filters.search" placeholder="Nama, kode, ID barang, ID mutasi..." @keyup.enter="applyFilters" />
+        <b-col cols="12" md="3">
+          <b-form-group label="Tanggal transaksi dari (DD MM YYYY)">
+            <b-form-input v-model.trim="filters.transaction_date_start" placeholder="01 01 2026" maxlength="10" @keyup.enter="applyFilters" />
+          </b-form-group>
+        </b-col>
+        <b-col cols="12" md="3">
+          <b-form-group label="Tanggal transaksi sampai (DD MM YYYY)">
+            <b-form-input v-model.trim="filters.transaction_date_end" placeholder="31 12 2026" maxlength="10" @keyup.enter="applyFilters" />
+          </b-form-group>
+        </b-col>
+        <b-col cols="12" md="3">
+          <b-form-group label="Cari barang / deskripsi / kode">
+            <b-form-input v-model.trim="filters.search" placeholder="Cari..." @keyup.enter="applyFilters" />
           </b-form-group>
         </b-col>
         <b-col cols="12" md="3">
@@ -50,12 +60,9 @@
         </b-col>
       </b-row>
       <b-alert variant="danger" :show="!!errorMessage">{{ errorMessage }}</b-alert>
-      <b-alert variant="warning" :show="!loading && !errorMessage && total === 0">
-        Tidak ada mutasi arsip yang cocok. Semua filter yang terisi digabungkan.
-        Klik Reset untuk mencari di seluruh inventaris.
-      </b-alert>
+      <small class="text-muted">Klik judul kolom untuk mengurutkan hasil filter. Urutan berlaku untuk seluruh halaman.</small>
       <b-alert variant="info" :show="unassignedCount > 0 && !loading">
-        {{ unassignedCount }} mutasi arsip tidak memiliki archive_batch_id. Tanggal arsip untuk data tersebut tidak diketahui.
+        {{ unassignedCount }} mutasi arsip tidak memiliki archive_batch_id. Tanggal arsip untuk data tersebut mungkin belum tersedia.
       </b-alert>
     </div>
 
@@ -63,6 +70,10 @@
       :items="rows"
       :fields="fields"
       :busy="loading"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
+      :no-local-sorting="true"
+      @sort-changed="onSortChanged"
       responsive
       striped
       show-empty
@@ -117,6 +128,7 @@ import axios from '@axios'
 
 const emptyFilters = () => ({
   inventory_id: '', date_start: '', date_end: '', archive_batch_id: '', search: '',
+  transaction_date_start: '', transaction_date_end: '',
 })
 
 export default {
@@ -134,22 +146,24 @@ export default {
       filters: { ...emptyFilters(), inventory_id: this.$route.query.inventory_id || '' },
       currentPage: 1,
       perPage: 25,
+      sortBy: 'archive_date',
+      sortDesc: true,
       total: 0,
       from: 0,
       to: 0,
       unassignedCount: 0,
       fields: [
-        { key: 'archive_date', label: 'Tanggal Arsip' },
-        { key: 'archive_batch_id', label: 'Batch ID' },
-        { key: 'batch_period', label: 'Periode Batch' },
-        { key: 'inventory', label: 'Barang' },
-        { key: 'post_date', label: 'Tanggal Transaksi' },
-        { key: 'masuk', label: 'Masuk', class: 'text-right' },
-        { key: 'keluar', label: 'Keluar', class: 'text-right' },
-        { key: 'price', label: 'Harga', class: 'text-right' },
-        { key: 'total', label: 'Total', class: 'text-right' },
-        { key: 'reference', label: 'Referensi' },
-        { key: 'description', label: 'Deskripsi' },
+        { key: 'archive_date', sortable: true, label: 'Tanggal Arsip' },
+        { key: 'archive_batch_id', sortable: true, label: 'Batch ID' },
+        { key: 'batch_period', sortable: true, label: 'Periode Batch' },
+        { key: 'inventory', sortable: true, label: 'Barang' },
+        { key: 'post_date', sortable: true, label: 'Tanggal Transaksi' },
+        { key: 'masuk', sortable: true, label: 'Masuk', class: 'text-right' },
+        { key: 'keluar', sortable: true, label: 'Keluar', class: 'text-right' },
+        { key: 'price', sortable: true, label: 'Harga', class: 'text-right' },
+        { key: 'total', sortable: true, label: 'Total', class: 'text-right' },
+        { key: 'reference', sortable: true, label: 'Referensi' },
+        { key: 'description', sortable: true, label: 'Deskripsi' },
       ],
     }
   },
@@ -157,7 +171,7 @@ export default {
     batchOptions() {
       return [{ value: '', text: 'Semua batch' }].concat(this.batches.map(batch => ({
         value: String(batch.id),
-        text: `#${batch.id} — ${batch.range_start} s.d. ${batch.range_end}`,
+        text: `#${batch.id} — ${batch.created_at ? this.formatDate(batch.created_at) : 'tanggal belum tersedia'}`,
       })))
     },
   },
@@ -178,8 +192,22 @@ export default {
     },
     formatDate(value) {
       if (!value) return '-'
-      // Keep the date as returned by Laravel; avoid timezone conversion for display.
-      return String(value).replace('T', ' ').replace(/\.\d+Z?$/, '').replace(/Z$/, '')
+      // Only extract date characters; do not convert timestamps between timezones.
+      const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/)
+      return match ? `${match[3]} ${match[2]} ${match[1]}` : String(value)
+    },
+    parseTransactionDate(input, label) {
+      if (!input) return ''
+      const match = String(input).trim().match(/^(\d{2})[ \/-](\d{2})[ \/-](\d{4})$/)
+      if (!match) throw new Error(`${label} harus berformat DD MM YYYY, contoh 27 10 2026.`)
+      const day = Number(match[1])
+      const month = Number(match[2])
+      const year = Number(match[3])
+      const date = new Date(Date.UTC(year, month - 1, day))
+      if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+        throw new Error(`${label} tidak valid.`)
+      }
+      return `${match[3]}-${match[2]}-${match[1]}`
     },
     shortType(type) { return String(type || '').split('\\').pop() },
     applyFilters() {
@@ -189,11 +217,19 @@ export default {
     resetFilters() {
       this.filters = emptyFilters()
       this.currentPage = 1
+      // The URL filter should also be cleared so a future route change is predictable.
       if (this.$route.query.inventory_id) {
         const query = { ...this.$route.query }
         delete query.inventory_id
         this.$router.replace({ query }).catch(() => {})
       }
+      this.loadData()
+    },
+    onSortChanged(ctx) {
+      // Sorting is performed by Laravel across all archive rows (not just this page).
+      this.sortBy = ctx.sortBy || 'archive_date'
+      this.sortDesc = !!ctx.sortDesc
+      this.currentPage = 1
       this.loadData()
     },
     onPageChange(page) {
@@ -204,10 +240,16 @@ export default {
       this.loading = true
       this.errorMessage = ''
       try {
-        const params = { page: this.currentPage, per_page: this.perPage }
+        const params = { page: this.currentPage, per_page: this.perPage, sort_by: this.sortBy, sort_desc: this.sortDesc ? 1 : 0 }
         Object.keys(this.filters).forEach(key => {
+          if (['transaction_date_start', 'transaction_date_end'].includes(key)) return
           if (this.filters[key] !== '' && this.filters[key] !== null) params[key] = this.filters[key]
         })
+        const first = this.parseTransactionDate(this.filters.transaction_date_start, 'Tanggal transaksi dari')
+        const last = this.parseTransactionDate(this.filters.transaction_date_end, 'Tanggal transaksi sampai')
+        if (first && last && first > last) throw new Error('Tanggal transaksi sampai tidak boleh lebih awal dari tanggal mulai.')
+        if (first) params.transaction_date_start = first
+        if (last) params.transaction_date_end = last
         const { data } = await axios.get('stock-mutations/archive', { params })
         this.rows = Array.isArray(data.data) ? data.data : []
         this.total = Number(data.total) || 0
@@ -221,7 +263,7 @@ export default {
         this.from = 0
         this.to = 0
         this.errorMessage = (error.response && error.response.data && error.response.data.message)
-          || 'Gagal mengambil arsip mutasi stok. Periksa koneksi dan endpoint API.'
+          || error.message || 'Gagal mengambil arsip mutasi stok. Periksa koneksi dan endpoint API.'
       } finally {
         this.loading = false
       }

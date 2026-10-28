@@ -141,6 +141,9 @@ class ArchiveStockJob implements ShouldQueue
                 );
             }
 
+            // Timestamp yang sama untuk seluruh mutasi dalam satu batch.
+            $archivedAt = now();
+
             $summaryId = DB::table('stock_mutations')
                 ->insertGetId([
                     'stockable_type' => $stockableType,
@@ -175,6 +178,7 @@ class ArchiveStockJob implements ShouldQueue
 
                     $data['archive_batch_id'] = $batchId;
                     $data['summary_id'] = $summaryId;
+                    $data['archived_at'] = $archivedAt;
 
                     $archiveRows[] = $data;
                 }

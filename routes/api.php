@@ -75,6 +75,16 @@ Route::middleware('auth:api')->group(function () {
 // });
 
 Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
+    Route::get(
+        'inventories-fast/{id}/mutations',
+        'InventoryViewFastController@mutations'
+    );
+
+    Route::get(
+        'inventories-fast/{id}',
+        'InventoryViewFastController@show'
+    );
+
   Route::get('users/roles-permissions/{username}', [RolePermissionController::class, 'rolePermissions']);
   Route::get('users/pageData', [RolePermissionController::class, 'pageData']);
   Route::get('users', [AuthController::class, 'users'])->name('users');
@@ -107,6 +117,8 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('inventories/removeTicket/{stockMutationID}', 'InventoryController@removeTicket');
 //    Route::get('inventories/transaction', 'InventoryController@lastTransaction');
   Route::resource('inventories', 'InventoryController');
+
+  Route::get('stock-mutations/archive', 'ArchivedStockMutationController@index');
 
   Route::get('vendors/all', 'VendorController@all');
   Route::resource('vendors', 'VendorController');
