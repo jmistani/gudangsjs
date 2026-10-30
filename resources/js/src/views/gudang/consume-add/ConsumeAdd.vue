@@ -43,46 +43,19 @@
                             :state="getValidationState(validationContext)"
                           >
                             <v-select
-                              :id="`inventory-consume-inventory-input-${index}`"
-                              v-model="item.inventory"
+                              id="consume-add-account"
+                              v-model="consumeData.account"
                               :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                              :options="inventorySearchOptions[index] || []"
-                              :filterable="false"
-                              :loading="inventoryLoading[index] || false"
+                              :options="refAccountOptions"
                               label="name"
+                              input-id="consume-data-account-id"
                               :clearable="false"
-                              class="mb-0 item-selector-title"
-                              placeholder="Ketik kode atau nama barang..."
-                              :state="getValidationState(validationContext)"
-                              @search="query => searchInventory(query, index)"
-                              @input="val => updateItemForm(index, val)"
+                              class="select-option-capitalize"
                             >
-                              <template #option="{ code, name, in_stock, unit }">
-                                <div>
-                                  <strong>{{ code }}</strong> - {{ name }}
-                                  <small class="text-muted d-block">
-                                    Stok: {{ in_stock }} {{ unit }}
-                                  </small>
-                                </div>
+                              <template #option="{ name }">
+                                <!-- HTML that describe how select should render items when the select is open -->
+                                {{ name | titlecase }}
                               </template>
-                              <template #no-options>
-                                Ketik minimal 2 karakter untuk mencari barang.
-                              </template>
-                              <template #list-header>
-                                <li
-                                  v-if="$can('create', 'inventory')"
-                                  v-b-toggle.sidebar-add-new-inventory
-                                  class="add-new-inventory-header d-flex align-items-center my-50"
-                                >
-                                  <feather-icon icon="PlusIcon" size="16" />
-                                  <span class="align-middle ml-25">Add New Inventory</span>
-                                </li>
-                              </template>
-                            </v-select>
-                            <template #option="{ name }">
-                              <!-- HTML that describe how select should render items when the select is open -->
-                              {{ name | titlecase }}
-                            </template>
                               <!-- <template #list-header>
                               <li
                                 v-b-toggle.sidebar-add-new-ticket
@@ -306,26 +279,35 @@
                                   :id="`inventory-consume-inventory-input-${index}`"
                                   v-model="item.inventory"
                                   :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                                  :options="refInventoryOptions"
+                                  :options="inventorySearchOptions[index] || []"
+                                  :filterable="false"
+                                  :loading="inventoryLoading[index] || false"
                                   label="name"
                                   :clearable="false"
                                   class="mb-0 item-selector-title"
-                                  placeholder="Select Item"
-                                  @input="val => updateItemForm(index, val)"
+                                  placeholder="Ketik kode atau nama barang..."
                                   :state="getValidationState(validationContext)"
+                                  @search="query => searchInventory(query, index)"
+                                  @input="val => updateItemForm(index, val)"
                                 >
-                                  <template #option="{ name }">
-                                    {{ name | titlecase }}
+                                  <template #option="{ code, name, in_stock, unit }">
+                                    <div>
+                                      <strong>{{ code }}</strong> - {{ name }}
+                                      <small class="text-muted d-block">
+                                        Stok: {{ in_stock }} {{ unit }}
+                                      </small>
+                                    </div>
+                                  </template>
+                                  <template #no-options>
+                                    Ketik minimal 2 karakter untuk mencari barang.
                                   </template>
                                   <template #list-header>
                                     <li
+                                      v-if="$can('create', 'inventory')"
                                       v-b-toggle.sidebar-add-new-inventory
                                       class="add-new-inventory-header d-flex align-items-center my-50"
                                     >
-                                      <feather-icon
-                                        icon="PlusIcon"
-                                        size="16"
-                                      />
+                                      <feather-icon icon="PlusIcon" size="16" />
                                       <span class="align-middle ml-25">Add New Inventory</span>
                                     </li>
                                   </template>
@@ -674,6 +656,7 @@ export default {
   mounted() {
     this.fetchAllAccount()
     this.initTrHeight()
+    this.fetchInventoryOptions()
     this.fetchAllTickets()
   },
   created() {
@@ -717,8 +700,6 @@ export default {
         })
     },
     updateItemForm(index, val) {
-      if (!val) return false
-
       const { avg_value, in_stock, unit } = val
       if(this.consumeData.items != null) {
         this.consumeData.items[index].avg_value= avg_value
@@ -829,6 +810,7 @@ export default {
         }
       }, 300)
     }
+
     const itemFormBlankItem = {
       inventory: null,
       price: 0,
