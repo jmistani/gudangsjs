@@ -1,12 +1,12 @@
 <template>
   <section class="invoice-add-wrapper">
-    <ValidationObserver 
+    <ValidationObserver
       ref="refFormObserver"
       v-slot="{ handleSubmit }"
     >
       <b-form ref="form" @submit.prevent="handleSubmit(consumeInventory)">
         <b-row class="invoice-add">
-        <!-- Col: Left (Invoice Container) -->
+          <!-- Col: Left (Invoice Container) -->
           <b-col
             cols="12"
             xl="10"
@@ -37,25 +37,52 @@
                           name="consume-add-account"
                           :rules="{ requiredAccount: true }"
                         >
-                        <b-form-group
-                          label="Pencatatan biaya"
-                          label-for="consume-add-account"
-                          :state="getValidationState(validationContext)"
-                        >
-                          <v-select
-                            id="consume-add-account"
-                            v-model="consumeData.account"
-                            :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                            :options="refAccountOptions"
-                            label="name"
-                            input-id="consume-data-account-id"
-                            :clearable="false"
-                            class="select-option-capitalize"
+                          <b-form-group
+                            label="Pencatatan biaya"
+                            label-for="consume-add-account"
+                            :state="getValidationState(validationContext)"
                           >
-                              <template #option="{ name }">
-                                    <!-- HTML that describe how select should render items when the select is open -->
-                                {{ name | titlecase }} 
+                            <v-select
+                              :id="`inventory-consume-inventory-input-${index}`"
+                              v-model="item.inventory"
+                              :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                              :options="inventorySearchOptions[index] || []"
+                              :filterable="false"
+                              :loading="inventoryLoading[index] || false"
+                              label="name"
+                              :clearable="false"
+                              class="mb-0 item-selector-title"
+                              placeholder="Ketik kode atau nama barang..."
+                              :state="getValidationState(validationContext)"
+                              @search="query => searchInventory(query, index)"
+                              @input="val => updateItemForm(index, val)"
+                            >
+                              <template #option="{ code, name, in_stock, unit }">
+                                <div>
+                                  <strong>{{ code }}</strong> - {{ name }}
+                                  <small class="text-muted d-block">
+                                    Stok: {{ in_stock }} {{ unit }}
+                                  </small>
+                                </div>
                               </template>
+                              <template #no-options>
+                                Ketik minimal 2 karakter untuk mencari barang.
+                              </template>
+                              <template #list-header>
+                                <li
+                                  v-if="$can('create', 'inventory')"
+                                  v-b-toggle.sidebar-add-new-inventory
+                                  class="add-new-inventory-header d-flex align-items-center my-50"
+                                >
+                                  <feather-icon icon="PlusIcon" size="16" />
+                                  <span class="align-middle ml-25">Add New Inventory</span>
+                                </li>
+                              </template>
+                            </v-select>
+                            <template #option="{ name }">
+                              <!-- HTML that describe how select should render items when the select is open -->
+                              {{ name | titlecase }}
+                            </template>
                               <!-- <template #list-header>
                               <li
                                 v-b-toggle.sidebar-add-new-ticket
@@ -68,11 +95,11 @@
                                 <span class="align-middle ml-25">Tambah Akun/Tiket Reparasi/Servis/Proyek</span>
                               </li>
                             </template> -->
-                          </v-select>
-                          <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                            {{ validationContext.errors[0] }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
+                            </v-select>
+                            <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
+                              {{ validationContext.errors[0] }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
                         </ValidationProvider>
                       </b-col>
                     </b-row>
@@ -81,32 +108,32 @@
                         cols="12"
                         xl="3"
                       >
-                      <ValidationProvider
-                        #default="validationContext"
-                        ref="consume-add-code"
-                        name="consume-add-code"
-                        :rules="{ requiredCode: true }"
-                        class="invoice-title-input"
-                      >
-                        <b-form-group 
-                          label="Kode"
-                          label-for="consume-add-code-input-group"
-                          :state="getValidationState(validationContext)"
+                        <ValidationProvider
+                          #default="validationContext"
+                          ref="consume-add-code"
+                          name="consume-add-code"
+                          :rules="{ requiredCode: true }"
+                          class="invoice-title-input"
                         >
-                          <b-input-group id="consume-add-code-input-group" class="input-group-merge invoice-edit-input-group">
-                            <b-input-group-prepend is-text>
-                              <feather-icon icon="HashIcon" />
-                            </b-input-group-prepend>
-                            <b-form-input
-                              id="consume-add-code-input"
-                              v-model="consumeData.consume_code"
-                            />
-                          </b-input-group>
-                        </b-form-group>
-                        <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                          {{ validationContext.errors[0] }}
-                        </b-form-invalid-feedback>
-                      </ValidationProvider>
+                          <b-form-group
+                            label="Kode"
+                            label-for="consume-add-code-input-group"
+                            :state="getValidationState(validationContext)"
+                          >
+                            <b-input-group id="consume-add-code-input-group" class="input-group-merge invoice-edit-input-group">
+                              <b-input-group-prepend is-text>
+                                <feather-icon icon="HashIcon" />
+                              </b-input-group-prepend>
+                              <b-form-input
+                                id="consume-add-code-input"
+                                v-model="consumeData.consume_code"
+                              />
+                            </b-input-group>
+                          </b-form-group>
+                          <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
+                            {{ validationContext.errors[0] }}
+                          </b-form-invalid-feedback>
+                        </ValidationProvider>
                       </b-col>
                       <b-col
                         cols="12"
@@ -120,12 +147,12 @@
                           class="invoice-title-input"
                         >
                           <b-form-group label="Tanggal" label-for="consume-add-date-input" :state="getValidationState(validationContext)">
-                          <flat-pickr
-                            id="consume-add-date-input"
-                            v-model="consumeData.post_date"
-                            :config="flatpickrConfig"
-                            class="form-control invoice-title-input"
-                          />
+                            <flat-pickr
+                              id="consume-add-date-input"
+                              v-model="consumeData.post_date"
+                              :config="flatpickrConfig"
+                              class="form-control invoice-title-input"
+                            />
                           </b-form-group>
                           <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
                             {{ validationContext.errors[0] }}
@@ -142,9 +169,9 @@
                           :rules=" { requiredStaff: true } "
                           class="invoice-title-input"
                         >
-                          <b-form-group 
-                            label="Staff Gudang" 
-                            label-for="consume-add-input-staff-gudang-input" 
+                          <b-form-group
+                            label="Staff Gudang"
+                            label-for="consume-add-input-staff-gudang-input"
                             :state="getValidationState(validationContext)"
                           >
                             <b-form-input
@@ -155,7 +182,7 @@
                             <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
                               {{ validationContext.errors[0] }}
                             </b-form-invalid-feedback>
-                          </b-form-group> 
+                          </b-form-group>
                         </ValidationProvider>
                       </b-col>
                       <b-col
@@ -169,9 +196,9 @@
                           #default="validationContext"
                           class="invoice-title-input"
                         >
-                          <b-form-group 
-                            label="Diterima" 
-                            label-for="consume-add-input-penerima-input" 
+                          <b-form-group
+                            label="Diterima"
+                            label-for="consume-add-input-penerima-input"
                             :state="getValidationState(validationContext)"
                           >
                             <b-form-input
@@ -182,327 +209,327 @@
                             <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
                               {{ validationContext.errors[0] }}
                             </b-form-invalid-feedback>
-                          </b-form-group> 
+                          </b-form-group>
                         </ValidationProvider>
                       </b-col>
                     </b-row>
                   </b-col>
                 </b-row>
               </b-card-body>
-            <hr class="invoice-spacing mx-0 my-0 px-0 py-0">
+              <hr class="invoice-spacing mx-0 my-0 px-0 py-0">
 
-          <b-card-body class="invoice-padding pb-0 form-consume-row">
-            <b-row class="pb-0">
-              <b-col cols="12">
-                <div class="flex-grow-1">
-                  <b-row class="flex-grow-1 px-0">
-                    <!-- Single Item Form Headers -->
-                    <b-col
-                      cols="12"
-                      lg="4"
-                    >                      
-                      Nama
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="2"
-                    >
-                      Harga
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="1"
-                    >
-                      Jumlah
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="3"
-                    >
-                      Keterangan
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="2"
-                    >
-                      <ValidationProvider
-                        ref="inventory-numofvaliditems"
-                        name="inventory-numofvaliditems"
-                        :rules="{numOfItemTerimaBarang: true }"
-                        v-slot="{ errors }"
-                      >
-                      <b-form-group
-                        id="inventory-numofvaliditems"
-                      >
-                      <b-form-input style="display:none;"  v-model="dataMeta.numOfValidItems" type="number" class="form-control"></b-form-input>
-                        <span class="text-custom-error" :state="errors.length > 0 ? false:null" >{{errors[0]}}</span>
-                      </b-form-group>
-                      </ValidationProvider>
-                    </b-col>
-                  </b-row>
-                  <div class="form-item-action-col" />
-                </div>                  
-              </b-col>
-            </b-row>
-          </b-card-body>
-          <b-card-body class="invoice-padding pb-0 form-consume-row">
-            <div
-              ref="form"
-              class="repeater-form form-consume-row"
-            >
-              <b-row
-                v-for="(item, index) in consumeData.items"
-                :key="index"
-                ref="row"
-                class="pb-1"
-              >
-                <b-col cols="12">
-                  <div class="d-flex border rounded py-0 px-0 text-right" border="1">
-                    <b-row class="flex-grow-1 px-0">
-                      <!-- Single Item Form Headers -->
-                      <b-col
-                        cols="12"
-                        lg="4"
-                      >
-                        <ValidationProvider
-                          #default="validationContext"
-                          :ref="`inventory-consume-inventory-input-${index}`"
-                          :name="`inventory-consume-inventory-input-${index}`"
-
-                          :rules="{ requiredInventory: true, myRule:[consumeData.items,'inventory','code'] }"
+              <b-card-body class="invoice-padding pb-0 form-consume-row">
+                <b-row class="pb-0">
+                  <b-col cols="12">
+                    <div class="flex-grow-1">
+                      <b-row class="flex-grow-1 px-0">
+                        <!-- Single Item Form Headers -->
+                        <b-col
+                          cols="12"
+                          lg="4"
                         >
-                          <b-form-group
-                            :id="`inventory-consume-inventory-input-${index}`"
-                            :state="getValidationState(validationContext)"
+                          Nama
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="2"
+                        >
+                          Harga
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="1"
+                        >
+                          Jumlah
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="3"
+                        >
+                          Keterangan
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="2"
+                        >
+                          <ValidationProvider
+                            ref="inventory-numofvaliditems"
+                            name="inventory-numofvaliditems"
+                            :rules="{numOfItemTerimaBarang: true }"
+                            v-slot="{ errors }"
                           >
-                            <v-select
-                              :id="`inventory-consume-inventory-input-${index}`"
-                              v-model="item.inventory"
-                              :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                              :options="refInventoryOptions"
-                              label="name"
-                              :clearable="false"
-                              class="mb-0 item-selector-title"
-                              placeholder="Select Item"
-                              @input="val => updateItemForm(index, val)"
-                              :state="getValidationState(validationContext)"
+                            <b-form-group
+                              id="inventory-numofvaliditems"
                             >
-                              <template #option="{ name }">
-                                {{ name | titlecase }}
-                              </template>
-                              <template #list-header>
-                                <li
-                                  v-b-toggle.sidebar-add-new-inventory
-                                  class="add-new-inventory-header d-flex align-items-center my-50"
-                                >
-                                  <feather-icon
-                                    icon="PlusIcon"
-                                    size="16"
-                                  />
-                                  <span class="align-middle ml-25">Add New Inventory</span>
-                                </li>
-                              </template>
-                            </v-select>
-                            <span class="text-success stock-display-consume-add" v-if="item.inventory"> Stok: {{ item.inventory.in_stock }} {{ item.inventory.unit }}</span>                            
-                            <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                              {{ validationContext.errors[0] }}
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-                        </ValidationProvider>
-                      </b-col>
-                      <b-col
-                        cols="12"
-                        lg="2"
-                        align="text-right"
-                      >
-                        <ValidationProvider
-                          :ref="`inventory-consume-price-input-${index}`"
-                          :name="`inventory-consume-price-input-${index}`"
+                              <b-form-input style="display:none;"  v-model="dataMeta.numOfValidItems" type="number" class="form-control"></b-form-input>
+                              <span class="text-custom-error" :state="errors.length > 0 ? false:null" >{{errors[0]}}</span>
+                            </b-form-group>
+                          </ValidationProvider>
+                        </b-col>
+                      </b-row>
+                      <div class="form-item-action-col" />
+                    </div>
+                  </b-col>
+                </b-row>
+              </b-card-body>
+              <b-card-body class="invoice-padding pb-0 form-consume-row">
+                <div
+                  ref="form"
+                  class="repeater-form form-consume-row"
+                >
+                  <b-row
+                    v-for="(item, index) in consumeData.items"
+                    :key="index"
+                    ref="row"
+                    class="pb-1"
+                  >
+                    <b-col cols="12">
+                      <div class="d-flex border rounded py-0 px-0 text-right" border="1">
+                        <b-row class="flex-grow-1 px-0">
+                          <!-- Single Item Form Headers -->
+                          <b-col
+                            cols="12"
+                            lg="4"
+                          >
+                            <ValidationProvider
+                              #default="validationContext"
+                              :ref="`inventory-consume-inventory-input-${index}`"
+                              :name="`inventory-consume-inventory-input-${index}`"
 
-                          :rules="{ hargaTerimaBarang:[consumeData.items,'inventory','code',index] }"
-                          #default="validationContext"
-                        >
-                        <b-form-group
-                          :id="`inventory-consume-price-input-${index}`"
-                          :state="getValidationState(validationContext)"
-                        > 
-                        <vue-numeric v-if="item.inventory"
-                          v-model="item.avg_value.amount"
-                          :precision="2"
-                          :minus="false"
-                          currency="Rp."
-                          size="sm"
-                          read-only
-                          class="mx-0 my-0 px-0 py-0 form-control"
-                        />
-                        </b-form-group>
-                        <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                          {{ validationContext.errors[0] }}
-                        </b-form-invalid-feedback>
-                        </ValidationProvider>
-                      </b-col>
-                      <b-col
-                        cols="12"
-                        lg="1"
-                      >
-                        <ValidationProvider
-                          :ref="`inventory-consume-qty-input-${index}`"
-                          :name="`inventory-consume-qty-input-${index}`"
-
-                          :rules="{ qtyConsumeAdd:[consumeData.items,'inventory','id',index] }"
-                          #default="validationContext"
-                        >
-                        <b-form-group
-                          :state="getValidationState(validationContext)"
-                        >        
-                        <vue-numeric
-                          :id="`inventory-consume-qty-input-${index}`"
-                          v-model="item.qty"
-                          :precision="2"
-                          :minus="false"
-                          size="sm"
-                          class="mx-0 my-0 px-0 py-0 form-control"
-                        />
-                        </b-form-group>
-                            <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                              {{ validationContext.errors[0] }}
-                            </b-form-invalid-feedback>
-                        </ValidationProvider>
-                      </b-col>
-                      <b-col
-                        cols="12"
-                        lg="3"
-                      >
-                        <ValidationProvider
-                          :ref="`inventory-consume-memo-input-${index}`"
-                          :name="`inventory-consume-memo-input-${index}`"
-
-                          :rules="{ requiredKeterangan: true }"
-                          #default="validationContext"
-                        >
-                        <b-form-group
-                          :state="getValidationState(validationContext)"
-                        >
-                          <b-form-input 
-                            v-model="item.memo" 
-                            rules="required" 
-                            class="form-control"
-                            :id="`inventory-consume-memo-input-${index}`"
-                            :state="getValidationState(validationContext)"
-                          />                 
-                          <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                            {{ validationContext.errors[0] }}
-                          </b-form-invalid-feedback>
-                        </b-form-group> 
-                        </ValidationProvider>
-                      </b-col>
-                      <b-col
-                        cols="12"
-                        lg="2"
-                      >
-                        <p class="mb-0">
-                          <vue-numeric
-                            v-model="dataMeta.subtotalRow[index]"
-                            :precision="2"
-                            :minus="false"
-                            read-only
-                            currency="Rp."
-                            class="mx-0 my-0 px-0 py-0 form-control"
-                            align="right"
-                          />
-
-                        </p>
-                      </b-col>
-                    </b-row>
-                    <div class="d-flex flex-column justify-content-between border-left py-1 px-1">
-                      <feather-icon
-                        size="16"
-                        icon="XIcon"
-                        class="cursor-pointer"
-                        @click="removeItem(index)"
-                      />
-                      <feather-icon
-                        :id="`form-item-file-icon-${index}`"
-                        size="16"
-                        icon="FileIcon"
-                        class="cursor-pointer"
-                      />
-
-                      <!-- Setting Item Form -->
-                      <b-popover
-                        :ref="`form-item-settings-popover-${index}`"
-                        :target="`form-item-file-icon-${index}`"
-                        triggers="click"
-                        placement="lefttop"
-                      >
-                          <b-row>
-
-                            <!-- Field: Discount -->
-                            <b-col cols="12">
+                              :rules="{ requiredInventory: true, myRule:[consumeData.items,'inventory','code'] }"
+                            >
                               <b-form-group
-                                label="Tiket"
-                                :label-for="`setting-item-${index}-tiket`"
+                                :id="`inventory-consume-inventory-input-${index}`"
+                                :state="getValidationState(validationContext)"
                               >
                                 <v-select
-                                  :id="`setting-item-${index}-tiket`"
-                                  v-model="item.tiket"
+                                  :id="`inventory-consume-inventory-input-${index}`"
+                                  v-model="item.inventory"
                                   :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                                  :options="refTicketOptions"
+                                  :options="refInventoryOptions"
                                   label="name"
                                   :clearable="false"
                                   class="mb-0 item-selector-title"
                                   placeholder="Select Item"
+                                  @input="val => updateItemForm(index, val)"
+                                  :state="getValidationState(validationContext)"
                                 >
                                   <template #option="{ name }">
                                     {{ name | titlecase }}
                                   </template>
+                                  <template #list-header>
+                                    <li
+                                      v-b-toggle.sidebar-add-new-inventory
+                                      class="add-new-inventory-header d-flex align-items-center my-50"
+                                    >
+                                      <feather-icon
+                                        icon="PlusIcon"
+                                        size="16"
+                                      />
+                                      <span class="align-middle ml-25">Add New Inventory</span>
+                                    </li>
+                                  </template>
                                 </v-select>
+                                <span class="text-success stock-display-consume-add" v-if="item.inventory"> Stok: {{ item.inventory.in_stock }} {{ item.inventory.unit }}</span>
+                                <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
+                                  {{ validationContext.errors[0] }}
+                                </b-form-invalid-feedback>
                               </b-form-group>
-                            </b-col>
+                            </ValidationProvider>
+                          </b-col>
+                          <b-col
+                            cols="12"
+                            lg="2"
+                            align="text-right"
+                          >
+                            <ValidationProvider
+                              :ref="`inventory-consume-price-input-${index}`"
+                              :name="`inventory-consume-price-input-${index}`"
 
-
-                            <b-col
-                              cols="12"
-                              class="d-flex justify-content-between mt-1"
+                              :rules="{ hargaTerimaBarang:[consumeData.items,'inventory','code',index] }"
+                              #default="validationContext"
                             >
-                              <b-button
-                                variant="outline-primary"
-                                @click="() => {$refs[`form-item-settings-popover-${index}`][0].$emit('close')}"
+                              <b-form-group
+                                :id="`inventory-consume-price-input-${index}`"
+                                :state="getValidationState(validationContext)"
                               >
-                                Tutup
-                              </b-button>
-                            </b-col>
-                          </b-row>
-                      </b-popover>
-                    </div>
-                  </div>
-                </b-col>
-              </b-row>
-            </div>
-              <b-button
-                v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-                size="sm"
-                variant="primary"
-                @click="addNewItemInItemForm"
-              >
-                Tambah Barang
-              </b-button>
-          </b-card-body>
+                                <vue-numeric v-if="item.inventory"
+                                             v-model="item.avg_value.amount"
+                                             :precision="2"
+                                             :minus="false"
+                                             currency="Rp."
+                                             size="sm"
+                                             read-only
+                                             class="mx-0 my-0 px-0 py-0 form-control"
+                                />
+                              </b-form-group>
+                              <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
+                                {{ validationContext.errors[0] }}
+                              </b-form-invalid-feedback>
+                            </ValidationProvider>
+                          </b-col>
+                          <b-col
+                            cols="12"
+                            lg="1"
+                          >
+                            <ValidationProvider
+                              :ref="`inventory-consume-qty-input-${index}`"
+                              :name="`inventory-consume-qty-input-${index}`"
 
-            <b-card-body class="invoice-padding pb-0">
-              <b-row>
-                <!-- Col: Total -->
-                <b-col
-                  cols="12"
-                  md="10"
-                  class="mt-6 mx-0 d-flex justify-content-end"
+                              :rules="{ qtyConsumeAdd:[consumeData.items,'inventory','id',index] }"
+                              #default="validationContext"
+                            >
+                              <b-form-group
+                                :state="getValidationState(validationContext)"
+                              >
+                                <vue-numeric
+                                  :id="`inventory-consume-qty-input-${index}`"
+                                  v-model="item.qty"
+                                  :precision="2"
+                                  :minus="false"
+                                  size="sm"
+                                  class="mx-0 my-0 px-0 py-0 form-control"
+                                />
+                              </b-form-group>
+                              <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
+                                {{ validationContext.errors[0] }}
+                              </b-form-invalid-feedback>
+                            </ValidationProvider>
+                          </b-col>
+                          <b-col
+                            cols="12"
+                            lg="3"
+                          >
+                            <ValidationProvider
+                              :ref="`inventory-consume-memo-input-${index}`"
+                              :name="`inventory-consume-memo-input-${index}`"
+
+                              :rules="{ requiredKeterangan: true }"
+                              #default="validationContext"
+                            >
+                              <b-form-group
+                                :state="getValidationState(validationContext)"
+                              >
+                                <b-form-input
+                                  v-model="item.memo"
+                                  rules="required"
+                                  class="form-control"
+                                  :id="`inventory-consume-memo-input-${index}`"
+                                  :state="getValidationState(validationContext)"
+                                />
+                                <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
+                                  {{ validationContext.errors[0] }}
+                                </b-form-invalid-feedback>
+                              </b-form-group>
+                            </ValidationProvider>
+                          </b-col>
+                          <b-col
+                            cols="12"
+                            lg="2"
+                          >
+                            <p class="mb-0">
+                              <vue-numeric
+                                v-model="dataMeta.subtotalRow[index]"
+                                :precision="2"
+                                :minus="false"
+                                read-only
+                                currency="Rp."
+                                class="mx-0 my-0 px-0 py-0 form-control"
+                                align="right"
+                              />
+
+                            </p>
+                          </b-col>
+                        </b-row>
+                        <div class="d-flex flex-column justify-content-between border-left py-1 px-1">
+                          <feather-icon
+                            size="16"
+                            icon="XIcon"
+                            class="cursor-pointer"
+                            @click="removeItem(index)"
+                          />
+                          <feather-icon
+                            :id="`form-item-file-icon-${index}`"
+                            size="16"
+                            icon="FileIcon"
+                            class="cursor-pointer"
+                          />
+
+                          <!-- Setting Item Form -->
+                          <b-popover
+                            :ref="`form-item-settings-popover-${index}`"
+                            :target="`form-item-file-icon-${index}`"
+                            triggers="click"
+                            placement="lefttop"
+                          >
+                            <b-row>
+
+                              <!-- Field: Discount -->
+                              <b-col cols="12">
+                                <b-form-group
+                                  label="Tiket"
+                                  :label-for="`setting-item-${index}-tiket`"
+                                >
+                                  <v-select
+                                    :id="`setting-item-${index}-tiket`"
+                                    v-model="item.tiket"
+                                    :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                                    :options="refTicketOptions"
+                                    label="name"
+                                    :clearable="false"
+                                    class="mb-0 item-selector-title"
+                                    placeholder="Select Item"
+                                  >
+                                    <template #option="{ name }">
+                                      {{ name | titlecase }}
+                                    </template>
+                                  </v-select>
+                                </b-form-group>
+                              </b-col>
+
+
+                              <b-col
+                                cols="12"
+                                class="d-flex justify-content-between mt-1"
+                              >
+                                <b-button
+                                  variant="outline-primary"
+                                  @click="() => {$refs[`form-item-settings-popover-${index}`][0].$emit('close')}"
+                                >
+                                  Tutup
+                                </b-button>
+                              </b-col>
+                            </b-row>
+                          </b-popover>
+                        </div>
+                      </div>
+                    </b-col>
+                  </b-row>
+                </div>
+                <b-button
+                  v-ripple.400="'rgba(255, 255, 255, 0.15)'"
+                  size="sm"
+                  variant="primary"
+                  @click="addNewItemInItemForm"
                 >
-                  <div class="receive-total-wrapper">
+                  Tambah Barang
+                </b-button>
+              </b-card-body>
 
-                    <hr class="my-50">
-                    <div class="consume-total-item">
-                      <p class="consume-total-title">
-                        Total: <vue-numeric
+              <b-card-body class="invoice-padding pb-0">
+                <b-row>
+                  <!-- Col: Total -->
+                  <b-col
+                    cols="12"
+                    md="10"
+                    class="mt-6 mx-0 d-flex justify-content-end"
+                  >
+                    <div class="receive-total-wrapper">
+
+                      <hr class="my-50">
+                      <div class="consume-total-item">
+                        <p class="consume-total-title">
+                          Total: <vue-numeric
                             v-model="dataMeta.total"
                             :precision="2"
                             :minus="false"
@@ -511,15 +538,15 @@
                             class="form-control"
                             align="right"
                           />
-                      </p>
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </b-col>
-              </b-row>
-            </b-card-body>
+                  </b-col>
+                </b-row>
+              </b-card-body>
 
-            <!-- Spacer -->
-            <hr class="invoice-spacing">
+              <!-- Spacer -->
+              <hr class="invoice-spacing">
             </b-card>
           </b-col>
           <b-col
@@ -555,7 +582,7 @@
                 </b-button>
               </b-card-body>
             </b-card>
-          </b-col> 
+          </b-col>
         </b-row>
       </b-form>
     </ValidationObserver>
@@ -566,7 +593,7 @@
     <sidebar-add-new-inventory
       :is-add-new-inventory-sidebar-active.sync="isAddNewInventorySidebarActive"
       @refetch-data="refetchInventoryOptions"
-     />
+    />
     <!-- <sidebar-add-new-ticket
       :is-add-new-ticket-sidebar-active.sync="isAddNewTicketSidebarActive"
       @refetch-data="refetchAccountData"
@@ -594,8 +621,8 @@ import SidebarAddNewInventory from '../sidebar/SidebarAddNewInventory.vue'
 import useConsumeAdd from './useConsumeAdd'
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate'
 import { required, email, url, myRule, myRule2, numOfItemTerimaBarang,
-       requiredInventory, requiredInv, requiredDate, requiredReceiver, requiredStaff, requiredKeterangan,
-       requiredAccount } from '@validationsInventory/consume-add.js'
+  requiredInventory, requiredInv, requiredDate, requiredReceiver, requiredStaff, requiredKeterangan,
+  requiredAccount } from '@validationsInventory/consume-add.js'
 import formValidation from '@core/comp-functions/forms/form-validation'
 import MoneyFormat from 'vue-money-format'
 import { useToast } from 'vue-toastification/composition'
@@ -647,9 +674,7 @@ export default {
   mounted() {
     this.fetchAllAccount()
     this.initTrHeight()
-    this.fetchInventoryOptions()
     this.fetchAllTickets()
-
   },
   created() {
     window.addEventListener('resize', this.initTrHeight)
@@ -659,7 +684,7 @@ export default {
   },
   methods: {
     addNewItemInItemForm() {
-//      this.$refs.form.style.overflow = 'hidden'
+      //      this.$refs.form.style.overflow = 'hidden'
       this.consumeData.items.push(JSON.parse(JSON.stringify(this.itemFormBlankItem)))
       this.$nextTick(() => {
         this.trAddHeight(this.$refs.row[0].offsetHeight)
@@ -670,6 +695,7 @@ export default {
     },
     removeItem(index) {
       this.consumeData.items.splice(index, 1)
+      Object.values(this.inventorySearchTimers || {}).forEach(clearTimeout)
       this.trTrimHeight(this.$refs.row[0].offsetHeight)
     },
     initTrHeight() {
@@ -680,7 +706,7 @@ export default {
     },
     consumeInventory() {
       this.consumeData.total = this.dataMeta.total;
-       store
+      store
         .dispatch('app-inventory/consumeInventory',this.consumeData)
         .then((response) => {
           this.$router.push({ name: 'inventory-list'})
@@ -691,18 +717,20 @@ export default {
         })
     },
     updateItemForm(index, val) {
-        const { avg_value, in_stock, unit } = val
-        if(this.consumeData.items != null) {
-          this.consumeData.items[index].avg_value= avg_value
-          this.consumeData.items[index].in_stock = in_stock
-          this.consumeData.items[index].qty = 0
-          this.consumeData.items[index].unit = unit
-          this.consumeData.items[index].memo = ''
-        }
-        return true
+      if (!val) return false
+
+      const { avg_value, in_stock, unit } = val
+      if(this.consumeData.items != null) {
+        this.consumeData.items[index].avg_value= avg_value
+        this.consumeData.items[index].in_stock = in_stock
+        this.consumeData.items[index].qty = 0
+        this.consumeData.items[index].unit = unit
+        this.consumeData.items[index].memo = ''
+      }
+      return true
     },
     sycnValueWithHidden() {
-        this.consumeData.items.inventoryHidden = this.consumeData.items.inventory
+      this.consumeData.items.inventoryHidden = this.consumeData.items.inventory
     },
     showToast(variant, icon, title, message) {
       this.$toast({
@@ -738,26 +766,89 @@ export default {
     const isAddNewTicketSidebarActive = ref(false)
     const isAddNewInventorySidebarActive = ref(false)
 
+    const inventorySearchOptions = ref({})
+    const inventoryLoading = ref({})
+
+    const inventorySearchTimers = {}
+    const inventorySearchVersions = {}
+
+    function searchInventory(query, index) {
+      const keyword = query.trim()
+
+      clearTimeout(inventorySearchTimers[index])
+
+      const version = (inventorySearchVersions[index] || 0) + 1
+      inventorySearchVersions[index] = version
+
+      if (keyword.length < 2) {
+        inventorySearchOptions.value = {
+          ...inventorySearchOptions.value,
+          [index]: [],
+        }
+
+        inventoryLoading.value = {
+          ...inventoryLoading.value,
+          [index]: false,
+        }
+        return
+      }
+
+      inventoryLoading.value = {
+        ...inventoryLoading.value,
+        [index]: true,
+      }
+
+      inventorySearchTimers[index] = setTimeout(async () => {
+        try {
+          const response = await store.dispatch(
+            'app-inventory/searchInventory',
+            keyword
+          )
+
+          if (inventorySearchVersions[index] !== version) return
+
+          inventorySearchOptions.value = {
+            ...inventorySearchOptions.value,
+            [index]: response.data.payload || [],
+          }
+        } catch (error) {
+          if (inventorySearchVersions[index] === version) {
+            inventorySearchOptions.value = {
+              ...inventorySearchOptions.value,
+              [index]: [],
+            }
+            console.error('Inventory search failed:', error)
+          }
+        } finally {
+          if (inventorySearchVersions[index] === version) {
+            inventoryLoading.value = {
+              ...inventoryLoading.value,
+              [index]: false,
+            }
+          }
+        }
+      }, 300)
+    }
     const itemFormBlankItem = {
-        inventory: null,
-        price: 0,
-        qty: 0,
-        unit: '',
-        avg_value: 0,
-        in_stock: 0,
-        subtotal: 0,
-        memo: ''
+      inventory: null,
+      price: 0,
+      qty: 0,
+      unit: '',
+      avg_value: 0,
+      in_stock: 0,
+      subtotal: 0,
+      memo: ''
     }
     const consumeData = ref({
-        consume_code: '',
-        post_date: '',
-        giver: '',
-        receiver: '',
-        account: null,
-        // ? Set single Item in form for adding data
-        items: [JSON.parse(JSON.stringify(itemFormBlankItem))],
-        note: '',
-        total: 0,
+      consume_code: '',
+      post_date: '',
+      giver: '',
+      receiver: '',
+      account: null,
+      // ? Set single Item in form for adding data
+      items: [JSON.parse(JSON.stringify(itemFormBlankItem))],
+      note: '',
+      total: 0,
     })
 
     const satuanOptions = ref([])
@@ -765,16 +856,16 @@ export default {
       .then((response) => {
         satuanOptions.value = response.data.payload.satuan
       })
-    
+
     const statusPembayaranOptions = [
-        "Bon / Hutang",
-        "Cash / Lunas"
+      "Bon / Hutang",
+      "Cash / Lunas"
     ]
 
     const paymentMethods = [
-        'Bank Account',
-        'PayPal',
-        'UPI Transfer',
+      'Bank Account',
+      'PayPal',
+      'UPI Transfer',
     ]
 
     watch([], () => {
@@ -790,56 +881,56 @@ export default {
           toast({
             component: ToastificationContent,
             props: {
-                title: "Error fetching inventories",
-                icon: 'AlertTriangleIcon',
-                variant: 'danger',
+              title: "Error fetching inventories",
+              icon: 'AlertTriangleIcon',
+              variant: 'danger',
             },
           })
-        })      
+        })
     }
 
     function fetchAllAccount()  {
-        store
-            .dispatch('app-inventory/fetchAccountExpenseOptions')
-            .then((response) => {
-                refAccountOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching accounts",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
+      store
+        .dispatch('app-inventory/fetchAccountExpenseOptions')
+        .then((response) => {
+          refAccountOptions.value = response.data.payload
+        })
+        .catch(() => {
+          toast({
+            component: ToastificationContent,
+            props: {
+              title: "Error fetching accounts",
+              icon: 'AlertTriangleIcon',
+              variant: 'danger',
+            },
+          })
+        })
     }
 
     function fetchAllTickets()  {
-        store
-            .dispatch('app-inventory/fetchTicketOptions')
-            .then((response) => {
-                refTicketOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching tickets",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
+      store
+        .dispatch('app-inventory/fetchTicketOptions')
+        .then((response) => {
+          refTicketOptions.value = response.data.payload
+        })
+        .catch(() => {
+          toast({
+            component: ToastificationContent,
+            props: {
+              title: "Error fetching tickets",
+              icon: 'AlertTriangleIcon',
+              variant: 'danger',
+            },
+          })
+        })
     }
 
     function refetchInventoryOptions() {
-        fetchInventoryOptions()
+      fetchInventoryOptions()
     }
 
     const refetchAccountData = () => {
-        fetchAllAccount()
+      fetchAllAccount()
     }
 
     const subtotalRow = ref([])
@@ -847,15 +938,15 @@ export default {
     const tax = ref(0)
 
     const dataMeta = computed(() => {
-        return {
-            numOfValidItems: consumeData.value.items.reduce((numofvalidrow, i) => numofvalidrow + (i.qty > 0 && i.inventory != null && i.memo != '' ? 1:0), 0),
-            subtotalRow:  
+      return {
+        numOfValidItems: consumeData.value.items.reduce((numofvalidrow, i) => numofvalidrow + (i.qty > 0 && i.inventory != null && i.memo != '' ? 1:0), 0),
+        subtotalRow:
               consumeData.value.items.map((item) => {
                 return Number(item.qty * item.avg_value.amount)
               })
-            ,
-            total: consumeData.value.items.reduce((runningsubTotalCount, i) => runningsubTotalCount + (i.qty * i.avg_value.amount), 0)
-        }
+        ,
+        total: consumeData.value.items.reduce((runningsubTotalCount, i) => runningsubTotalCount + (i.qty * i.avg_value.amount), 0)
+      }
     })
 
     const {
@@ -868,7 +959,7 @@ export default {
       getValidationState,
       resetForm,
     } = formValidation()
-    
+
     return {
       dataMeta,
       refInventoriesReceiving,
@@ -888,12 +979,15 @@ export default {
       isAddNewAccountSidebarActive,
       isAddNewTicketSidebarActive,
       isAddNewInventorySidebarActive,
-      
+
       fetchInventoryOptions,
       refetchInventoryOptions,
       refetchAccountData,
       fetchAllAccount,
-      fetchAllTickets
+      fetchAllTickets,
+      inventorySearchOptions,
+      inventoryLoading,
+      searchInventory,
     }
   },
 }
