@@ -96,6 +96,10 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('accounts/listFormData', 'AccountController@listFormData');
   Route::resource('accounts', 'AccountController');
 
+  Route::get(
+    'inventories/search',
+    [InventoryController::class, 'search']
+    );
   Route::get('inventories/all', 'InventoryController@all');
   Route::get('inventoriesEdit/{id}', 'InventoryController@inventoriesEdit');
   Route::post('inventories/tag/add', 'InventoryController@addTag');

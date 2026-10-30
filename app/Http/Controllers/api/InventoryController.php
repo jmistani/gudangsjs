@@ -56,7 +56,7 @@ class InventoryController extends Controller
             $bagianFilter = "P.";
         else if($bagian == 'pengangkutan')
             $bagianFilter = "M.";
-    
+
         $namefilter = request('q') ? request('q') : "";
         $orderby = request('sortBy') ? request('sortBy') : 'id';
         $sortdesc = request('sortDesc') == 'true' ? 'desc' : 'asc';
@@ -68,7 +68,7 @@ class InventoryController extends Controller
 
         $inventory = $inventory->orderBy($orderby, $sortdesc)
                         ->paginate(request('perPage'),'*', 'page',request('page'));
-        
+
         return $this->response->successResponse($inventory);
     }
     /**
@@ -89,14 +89,14 @@ class InventoryController extends Controller
     {
         $inventoryAll = Inventory::latest()->get();
         $inventoryAll = Inventory::with(['stockMutations', 'account'])->latest()->get();
-        
+
         return $this->response->successResponse($inventoryAll);
     }
 
     public function inventoriesEdit(Request $request)
     {
         $inventoryAll = Inventory::select('code','name','unit','category')->where('id',$request['id'])->first();
-        
+
         return $this->response->successResponse($inventoryAll);
     }
     /**
@@ -124,7 +124,7 @@ class InventoryController extends Controller
 
             return $this->response->failedResponseException($e);
         }
-         
+
     }
 
     public function showa($inventory)
@@ -137,7 +137,7 @@ class InventoryController extends Controller
 		$sm->assignReference(JournalHead::find($sm->journal_head_id));
             }
 	}
-	
+
 	return 'OK';
     }
 
@@ -161,7 +161,7 @@ class InventoryController extends Controller
                 $inventory->stockMutations[$key]['journalhead'] = $sm->journalhead;
             }
         }
-        
+
          return $this->response->successResponse($inventory);
      }
 
@@ -298,7 +298,7 @@ class InventoryController extends Controller
             return $this->response->failedResponseException($e);
         }
     }
-    
+
     public function editReceive(Request $request)
     {
         try {
@@ -331,10 +331,10 @@ class InventoryController extends Controller
             }
 
             StockMutation::upsert();
-            
+
             DB::commit();
             return $this->response->successResponse('OK');
-        
+
         } catch (Exception $e) {
             DB::rollback();
 
@@ -347,11 +347,11 @@ class InventoryController extends Controller
         try {
             DB::beginTansaction();
 
-            
-            
+
+
             DB::commit();
             return $this->response->successResponse('OK');
-        
+
         } catch (Exception $e) {
             DB::rollback();
 
@@ -391,7 +391,7 @@ class InventoryController extends Controller
                     $stockMutation->assignToReceiveJournal($receiveJournal);
                     $journalhead->stockMutations()->save($stockMutation);
                     $inventory->in_stock += $item['qty'];
-    
+
                     $stockValue = $inventory->stock_value->add(new Money($item['qty'] * $item['price'], new Currency(Config::get('gudang.currency'))));
                     if($inventory->in_stock != 0)
                         $avgValue = $stockValue->divide($inventory->in_stock);
@@ -400,7 +400,7 @@ class InventoryController extends Controller
 
                     $inventory->stock_value = $stockValue->getAmount();
                     $inventory->avg_value = $avgValue->getAmount();
-                    
+
                     $inventory->save();
                 }
                 else {
@@ -444,6 +444,34 @@ class InventoryController extends Controller
 
             return $this->response->failedResponseException($e);
         }
+    }
+    public function search(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+
+        if (mb_strlen($q) < 2) {
+            return $this->response->successResponse([]);
+        }
+
+        $items = Inventory::query()
+            ->select([
+                'id',
+                'code',
+                'name',
+                'unit',
+                'in_stock',
+                'avg_value',
+            ])
+            ->where(function ($query) use ($q) {
+                $query
+                    ->where('name', 'LIKE', "%{$q}%")
+                    ->orWhere('code', 'LIKE', "%{$q}%");
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return $this->response->successResponse($items);
     }
 
     public function consume(Request $request)
@@ -561,7 +589,7 @@ class InventoryController extends Controller
         $inventory = $stockMutations
                         ->orderBy($orderby, $sortdesc)
                         ->paginate(request('perPage'),'*', 'page',request('page'));
-        
+
         return $this->response->successResponse($inventory);
     }
 
@@ -641,12 +669,12 @@ class InventoryController extends Controller
                     $inventory->stockMutations[$key]['ReceiveJournal'] = $sm->reference;
                 }
             }
-            
+
              return $this->response->successResponse($inventory);
         }
         return $this->response->successResponse(Inventory::with(['stockMutations','account'])->latest()->get());
     }
-    
+
     public function assignTicket($stockMutationID, $ticketID) {
         try {
             $stockMutation = StockMutation::findOrFail($stockMutationID);
@@ -689,7 +717,7 @@ class InventoryController extends Controller
 
             if($reportdata['tanggal_mulai'] && $reportdata['tanggal_akhir'])
             {
-                
+
                 $account = Account::with('transactions')
                                 ->where('code',$account)->get()->first();
                 $reportdata['account'] = $account->name;
@@ -703,7 +731,7 @@ class InventoryController extends Controller
         catch (Exception $e)
         {
             return $this>failedResponse($e);
-        }   
+        }
     }
 
     public function inventoryBalanceReport($date,$bygroup)
@@ -716,7 +744,7 @@ class InventoryController extends Controller
             {
 
 
-                $stockmutations = StockMutation::selectRAW('inventories.category as groupname, 
+                $stockmutations = StockMutation::selectRAW('inventories.category as groupname,
                 sum(stock_mutations.amount) as amount,
                 sum(stock_mutations.total) as total
                 ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
@@ -738,7 +766,7 @@ class InventoryController extends Controller
                     ->groupBy('groupname')
                     ->orderBy('groupname')
                     ->get();
-                
+
                     $i=0;
                     foreach($data['reportData'] as $key =>$rd) {
                         $index = array_search($rd->groupname,Arr::pluck($stockmutations,'groupname'));
@@ -753,16 +781,16 @@ class InventoryController extends Controller
                 }
                 else
                 {
-                    $data['reportData'] = Inventory::selectRaw('inventories.category as groupname, 
+                    $data['reportData'] = Inventory::selectRaw('inventories.category as groupname,
                     inventories.name as inventoryname,
-                    inventories.in_stocK as in_stock, 
-                    inventories.unit as unit, 
-                    inventories.avg_value as avg_value, 
+                    inventories.in_stocK as in_stock,
+                    inventories.unit as unit,
+                    inventories.avg_value as avg_value,
                     inventories.stock_value as stock_value
                     ')
                     ->orderBy('groupname')
                     ->get();
-                
+
                     return view('pdfreport.inventory-balance-perdate',$data);
                 }
             }
@@ -787,8 +815,8 @@ class InventoryController extends Controller
             if($data['tanggal_mulai'] && $data['tanggal_akhir'])
             {
                 $stockMutationsReceive = StockMutation::selectRAW('
-                inventories.name as name, 
-                inventories.category as groupname, 
+                inventories.name as name,
+                inventories.category as groupname,
                 inventories.unit as unit,
                 stock_mutations.amount as amount,
                 stock_mutations.price as price,
@@ -801,10 +829,10 @@ class InventoryController extends Controller
                 ->where('stock_mutations.second_reference_type', '=', 'App\Models\ReceiveJournal')
                 ->orderBy('post_date','asc')
                 ->get();
-    
+
                 $stockMutationsReceiveSum = StockMutation::selectRAW('
-                inventories.name as name, 
-                inventories.category as groupname, 
+                inventories.name as name,
+                inventories.category as groupname,
                 inventories.unit as unit,
                 SUM(stock_mutations.amount) as amount,
                 ROUND(AVG(stock_mutations.price),0) as price,
@@ -819,7 +847,7 @@ class InventoryController extends Controller
                 ->get();
 
                 $nonStockReceive = NonStockInventory::selectRAW('
-                nonstock_inventories.name as name, 
+                nonstock_inventories.name as name,
                 nonstock_inventories.amount as amount,
                 nonstock_inventories.unit as unit,
                 nonstock_inventories.price as price,
@@ -833,7 +861,7 @@ class InventoryController extends Controller
                 ->get();
 
                 $nonStockReceiveSum = NonStockInventory::selectRAW('
-                nonstock_inventories.name as name, 
+                nonstock_inventories.name as name,
                 SUM(nonstock_inventories.amount) as amount,
                 nonstock_inventories.unit as unit,
                 ROUND(AVG(nonstock_inventories.price),0) as price,
@@ -847,8 +875,8 @@ class InventoryController extends Controller
                 ->get();
 
                 $stockMutationsConsume = StockMutation::selectRAW('
-                inventories.name as name, 
-                inventories.category as groupname, 
+                inventories.name as name,
+                inventories.category as groupname,
                 inventories.unit as unit,
                 stock_mutations.amount as amount,
                 stock_mutations.price as price,
@@ -861,10 +889,10 @@ class InventoryController extends Controller
                 ->where('stock_mutations.second_reference_type', '=', 'App\Models\ConsumeJournal')
                 ->orderBy('post_date','asc')
                 ->get();
-    
+
                 $stockMutationsConsumeSum = StockMutation::selectRAW('
-                inventories.name as name, 
-                inventories.category as groupname, 
+                inventories.name as name,
+                inventories.category as groupname,
                 inventories.unit as unit,
                 SUM(stock_mutations.amount) as amount,
                 ROUND(AVG(stock_mutations.price),0) as price,
@@ -877,22 +905,22 @@ class InventoryController extends Controller
                 ->orderBy('groupname','asc')
                 ->groupBy('name')
                 ->get();
-    
+
                 $data['reportData']['receive'] = $stockMutationsReceive;
                 $data['reportData']['receiveSum'] = $stockMutationsReceiveSum;
                 $data['reportData']['consume'] = $stockMutationsConsume;
                 $data['reportData']['consumeSum'] = $stockMutationsConsumeSum;
                 $data['reportData']['nsreceive'] = $nonStockReceive;
                 $data['reportData']['nsreceiveSum'] = $nonStockReceiveSum;
-                
-                // $data['reportData'] = Inventory::selectRaw('inventories.category as groupname, 
+
+                // $data['reportData'] = Inventory::selectRaw('inventories.category as groupname,
                 // ANY_VALUE(inventories.name) as inventoryname,
                 // inventories.in_stocK as in_stock, inventories.unit as unit, inventories.avg_value as avg_value, inventories.stock_value as stock_value')
                 // ->orderBy('groupname')
                 // ->get();
-            
+
                 return view('pdfreport.inventory-mutation-perdate',$data);
-            
+
             }
             else
             {
