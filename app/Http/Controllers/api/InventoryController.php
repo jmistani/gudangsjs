@@ -805,131 +805,251 @@ class InventoryController extends Controller
         }
     }
 
-    public function inventoryMutationReport($date_start,$date_end)
-    {
-        try {
-            // $data['per_date'] = $request('per_date');
-            $data['tanggal_mulai'] = $date_start;
-            $data['tanggal_akhir'] = $date_end;
+    // Replace InventoryController::inventoryMutationReport() with this method.
+public function inventoryMutationReport(\Illuminate\Http\Request $request, $date_start, $date_end)
+{
+    $request->validate([
+        'sections' => 'nullable|string|max:255',
+    ]);
 
-            if($data['tanggal_mulai'] && $data['tanggal_akhir'])
-            {
-                $stockMutationsReceive = StockMutation::selectRAW('
-                inventories.name as name,
-                inventories.category as groupname,
-                inventories.unit as unit,
-                stock_mutations.amount as amount,
-                stock_mutations.price as price,
-                stock_mutations.total as total,
-                journal_heads.post_date as post_date
-                ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
-                ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
-                ->where('post_date', '>=', $data['tanggal_mulai'])
-                ->where('post_date', '<=', $data['tanggal_akhir'])
-                ->where('stock_mutations.second_reference_type', '=', 'App\Models\ReceiveJournal')
-                ->orderBy('post_date','asc')
-                ->get();
-
-                $stockMutationsReceiveSum = StockMutation::selectRAW('
-                inventories.name as name,
-                inventories.category as groupname,
-                inventories.unit as unit,
-                SUM(stock_mutations.amount) as amount,
-                ROUND(AVG(stock_mutations.price),0) as price,
-                SUM(stock_mutations.total) as total
-                ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
-                ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
-                ->where('post_date', '>=', $data['tanggal_mulai'])
-                ->where('post_date', '<=', $data['tanggal_akhir'])
-                ->where('stock_mutations.second_reference_type', '=', 'App\Models\ReceiveJournal')
-                ->orderBy('groupname','asc')
-                ->groupBy('name')
-                ->get();
-
-                $nonStockReceive = NonStockInventory::selectRAW('
-                nonstock_inventories.name as name,
-                nonstock_inventories.amount as amount,
-                nonstock_inventories.unit as unit,
-                nonstock_inventories.price as price,
-                nonstock_inventories.subtotal as subtotal,
-                journal_heads.post_date as post_date
-                ')
-                ->join('journal_heads','journal_heads.id','nonstock_inventories.journal_head_id')
-                ->where('post_date', '>=', $data['tanggal_mulai'])
-                ->where('post_date', '<=', $data['tanggal_akhir'])
-                ->orderBy('post_date','asc')
-                ->get();
-
-                $nonStockReceiveSum = NonStockInventory::selectRAW('
-                nonstock_inventories.name as name,
-                SUM(nonstock_inventories.amount) as amount,
-                nonstock_inventories.unit as unit,
-                ROUND(AVG(nonstock_inventories.price),0) as price,
-                SUM(nonstock_inventories.subtotal) as subtotal
-                ')
-                ->join('journal_heads','journal_heads.id','nonstock_inventories.journal_head_id')
-                ->where('post_date', '>=', $data['tanggal_mulai'])
-                ->where('post_date', '<=', $data['tanggal_akhir'])
-                ->orderBy('post_date','asc')
-                ->groupBy('name')
-                ->get();
-
-                $stockMutationsConsume = StockMutation::selectRAW('
-                inventories.name as name,
-                inventories.category as groupname,
-                inventories.unit as unit,
-                stock_mutations.amount as amount,
-                stock_mutations.price as price,
-                stock_mutations.total as total,
-                journal_heads.post_date as post_date
-                ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
-                ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
-                ->where('post_date', '>=', $data['tanggal_mulai'])
-                ->where('post_date', '<=', $data['tanggal_akhir'])
-                ->where('stock_mutations.second_reference_type', '=', 'App\Models\ConsumeJournal')
-                ->orderBy('post_date','asc')
-                ->get();
-
-                $stockMutationsConsumeSum = StockMutation::selectRAW('
-                inventories.name as name,
-                inventories.category as groupname,
-                inventories.unit as unit,
-                SUM(stock_mutations.amount) as amount,
-                ROUND(AVG(stock_mutations.price),0) as price,
-                SUM(stock_mutations.total) as total
-                ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
-                ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
-                ->where('post_date', '>=', $data['tanggal_mulai'])
-                ->where('post_date', '<=', $data['tanggal_akhir'])
-                ->where('stock_mutations.second_reference_type', '=', 'App\Models\ConsumeJournal')
-                ->orderBy('groupname','asc')
-                ->groupBy('name')
-                ->get();
-
-                $data['reportData']['receive'] = $stockMutationsReceive;
-                $data['reportData']['receiveSum'] = $stockMutationsReceiveSum;
-                $data['reportData']['consume'] = $stockMutationsConsume;
-                $data['reportData']['consumeSum'] = $stockMutationsConsumeSum;
-                $data['reportData']['nsreceive'] = $nonStockReceive;
-                $data['reportData']['nsreceiveSum'] = $nonStockReceiveSum;
-
-                // $data['reportData'] = Inventory::selectRaw('inventories.category as groupname,
-                // ANY_VALUE(inventories.name) as inventoryname,
-                // inventories.in_stocK as in_stock, inventories.unit as unit, inventories.avg_value as avg_value, inventories.stock_value as stock_value')
-                // ->orderBy('groupname')
-                // ->get();
-
-                return view('pdfreport.inventory-mutation-perdate',$data);
-
-            }
-            else
-            {
-                return $this>failedResponse($e);
-            }
+    try {
+        $start = \Carbon\Carbon::createFromFormat('!Y-m-d', $date_start);
+        $end = \Carbon\Carbon::createFromFormat('!Y-m-d', $date_end);
+        if (!$start || !$end || $start->gt($end)) {
+            abort(422, 'Rentang tanggal tidak valid.');
         }
-        catch (Exception $e)
-        {
-            return $this>failedResponse($e);
+    } catch (\Exception $e) {
+        abort(422, 'Format tanggal harus YYYY-MM-DD.');
+    }
+
+    $allowed = [
+        'receive', 'receiveSum', 'nsreceive', 'nsreceiveSum',
+        'consume', 'consumeSum', 'nsconsume', 'nsconsumeSum',
+    ];
+    $requested = $request->query('sections');
+    $sections = $requested === null ? $allowed : array_values(array_intersect(
+        $allowed,
+        array_filter(explode(',', $requested))
+    ));
+    if (count($sections) === 0) {
+        abort(422, 'Pilih minimal satu bagian laporan.');
+    }
+
+    $data = [
+        'tanggal_mulai' => $date_start,
+        'tanggal_akhir' => $date_end,
+        'sections' => $sections,
+        'reportData' => [],
+    ];
+
+    $stockQuery = function ($type) use ($date_start, $date_end) {
+        return \Illuminate\Support\Facades\DB::table('stock_mutations')
+            ->join('inventories', 'stock_mutations.stockable_id', '=', 'inventories.id')
+            ->join('journal_heads', 'journal_heads.id', '=', 'stock_mutations.journal_head_id')
+            ->whereNull('stock_mutations.deleted_at')
+            ->whereNull('inventories.deleted_at')
+            ->whereBetween('journal_heads.post_date', [$date_start, $date_end])
+            ->where('stock_mutations.second_reference_type', '=', $type)
+            ->select(
+                'inventories.id as item_id', 'inventories.code',
+                'inventories.name', 'inventories.unit',
+                'stock_mutations.amount', 'stock_mutations.price',
+                'stock_mutations.total', 'journal_heads.post_date'
+            )
+            ->orderBy('journal_heads.post_date')
+            ->get();
+    };
+
+    $nonStockQuery = function ($direction) use ($date_start, $date_end) {
+        $query = \Illuminate\Support\Facades\DB::table('nonstock_inventories')
+            ->join('journal_heads', 'journal_heads.id', '=', 'nonstock_inventories.journal_head_id')
+            ->whereBetween('journal_heads.post_date', [$date_start, $date_end]);
+
+        // The existing receive() writes receive_journal_id.
+        // The current consume() does not create non-stock rows, but older code may have.
+        if ($direction === 'receive') {
+            $query->whereNotNull('nonstock_inventories.receive_journal_id');
+        } else {
+            $query->where('nonstock_inventories.reference_type', '=', \App\Models\ConsumeJournal::class);
+        }
+
+        return $query->select(
+            'nonstock_inventories.id as item_id', 'nonstock_inventories.name',
+            'nonstock_inventories.unit', 'nonstock_inventories.amount',
+            'nonstock_inventories.price', 'nonstock_inventories.subtotal as total',
+            'journal_heads.post_date'
+        )->orderBy('journal_heads.post_date')->get();
+    };
+
+    // Summarize by inventory ID for stock items; by name and unit for non-stock.
+    $summarize = function ($rows, $stockable) {
+        return $rows->groupBy(function ($row) use ($stockable) {
+            return $stockable
+                ? (string) $row->item_id
+                : mb_strtolower(trim($row->name)) . '|' . (string) $row->unit;
+        })->map(function ($group) {
+            $first = $group->first();
+            $amount = $group->sum(function ($row) { return (float) $row->amount; });
+            $total = $group->sum(function ($row) { return (float) $row->total; });
+            return (object) [
+                'name' => $first->name,
+                'code' => isset($first->code) ? $first->code : null,
+                'unit' => $first->unit,
+                'amount' => $amount,
+                'price' => $amount != 0 ? $total / $amount : 0,
+                'total' => $total,
+                'post_date' => null,
+            ];
+        })->values();
+    };
+
+    foreach ([
+        ['receive', \App\Models\ReceiveJournal::class],
+        ['consume', \App\Models\ConsumeJournal::class],
+    ] as $pair) {
+        list($key, $class) = $pair;
+        if (in_array($key, $sections) || in_array($key . 'Sum', $sections)) {
+            $rows = $stockQuery($class);
+            if (in_array($key, $sections)) $data['reportData'][$key] = $rows;
+            if (in_array($key . 'Sum', $sections)) $data['reportData'][$key . 'Sum'] = $summarize($rows, true);
         }
     }
+    foreach (['nsreceive' => 'receive', 'nsconsume' => 'consume'] as $key => $direction) {
+        if (in_array($key, $sections) || in_array($key . 'Sum', $sections)) {
+            $rows = $nonStockQuery($direction);
+            if (in_array($key, $sections)) $data['reportData'][$key] = $rows;
+            if (in_array($key . 'Sum', $sections)) $data['reportData'][$key . 'Sum'] = $summarize($rows, false);
+        }
+    }
+
+    return view('pdfreport.inventory-mutation-perdate', $data);
+}
+
+    // public function inventoryMutationReport($date_start,$date_end)
+    // {
+    //     try {
+    //         // $data['per_date'] = $request('per_date');
+    //         $data['tanggal_mulai'] = $date_start;
+    //         $data['tanggal_akhir'] = $date_end;
+
+    //         if($data['tanggal_mulai'] && $data['tanggal_akhir'])
+    //         {
+    //             $stockMutationsReceive = StockMutation::selectRAW('
+    //             inventories.name as name,
+    //             inventories.category as groupname,
+    //             inventories.unit as unit,
+    //             stock_mutations.amount as amount,
+    //             stock_mutations.price as price,
+    //             stock_mutations.total as total,
+    //             journal_heads.post_date as post_date
+    //             ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
+    //             ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
+    //             ->where('post_date', '>=', $data['tanggal_mulai'])
+    //             ->where('post_date', '<=', $data['tanggal_akhir'])
+    //             ->where('stock_mutations.second_reference_type', '=', 'App\Models\ReceiveJournal')
+    //             ->orderBy('post_date','asc')
+    //             ->get();
+
+    //             $stockMutationsReceiveSum = StockMutation::selectRAW('
+    //             inventories.name as name,
+    //             inventories.category as groupname,
+    //             inventories.unit as unit,
+    //             SUM(stock_mutations.amount) as amount,
+    //             ROUND(AVG(stock_mutations.price),0) as price,
+    //             SUM(stock_mutations.total) as total
+    //             ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
+    //             ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
+    //             ->where('post_date', '>=', $data['tanggal_mulai'])
+    //             ->where('post_date', '<=', $data['tanggal_akhir'])
+    //             ->where('stock_mutations.second_reference_type', '=', 'App\Models\ReceiveJournal')
+    //             ->orderBy('groupname','asc')
+    //             ->groupBy('name')
+    //             ->get();
+
+    //             $nonStockReceive = NonStockInventory::selectRAW('
+    //             nonstock_inventories.name as name,
+    //             nonstock_inventories.amount as amount,
+    //             nonstock_inventories.unit as unit,
+    //             nonstock_inventories.price as price,
+    //             nonstock_inventories.subtotal as subtotal,
+    //             journal_heads.post_date as post_date
+    //             ')
+    //             ->join('journal_heads','journal_heads.id','nonstock_inventories.journal_head_id')
+    //             ->where('post_date', '>=', $data['tanggal_mulai'])
+    //             ->where('post_date', '<=', $data['tanggal_akhir'])
+    //             ->orderBy('post_date','asc')
+    //             ->get();
+
+    //             $nonStockReceiveSum = NonStockInventory::selectRAW('
+    //             nonstock_inventories.name as name,
+    //             SUM(nonstock_inventories.amount) as amount,
+    //             nonstock_inventories.unit as unit,
+    //             ROUND(AVG(nonstock_inventories.price),0) as price,
+    //             SUM(nonstock_inventories.subtotal) as subtotal
+    //             ')
+    //             ->join('journal_heads','journal_heads.id','nonstock_inventories.journal_head_id')
+    //             ->where('post_date', '>=', $data['tanggal_mulai'])
+    //             ->where('post_date', '<=', $data['tanggal_akhir'])
+    //             ->orderBy('post_date','asc')
+    //             ->groupBy('name')
+    //             ->get();
+
+    //             $stockMutationsConsume = StockMutation::selectRAW('
+    //             inventories.name as name,
+    //             inventories.category as groupname,
+    //             inventories.unit as unit,
+    //             stock_mutations.amount as amount,
+    //             stock_mutations.price as price,
+    //             stock_mutations.total as total,
+    //             journal_heads.post_date as post_date
+    //             ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
+    //             ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
+    //             ->where('post_date', '>=', $data['tanggal_mulai'])
+    //             ->where('post_date', '<=', $data['tanggal_akhir'])
+    //             ->where('stock_mutations.second_reference_type', '=', 'App\Models\ConsumeJournal')
+    //             ->orderBy('post_date','asc')
+    //             ->get();
+
+    //             $stockMutationsConsumeSum = StockMutation::selectRAW('
+    //             inventories.name as name,
+    //             inventories.category as groupname,
+    //             inventories.unit as unit,
+    //             SUM(stock_mutations.amount) as amount,
+    //             ROUND(AVG(stock_mutations.price),0) as price,
+    //             SUM(stock_mutations.total) as total
+    //             ')->join('inventories', 'stock_mutations.stockable_id','inventories.id')
+    //             ->join('journal_heads','journal_heads.id','stock_mutations.journal_head_id')
+    //             ->where('post_date', '>=', $data['tanggal_mulai'])
+    //             ->where('post_date', '<=', $data['tanggal_akhir'])
+    //             ->where('stock_mutations.second_reference_type', '=', 'App\Models\ConsumeJournal')
+    //             ->orderBy('groupname','asc')
+    //             ->groupBy('name')
+    //             ->get();
+
+    //             $data['reportData']['receive'] = $stockMutationsReceive;
+    //             $data['reportData']['receiveSum'] = $stockMutationsReceiveSum;
+    //             $data['reportData']['consume'] = $stockMutationsConsume;
+    //             $data['reportData']['consumeSum'] = $stockMutationsConsumeSum;
+    //             $data['reportData']['nsreceive'] = $nonStockReceive;
+    //             $data['reportData']['nsreceiveSum'] = $nonStockReceiveSum;
+
+    //             // $data['reportData'] = Inventory::selectRaw('inventories.category as groupname,
+    //             // ANY_VALUE(inventories.name) as inventoryname,
+    //             // inventories.in_stocK as in_stock, inventories.unit as unit, inventories.avg_value as avg_value, inventories.stock_value as stock_value')
+    //             // ->orderBy('groupname')
+    //             // ->get();
+
+    //             return view('pdfreport.inventory-mutation-perdate',$data);
+
+    //         }
+    //         else
+    //         {
+    //             return $this>failedResponse($e);
+    //         }
+    //     }
+    //     catch (Exception $e)
+    //     {
+    //         return $this>failedResponse($e);
+    //     }
+    // }
 }

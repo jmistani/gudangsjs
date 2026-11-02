@@ -1,463 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Terima Barang</title>
-    <style>
-        @page {
-            margin: 40px 30px 40px 25px;
-        }
-        .clearfix:after {
-        content: "";
-        display: table;
-        clear: both;
-        }
-
-        a {
-        color: #5D6975;
-        text-decoration: underline;
-        }
-
-        body {
-        position: relative;
-        width: 20cm;  
-        height: 25cm; 
-        margin: 0 auto; 
-        color: #001028;
-        background: #FFFFFF; 
-        font-family: Arial, sans-serif; 
-        font-size: 12px; 
-        font-family: Arial;
-        }
-
-        header {
-        padding: 10px 0;
-        margin-top: 40px;
-        margin-bottom: 30px;
-        }
-
-        #logo {
-        text-align: center;
-        margin-bottom: 10px;
-        }
-
-        #logo img {
-        width: 90px;
-        }
-
-        .reportheader {
-        font-size: 2.0em;
-        font-weight: normal;
-        text-align: left;
-        }
-
-        .tableheader {
-            margin: 20px 0 15px 0;
-        }
-
-        .subheader {
-        border-top: 1px solid;
-        border-bottom: 1px solid;
-        font-size: 1.2em;
-        font-weight: 300;
-        text-align: left;
-        }
-
-        .dateheader {
-        font-size: 1em;
-        font-weight: bold;
-        text-align: left;
-        padding: 20px 0px 5px 0;
-        }
-
-        #project {
-        float: left;
-        }
-
-        #project span {
-        color: #5D6975;
-        text-align: right;
-        width: 52px;
-        margin-right: 10px;
-        display: inline-block;
-        font-size: 0.8em;
-        }
-
-        #company {
-        float: right;
-        text-align: right;
-        font-size: 1.6em;
-        font-weight: bold;
-        }
-
-        #project div,
-        #company div {
-        white-space: nowrap;        
-        }
-
-        table {
-        width: 100%;
-        border-collapse: collapse;
-        border-spacing: 0;
-        margin-bottom: 20px;
-        }
-
-        table tr:nth-child(2n-1) td {
-        background: #F5F5F5 !important;
-        -webkit-print-color-adjust: exact; 
-        }
-
-        table th,
-        table td {
-        text-align: center;
-        padding: 5px;
-        }
-
-        table th {
-        padding: 5px 20px;
-        color: #5D6975;
-        border-bottom: 1px solid #C1CED9;
-        white-space: nowrap;        
-        font-weight: normal;
-        }
-
-        table .service,
-        table .desc {
-        text-align: left;
-        padding: 5px;
-        }
-
-        table td {
-        padding: 20px;
-        text-align: right;
-        padding: 5px;
-        }
-
-        table td.service,
-        table td.desc {
-        vertical-align: top;
-        padding: 5px;
-        }
-
-        table td.unit,
-        table td.qty,
-        table td.total {
-        font-size: 1.2em;
-        padding: 5px;
-        }
-
-        table td.grand {
-        border-top: 1px solid #5D6975;;
-        }
-
-        #notices .notice {
-        color: #5D6975;
-        font-size: 1.2em;
-        }
-
-        footer {
-            color: #5D6975;
-            width: 100%;
-            height: 30px;
-            padding: 8px 0;
-            text-align: center;
-            position: fixed;
-            bottom: 0;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laporan Mutasi Barang</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0 auto; padding: 24px; max-width: 1100px; color: #1f2937; font: 12px/1.5 Arial, sans-serif; background: #fff; }
+  h1 { margin: 0 0 6px; font-size: 22px; }
+  .period { color: #596477; margin-bottom: 24px; }
+  .report-section { margin: 0 0 28px; break-inside: avoid-page; }
+  .section-title { margin: 0 0 8px; padding: 9px 11px; background: #eef2f7; border-left: 4px solid #5b6fc7; font-size: 14px; }
+  .table-wrap { width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid #e1e6ed; vertical-align: top; }
+  th { color: #44516a; text-align: left; background: #f8fafc; }
+  .num { text-align: right; white-space: nowrap; }
+  .date-row td { background: #f4f6f9; color: #344054; font-weight: bold; }
+  .total td { background: #eef2f7; font-weight: bold; border-top: 2px solid #a8b2c3; }
+  .empty { padding: 18px; color: #64748b; text-align: center; }
+  @media print { body { padding: 0; max-width: none; } .report-section { break-inside: auto; } thead { display: table-header-group; } tr { break-inside: avoid; } }
+</style>
 </head>
-
 <body>
-    <header class="clearfix">
-        <h2 class="reportheader">Laporan Mutasi Barang</h2>
-        <div id="giver" class="clearfix">
-            <div></div>
-        </div>
-    </header>
-    <main>
-    <table>
-            <thead>
-                <tr>
-                    <th class="subheader" colspan="5">
-                        Penerimaan Stok [ {{Carbon\Carbon::parse($tanggal_mulai)->format('j F, Y')}} s/d {{Carbon\Carbon::parse($tanggal_akhir)->format('j F, Y')}} ]
-                    </th>
-                </tr>
-                <tr>
-                    <th class="desc">Nama Barang</th>
-                    <th class="desc">Jumlah</th>
-                    <th class="desc">Unit</th>
-                    <th class="desc">Harga per Unit</th>
-                    <th>Nilai Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php($prevdate = null)
-                @php($currdate = null)
-                @php($total = 0)
-                @php($index = 1)
-                @foreach($reportData['receive'] as $rd)
-                    @php($currdate = $rd->post_date)
-                    @if($currdate != $prevdate )
-                        <tr>
-                            <td colspan="5" class="dateheader">{{date('d-M-y', strtotime($currdate))}}</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="desc">{{$rd->name}}</td>
-                        <td class="desc">{{$rd->amount}}</td>
-                        <td class="desc">{{$rd->unit}}</td>
-                        <td class="unit">Rp. {{number_format($rd->price->getAmount(), 2)}}</td>
-                        <td class="unit">Rp. {{number_format($rd->total->getAmount(), 2)}}</td>
-                    </tr>
-                    @php($index = $index + 1)
-                    @php($total = $total+$rd->total->getAmount())
-                    @php($prevdate = $currdate)
-                @endforeach
-                <tr>
-                    <td colspan="4">TOTAL Penerimaan Barang Stok</td>
-                    <td class="total">Rp. {{number_format($total,2)}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th class="subheader" colspan="5">
-                        Penerimaan Stok [ {{Carbon\Carbon::parse($tanggal_mulai)->format('j F, Y')}} s/d {{Carbon\Carbon::parse($tanggal_akhir)->format('j F, Y')}} ] (RANGKUMAN)
-                    </th>
-                </tr>
-                <tr>
-                    <th class="desc">Nama Barang</th>
-                    <th class="desc">Jumlah</th>
-                    <th class="desc">Unit</th>
-                    <th class="desc">Harga per Unit</th>
-                    <th>Nilai Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php($prevdate = null)
-                @php($currdate = null)
-                @php($total = 0)
-                @php($index = 1)
-                @foreach($reportData['receiveSum'] as $rd)
-                    @php($currdate = $rd->post_date)
-                    @if($currdate != $prevdate )
-                        <tr>
-                            <td colspan="5" class="dateheader">{{date('d-M-y', strtotime($currdate))}}</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="desc">{{$rd->name}}</td>
-                        <td class="desc">{{$rd->amount}}</td>
-                        <td class="desc">{{$rd->unit}}</td>
-                        <td class="unit">Rp. {{number_format($rd->price->getAmount(), 2)}}</td>
-                        <td class="unit">Rp. {{number_format($rd->total->getAmount(), 2)}}</td>
-                    </tr>
-                    @php($index = $index + 1)
-                    @php($total = $total+$rd->total->getAmount())
-                    @php($prevdate = $currdate)
-                @endforeach
-                <tr>
-                    <td colspan="4">TOTAL Penerimaan Barang Stok (RANGKUMAN) </td>
-                    <td class="total">Rp. {{number_format($total,2)}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <div style="page-break-before: always;"></div>
-        <table>
-            <thead>
-                <tr>
-                    <th class="subheader" colspan="5">
-                        Pemakaian Barang Non Stok [ {{Carbon\Carbon::parse($tanggal_mulai)->format('j F, Y')}} s/d {{Carbon\Carbon::parse($tanggal_akhir)->format('j F, Y')}} ]
-                    </th>
-                </tr>
-                <tr>
-                    <th class="desc">Nama Barang</th>
-                    <th class="desc">Jumlah</th>
-                    <th class="desc">Unit</th>
-                    <th class="desc">Harga per Unit</th>
-                    <th>Nilai Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="5">&nbsp;</td>
-                </tr>
-                @php($prevdate = null)
-                @php($currdate = null)
-                @php($total = 0)
-                @php($index = 1)
-                @foreach($reportData['nsreceive'] as $rd)
-                    @php($currdate = $rd->post_date)
-                    @if($currdate != $prevdate )
-                        <tr>
-                            <td colspan="5" class="dateheader">{{date('d-M-y', strtotime($currdate))}}</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="desc">{{$rd->name}}</td>
-                        <td class="desc">{{$rd->amount}}</td>
-                        <td class="desc">{{$rd->unit}}</td>
-                        <td class="unit">Rp. {{number_format($rd->price->getAmount(), 2)}}</td>
-                        <td class="unit">Rp. {{number_format($rd->subtotal->getAmount(), 2)}}</td>
-                    </tr>
-                    @php($index = $index + 1)
-                    @php($total = $total+$rd->subtotal->getAmount())
-                    @php($prevdate = $currdate)
-                @endforeach
-                <tr>
-                    <td colspan="4">TOTAL Pemakaian Barang Non-Stok</td>
-                    <td class="total">Rp. {{number_format($total,2)}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th class="subheader" colspan="5">
-                        Pemakaian Barang Non Stok [ {{Carbon\Carbon::parse($tanggal_mulai)->format('j F, Y')}} s/d {{Carbon\Carbon::parse($tanggal_akhir)->format('j F, Y')}} ] (RANGKUMAN)
-                    </th>
-                </tr>
-                <tr>
-                    <th class="desc">Nama Barang</th>
-                    <th class="desc">Jumlah</th>
-                    <th class="desc">Unit</th>
-                    <th class="desc">Harga per Unit</th>
-                    <th>Nilai Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="5">&nbsp;</td>
-                </tr>
-                @php($prevdate = null)
-                @php($currdate = null)
-                @php($total = 0)
-                @php($index = 1)
-                @foreach($reportData['nsreceiveSum'] as $rd)
-                    @php($currdate = $rd->post_date)
-                    @if($currdate != $prevdate )
-                        <tr>
-                            <td colspan="5" class="dateheader">{{date('d-M-y', strtotime($currdate))}}</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="desc">{{$rd->name}}</td>
-                        <td class="desc">{{$rd->amount}}</td>
-                        <td class="desc">{{$rd->unit}}</td>
-                        <td class="unit">Rp. {{number_format($rd->price->getAmount(), 2)}}</td>
-                        <td class="unit">Rp. {{number_format($rd->subtotal->getAmount(), 2)}}</td>
-                    </tr>
-                    @php($index = $index + 1)
-                    @php($total = $total+$rd->subtotal->getAmount())
-                    @php($prevdate = $currdate)
-                @endforeach
-                <tr>
-                    <td colspan="4">TOTAL Pemakaian Barang Non-Stok (RANGKUMAN) </td>
-                    <td class="total">Rp. {{number_format($total,2)}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <div style="page-break-before: always;"></div>
-        <table>
-            <thead>
-                <tr>
-                    <th class="subheader" colspan="5">
-                        Pemakaian Barang Stok [ {{Carbon\Carbon::parse($tanggal_mulai)->format('j F, Y')}} s/d {{Carbon\Carbon::parse($tanggal_akhir)->format('j F, Y')}} ]
-                    </th>
-                </tr>
-                <tr>
-                    <th class="desc">Nama Barang</th>
-                    <th class="desc">Jumlah</th>
-                    <th class="desc">Unit</th>
-                    <th class="desc">Harga per Unit</th>
-                    <th>Nilai Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="5">&nbsp;</td>
-                </tr>
-                @php($prevdate = null)
-                @php($currdate = null)
-                @php($total = 0)
-                @php($index = 1)
-                @foreach($reportData['consume'] as $rd)
-                    @php($currdate = $rd->post_date)
-                    @if($currdate != $prevdate )
-                        <tr>
-                            <td colspan="5" class="dateheader">{{date('d-M-y', strtotime($currdate))}}</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="desc">{{$rd->name}}</td>
-                        <td class="desc">{{$rd->amount * -1}}</td>
-                        <td class="desc">{{$rd->unit}}</td>
-                        <td class="unit">Rp. {{number_format($rd->price->getAmount(), 2)}}</td>
-                        <td class="unit">Rp. {{number_format($rd->total->getAmount() * -1, 2)}}</td>
-                    </tr>
-                    @php($index = $index + 1)
-                    @php($total = $total+$rd->total->getAmount())
-                    @php($prevdate = $currdate)
-                @endforeach
-                <tr>
-                    <td colspan="4">TOTAL Pemakaian Barang Stok</td>
-                    <td class="total">Rp. {{number_format($total * -1,2)}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th class="subheader" colspan="5">
-                        Pemakaian Barang Stok [ {{Carbon\Carbon::parse($tanggal_mulai)->format('j F, Y')}} s/d {{Carbon\Carbon::parse($tanggal_akhir)->format('j F, Y')}} ] (RANGKUMAN)
-                    </th>
-                </tr>
-                <tr>
-                    <th class="desc">Nama Barang</th>
-                    <th class="desc">Jumlah</th>
-                    <th class="desc">Unit</th>
-                    <th class="desc">Harga per Unit</th>
-                    <th>Nilai Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="5">&nbsp;</td>
-                </tr>
-                @php($prevdate = null)
-                @php($currdate = null)
-                @php($total = 0)
-                @php($index = 1)
-                @foreach($reportData['consumeSum'] as $rd)
-                    @php($currdate = $rd->post_date)
-                    @if($currdate != $prevdate )
-                        <tr>
-                            <td colspan="5" class="dateheader">{{date('d-M-y', strtotime($currdate))}}</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="desc">{{$rd->name}}</td>
-                        <td class="desc">{{$rd->amount * -1}}</td>
-                        <td class="desc">{{$rd->unit}}</td>
-                        <td class="unit">Rp. {{number_format($rd->price->getAmount(), 2)}}</td>
-                        <td class="unit">Rp. {{number_format($rd->total->getAmount() * -1, 2)}}</td>
-                    </tr>
-                    @php($index = $index + 1)
-                    @php($total = $total+$rd->total->getAmount())
-                    @php($prevdate = $currdate)
-                @endforeach
-                <tr>
-                    <td colspan="4">TOTAL Pemakaian Barang Stok (RANGKUMAN) </td>
-                    <td class="total">Rp. {{number_format($total * -1,2)}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </main>
-    <footer>
-    </footer>
+<h1>Laporan Mutasi Barang</h1>
+<div class="period">Periode: {{ \Carbon\Carbon::parse($tanggal_mulai)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($tanggal_akhir)->format('d-m-Y') }}</div>
+@php
+  $definitions = [
+    'receive' => ['Penerimaan Stok — Detail', false, false],
+    'receiveSum' => ['Penerimaan Stok — Rangkuman', true, false],
+    'nsreceive' => ['Penerimaan Non-Stok — Detail', false, false],
+    'nsreceiveSum' => ['Penerimaan Non-Stok — Rangkuman', true, false],
+    'consume' => ['Pemakaian Stok — Detail', false, true],
+    'consumeSum' => ['Pemakaian Stok — Rangkuman', true, true],
+    'nsconsume' => ['Pemakaian Non-Stok — Detail', false, false],
+    'nsconsumeSum' => ['Pemakaian Non-Stok — Rangkuman', true, false],
+  ];
+@endphp
+@foreach($definitions as $key => $definition)
+  @if(in_array($key, $sections))
+    @php
+      $rows = $reportData[$key] ?? collect();
+      $isSummary = $definition[1];
+      $isStockConsume = $definition[2];
+      $sectionTotal = 0;
+      $previousDate = null;
+    @endphp
+    <section class="report-section" data-section="{{ $key }}">
+      <h2 class="section-title">{{ $definition[0] }}</h2>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Nama Barang</th><th class="num">Jumlah</th><th>Satuan</th><th class="num">Harga per Unit</th><th class="num">Total Nilai</th>
+        </tr></thead>
+        <tbody>
+        @forelse($rows as $row)
+          @php
+            $date = $row->post_date ?? null;
+            $qty = (float) $row->amount * ($isStockConsume ? -1 : 1);
+            $value = (float) $row->total * ($isStockConsume ? -1 : 1);
+            $sectionTotal += $value;
+          @endphp
+          @if(!$isSummary && $date && $date !== $previousDate)
+            <tr class="date-row"><td colspan="5">{{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</td></tr>
+            @php($previousDate = $date)
+          @endif
+          <tr>
+            <td>{{ $row->name }}</td>
+            <td class="num">{{ number_format($qty, 2, ',', '.') }}</td>
+            <td>{{ $row->unit }}</td>
+            <td class="num">Rp {{ number_format(abs((float) $row->price), 2, ',', '.') }}</td>
+            <td class="num">Rp {{ number_format($value, 2, ',', '.') }}</td>
+          </tr>
+        @empty
+          <tr><td colspan="5" class="empty">Tidak ada data pada periode ini.</td></tr>
+        @endforelse
+        <tr class="total"><td colspan="4">TOTAL {{ $definition[0] }}</td><td class="num">Rp {{ number_format($sectionTotal, 2, ',', '.') }}</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  @endif
+@endforeach
 </body>
-
 </html>
