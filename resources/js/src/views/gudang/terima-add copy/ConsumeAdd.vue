@@ -37,11 +37,11 @@
                     :clearable="false"
                     class="select-option-capitalize"
                   >
-                      <template #option="{ name, address }">
-                             <!-- HTML that describe how select should render items when the select is open -->
-                        {{ name | titlecase }} - {{ address | titlecase}}
-                      </template>
-                      <template #list-header>
+                    <template #option="{ name, address }">
+                      <!-- HTML that describe how select should render items when the select is open -->
+                      {{ name | titlecase }} - {{ address | titlecase}}
+                    </template>
+                    <template #list-header>
                       <li
                         v-b-toggle.sidebar-add-new-vendor
                         class="add-new-vendor-header d-flex align-items-center my-50"
@@ -80,254 +80,264 @@
                   xl="6"
                   class="mt-xl-0 mt-2 justify-content-end d-xl-flex d-block"
                 >
-                <div class="invoice-number-date mt-md-0 mt-2">
-                  <div class="d-flex align-items-center justify-content-md-fill mb-1">
-                    <h4 class="invoice-title">
-                      Invoice
-                    </h4>
-                    <b-input-group class="input-group-merge invoice-edit-input-group disabled">
-                      <b-input-group-prepend is-text>
-                        <feather-icon icon="HashIcon" />
-                      </b-input-group-prepend>
-                      <b-form-input
-                        id="invoice-data-id"
-                        v-model="receiveData.id"
-                        disabled
+                  <div class="invoice-number-date mt-md-0 mt-2">
+                    <div class="d-flex align-items-center justify-content-md-fill mb-1">
+                      <h4 class="invoice-title">
+                        Invoice
+                      </h4>
+                      <b-input-group class="input-group-merge invoice-edit-input-group disabled">
+                        <b-input-group-prepend is-text>
+                          <feather-icon icon="HashIcon" />
+                        </b-input-group-prepend>
+                        <b-form-input
+                          id="invoice-data-id"
+                          v-model="receiveData.id"
+                          disabled
+                        />
+                      </b-input-group>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-md-end mb-1">
+                      <span class="title">
+                        Tanggal:
+                      </span>
+                      <flat-pickr
+                        v-model="receiveData.date"
+                        :config="flatpickrConfig"
+                        class="form-control invoice-edit-input"
                       />
-                    </b-input-group>
+                    </div>
                   </div>
-                  <div class="d-flex align-items-center justify-content-md-end mb-1">
-                    <span class="title">
-                      Tanggal:
-                    </span>
-                    <flat-pickr
-                      v-model="receiveData.date"
-                      :config="flatpickrConfig"
-                      class="form-control invoice-edit-input"
-                    />
-                  </div>
-                </div>
                 </b-col>
                 <b-col
                   cols="12"
                   xl="2"
                   class="mt-xl-0 mt-2  align-items-end flex-column  d-xl-flex d-block"
                 >
-                    <!-- Button: Send Invoice -->
-                    <b-button
-                      v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-                      variant="primary"
-                      class="mb-75"
-                      block
-                      @click="receiveInventory"
-                    >
-                      Simpan
-                    </b-button>
+                  <!-- Button: Send Invoice -->
+                  <b-button
+                    v-ripple.400="'rgba(255, 255, 255, 0.15)'"
+                    variant="primary"
+                    class="mb-75"
+                    block
+                    @click="receiveInventory"
+                  >
+                    Simpan
+                  </b-button>
 
-                    <!-- Button: DOwnload -->
-                    <b-button
-                      v-ripple.400="'rgba(113, 102, 240, 0.15)'"
-                      variant="outline-primary"
-                      class="mb-75"
-                      block
-                      :to="{ name: 'inventory-list'}"
-                    >
-                      Cancel
-                    </b-button>
-                </b-col> 
+                  <!-- Button: DOwnload -->
+                  <b-button
+                    v-ripple.400="'rgba(113, 102, 240, 0.15)'"
+                    variant="outline-primary"
+                    class="mb-75"
+                    block
+                    :to="{ name: 'inventory-list'}"
+                  >
+                    Cancel
+                  </b-button>
+                </b-col>
               </b-row>
             </b-card-body>
-          <hr class="invoice-spacing mx-0 my-0 px-0 py-0">
+            <hr class="invoice-spacing mx-0 my-0 px-0 py-0">
 
-          <b-card-body class="invoice-padding pb-0">
-            <b-row class="pb-0">
-              <b-col cols="12">
-                <div class="flex-grow-1">
-                  <b-row class="flex-grow-1 px-0">
-                    <!-- Single Item Form Headers -->
-                    <b-col
-                      cols="12"
-                      lg="4"
-                    >
-                      Nama
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="2"
-                    >
-                      Harga
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="2"
-                    >
-                      Jumlah
-                    </b-col>
-                    <b-col
-                      cols="12"
-                      lg="4"
-                    >
-                      Satuan
-                    </b-col>
-                  </b-row>
-                  <div class="form-item-action-col" />
-                </div>                  
-              </b-col>
-            </b-row>
-          </b-card-body>
-          <b-card-body class="invoice-padding pb-0">
-            <div
-              ref="form"
-              class="repeater-form"
-            >
-              <b-row
-                v-for="(item, index) in receiveData.items"
-                :key="index"
-                ref="row"
-                class="pb-0"
-              >
+            <b-card-body class="invoice-padding pb-0">
+              <b-row class="pb-0">
                 <b-col cols="12">
-                  <div class="d-flex border rounded py-0 px-0" border="1">
+                  <div class="flex-grow-1">
                     <b-row class="flex-grow-1 px-0">
                       <!-- Single Item Form Headers -->
                       <b-col
                         cols="12"
                         lg="4"
                       >
-                        <label class="d-inline d-lg-none">Item</label>
-                        <v-select
-                          v-model="item.inventory"
-                          :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                          :options="refInventoryOptions"
-                          label="name"
-                          :clearable="false"
-                          class="mb-0 item-selector-title"
-                          placeholder="Select Item"
-                          @input="val => updateItemForm(index, {price:0, qty:0, unit:'BH', memo: ''} )"
-                        >
-                          <template #option="{ name }">
-                                <!-- HTML that describe how select should render items when the select is open -->
-                            {{ name | titlecase }}
-                          </template>
-                          <template #list-header>
-                            <li
-                              v-b-toggle.sidebar-add-new-inventory
-                              class="add-new-inventory-header d-flex align-items-center my-50"
-                            >
-                              <feather-icon
-                                icon="PlusIcon"
-                                size="16"
-                              />
-                              <span class="align-middle ml-25">Add New Inventory</span>
-                            </li>
-                          </template>
-                        </v-select>
+                        Nama
                       </b-col>
                       <b-col
                         cols="12"
                         lg="2"
                       >
-                        <label class="d-inline d-lg-none">Cost</label>
-                        <b-form-input
-                          v-model="item.price"
-                          type="number"
-                          class="mb-0"
-                        />
+                        Harga
                       </b-col>
                       <b-col
                         cols="12"
                         lg="2"
                       >
-                        <label class="d-inline d-lg-none">Qty</label>
-                        <b-form-input
-                          v-model="item.qty"
-                          type="number"
-                          class="mb-0"
-                        />
+                        Jumlah
                       </b-col>
                       <b-col
                         cols="12"
-                        lg="2"
+                        lg="4"
                       >
-                        <label class="d-inline d-lg-none">Satuan</label>
-                          <v-select
-                          v-model="item.unit"
-                          :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                          :options="satuanOptions"
-                          :clearable="false"
-                          class="mb-0 item-selector-title"
-                          placeholder="Satuan"
-                        />
-                      </b-col>
-                      <b-col
-                        cols="12"
-                        lg="1"
-                      >
-                        <label class="d-inline d-lg-none">Price</label>
-                        <p class="mb-0">
-                          ${{ item.price * item.qty }}
-                        </p>
+                        Satuan
                       </b-col>
                     </b-row>
-                    <div class="d-flex flex-column justify-content-between border-left py-1 px-1">
-                      <feather-icon
-                        size="16"
-                        icon="XIcon"
-                        class="cursor-pointer"
-                        @click="removeItem(index)"
-                      />
-                      <feather-icon
-                        :id="`form-item-file-icon-${index}`"
-                        size="16"
-                        icon="FileIcon"
-                        class="cursor-pointer"
-                      />
-
-                      <!-- Setting Item Form -->
-                      <b-popover
-                        :ref="`form-item-settings-popover-${index}`"
-                        :target="`form-item-file-icon-${index}`"
-                        triggers="click"
-                        placement="lefttop"
-                      >
-                        <b-form @submit.prevent>
-                          <b-row>
-
-                            <!-- Field: Discount -->
-                            <b-col cols="12">
-                              <b-form-group
-                                label="Keterangan"
-                                :label-for="`setting-item-${index}-keterangan`"
-                              >
-                                <b-form-input
-                                  :id="`setting-item-${index}-keterangan`"
-                                  :value="null"
-                                  type="text"
-                                  v-model="item.memo"
-                                />
-                              </b-form-group>
-                            </b-col>
-
-
-                            <b-col
-                              cols="12"
-                              class="d-flex justify-content-between mt-1"
-                            >
-                              <b-button
-                                variant="outline-primary"
-                                @click="() => {$refs[`form-item-settings-popover-${index}`][0].$emit('close')}"
-                              >
-                                Tutup
-                              </b-button>
-                            </b-col>
-                          </b-row>
-                        </b-form>
-                      </b-popover>
-                    </div>
+                    <div class="form-item-action-col" />
                   </div>
                 </b-col>
               </b-row>
-            </div>
+            </b-card-body>
+            <b-card-body class="invoice-padding pb-0">
+              <div
+                ref="form"
+                class="repeater-form"
+              >
+                <b-row
+                  v-for="(item, index) in receiveData.items"
+                  :key="index"
+                  ref="row"
+                  class="pb-0"
+                >
+                  <b-col cols="12">
+                    <div class="d-flex border rounded py-0 px-0" border="1">
+                      <b-row class="flex-grow-1 px-0">
+                        <!-- Single Item Form Headers -->
+                        <b-col
+                          cols="12"
+                          lg="4"
+                        >
+                          <label class="d-inline d-lg-none">Item</label>
+                          <v-select
+                            :id="`inventory-consume-inventory-input-${index}`"
+                            v-model="item.inventory"
+                            :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                            :options="inventorySearchOptions[index] || []"
+                            :filterable="false"
+                            :loading="inventoryLoading[index] || false"
+                            label="name"
+                            :clearable="false"
+                            class="mb-0 item-selector-title"
+                            placeholder="Ketik kode atau nama barang..."
+                            :state="getValidationState(validationContext)"
+                            @search="query => searchInventory(query, index)"
+                            @input="val => updateItemForm(index, val)"
+                          >
+                            <template #option="{ code, name, in_stock, unit }">
+                              <div>
+                                <strong>{{ code }}</strong> - {{ name }}
+                                <small class="text-muted d-block">
+                                  Stok: {{ in_stock }} {{ unit }}
+                                </small>
+                              </div>
+                            </template>
+                            <template #no-options>
+                              Ketik minimal 2 karakter untuk mencari barang.
+                            </template>
+                            <template #list-header>
+                              <li
+                                v-if="$can('create', 'inventory')"
+                                v-b-toggle.sidebar-add-new-inventory
+                                class="add-new-inventory-header d-flex align-items-center my-50"
+                              >
+                                <feather-icon icon="PlusIcon" size="16" />
+                                <span class="align-middle ml-25">Add New Inventory</span>
+                              </li>
+                            </template>
+                          </v-select>
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="2"
+                        >
+                          <label class="d-inline d-lg-none">Cost</label>
+                          <b-form-input
+                            v-model="item.price"
+                            type="number"
+                            class="mb-0"
+                          />
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="2"
+                        >
+                          <label class="d-inline d-lg-none">Qty</label>
+                          <b-form-input
+                            v-model="item.qty"
+                            type="number"
+                            class="mb-0"
+                          />
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="2"
+                        >
+                          <label class="d-inline d-lg-none">Satuan</label>
+                          <v-select
+                            v-model="item.unit"
+                            :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                            :options="satuanOptions"
+                            :clearable="false"
+                            class="mb-0 item-selector-title"
+                            placeholder="Satuan"
+                          />
+                        </b-col>
+                        <b-col
+                          cols="12"
+                          lg="1"
+                        >
+                          <label class="d-inline d-lg-none">Price</label>
+                          <p class="mb-0">
+                            ${{ item.price * item.qty }}
+                          </p>
+                        </b-col>
+                      </b-row>
+                      <div class="d-flex flex-column justify-content-between border-left py-1 px-1">
+                        <feather-icon
+                          size="16"
+                          icon="XIcon"
+                          class="cursor-pointer"
+                          @click="removeItem(index)"
+                        />
+                        <feather-icon
+                          :id="`form-item-file-icon-${index}`"
+                          size="16"
+                          icon="FileIcon"
+                          class="cursor-pointer"
+                        />
+
+                        <!-- Setting Item Form -->
+                        <b-popover
+                          :ref="`form-item-settings-popover-${index}`"
+                          :target="`form-item-file-icon-${index}`"
+                          triggers="click"
+                          placement="lefttop"
+                        >
+                          <b-form @submit.prevent>
+                            <b-row>
+
+                              <!-- Field: Discount -->
+                              <b-col cols="12">
+                                <b-form-group
+                                  label="Keterangan"
+                                  :label-for="`setting-item-${index}-keterangan`"
+                                >
+                                  <b-form-input
+                                    :id="`setting-item-${index}-keterangan`"
+                                    :value="null"
+                                    type="text"
+                                    v-model="item.memo"
+                                  />
+                                </b-form-group>
+                              </b-col>
+
+
+                              <b-col
+                                cols="12"
+                                class="d-flex justify-content-between mt-1"
+                              >
+                                <b-button
+                                  variant="outline-primary"
+                                  @click="() => {$refs[`form-item-settings-popover-${index}`][0].$emit('close')}"
+                                >
+                                  Tutup
+                                </b-button>
+                              </b-col>
+                            </b-row>
+                          </b-form>
+                        </b-popover>
+                      </div>
+                    </div>
+                  </b-col>
+                </b-row>
+              </div>
               <b-button
                 v-ripple.400="'rgba(255, 255, 255, 0.15)'"
                 size="sm"
@@ -336,7 +346,7 @@
               >
                 Add Item
               </b-button>
-          </b-card-body>
+            </b-card-body>
 
             <!-- Invoice Description: Total -->
             <b-card-body class="invoice-padding pb-0">
@@ -420,15 +430,15 @@
         </b-form>
       </b-col>
 
-      </b-row>
+    </b-row>
     <sidebar-add-new-vendor
       :is-add-new-vendor-sidebar-active.sync="isAddNewVendorSidebarActive"
       @refetch-data="refetchVendorData"
-     />
+    />
     <sidebar-add-new-inventory
       :is-add-new-inventory-sidebar-active.sync="isAddNewInventorySidebarActive"
       @refetch-data="refetchInventoryData"
-     />
+    />
   </section>
 </template>
 
@@ -478,15 +488,15 @@ export default {
   data() {
     return {
       flatpickrConfig: {
-         defaultDate: 'today'
+        defaultDate: 'today'
       }
     }
   },
   mixins: [heightTransition],
   mounted() {
-    this.fetchAllVendor()
-    this.fetchAllInventory()
+    this.fetchAllAccount()
     this.initTrHeight()
+    this.fetchAllTickets()
   },
   created() {
     window.addEventListener('resize', this.initTrHeight)
@@ -508,6 +518,7 @@ export default {
     },
     removeItem(index) {
       this.receiveData.items.splice(index, 1)
+      Object.values(this.inventorySearchTimers || {}).forEach(clearTimeout)
       this.trTrimHeight(this.$refs.row[0].offsetHeight)
     },
     initTrHeight() {
@@ -517,17 +528,17 @@ export default {
       })
     },
     receiveInventory() {
-       store
+      store
         .dispatch('app-inventory/receiveInventory',this.receiveData)
         .then(response)
         .catch(() => {
           toast({
-              component: ToastificationContent,
-              props: {
-                  title: "Error Menyimpan Data",
-                  icon: 'AlertTriangleIcon',
-                  variant: 'danger',
-              },
+            component: ToastificationContent,
+            props: {
+              title: "Error Menyimpan Data",
+              icon: 'AlertTriangleIcon',
+              variant: 'danger',
+            },
           })
         })
     }
@@ -548,96 +559,162 @@ export default {
     })
 
     const refInventoryOptions = ref([])
+    const inventorySearchOptions = ref({})
+    const inventoryLoading = ref({})
 
+    const inventorySearchTimers = {}
+    const inventorySearchVersions = {}
+
+    function searchInventory(query, index) {
+      const keyword = query.trim()
+
+      clearTimeout(inventorySearchTimers[index])
+
+      const version = (inventorySearchVersions[index] || 0) + 1
+      inventorySearchVersions[index] = version
+
+      if (keyword.length < 2) {
+        inventorySearchOptions.value = {
+          ...inventorySearchOptions.value,
+          [index]: [],
+        }
+
+        inventoryLoading.value = {
+          ...inventoryLoading.value,
+          [index]: false,
+        }
+        return
+      }
+
+      inventoryLoading.value = {
+        ...inventoryLoading.value,
+        [index]: true,
+      }
+
+      inventorySearchTimers[index] = setTimeout(async () => {
+        try {
+          const response = await store.dispatch(
+            'app-inventory/searchInventory',
+            keyword
+          )
+
+          if (inventorySearchVersions[index] !== version) return
+
+          inventorySearchOptions.value = {
+            ...inventorySearchOptions.value,
+            [index]: response.data.payload || [],
+          }
+        } catch (error) {
+          if (inventorySearchVersions[index] === version) {
+            inventorySearchOptions.value = {
+              ...inventorySearchOptions.value,
+              [index]: [],
+            }
+            console.error('Inventory search failed:', error)
+          }
+        } finally {
+          if (inventorySearchVersions[index] === version) {
+            inventoryLoading.value = {
+              ...inventoryLoading.value,
+              [index]: false,
+            }
+          }
+        }
+      }, 300)
+    }
     const refVendorOptions = ref([])
 
     const isAddNewVendorSidebarActive = ref(false)
     const isAddNewInventorySidebarActive = ref(false)
 
     const itemFormBlankItem = {
-        code: '',
-        price: 0,
-        qty: 0,
-        unit: 0,
-        memo: ''
+      code: '',
+      price: 0,
+      qty: 0,
+      unit: 0,
+      memo: ''
     }
     const receiveData = ref({
-        id: '',
-        vendor: null,
+      id: '',
+      vendor: null,
 
-        // ? Set single Item in form for adding data
-        items: [JSON.parse(JSON.stringify(itemFormBlankItem))],
+      // ? Set single Item in form for adding data
+      items: [JSON.parse(JSON.stringify(itemFormBlankItem))],
 
-        salesPerson: '',
-        note: '',
-        paymentMethod: null,
-        payment: '',
+      salesPerson: '',
+      note: '',
+      paymentMethod: null,
+      payment: '',
     })
 
     const satuanOptions = [
-        'BH', 'LSN', 'BTG', 'CM', 'M', 'M3', 'PSG', 'LTR', 'DRUM', 'BTL', 'KOTAK', 'TON'
+      'BH', 'LSN', 'BTG', 'CM', 'M', 'M3', 'PSG', 'LTR', 'DRUM', 'BTL', 'KOTAK', 'TON'
     ]
 
     const statusPembayaranOptions = [
-        "Bon / Hutang",
-        "Cash / Lunas"
+      "Bon / Hutang",
+      "Cash / Lunas"
     ]
 
     const paymentMethods = [
-        'Bank Account',
-        'PayPal',
-        'UPI Transfer',
+      'Bank Account',
+      'PayPal',
+      'UPI Transfer',
     ]
 
     const updateItemForm = (index, val) => {
-        const { price, qty, unit } = val
-        receiveData.value.items[index].price = price
-        receiveData.value.items[index].qty = qty
-        receiveData.value.items[index].unit = unit
+      if (!val) return false
+
+      const { avg_value, in_stock, unit } = val
+      const { price, qty, unit } = val
+
+      receiveData.value.items[index].price = price
+      receiveData.value.items[index].qty = qty
+      receiveData.value.items[index].unit = unit
     }
 
     function fetchAllInventory() {
-        store
-            .dispatch('app-inventory/fetchInventoryOptions')
-            .then((response) => {
-                refInventoryOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching inventories",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
+      store
+        .dispatch('app-inventory/fetchInventoryOptions')
+        .then((response) => {
+          refInventoryOptions.value = response.data.payload
+        })
+        .catch(() => {
+          toast({
+            component: ToastificationContent,
+            props: {
+              title: "Error fetching inventories",
+              icon: 'AlertTriangleIcon',
+              variant: 'danger',
+            },
+          })
+        })
     }
 
     function fetchAllVendor()  {
-        store
-            .dispatch('app-inventory/fetchVendorOptions')
-            .then((response) => {
-                refVendorOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching vendors",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
+      store
+        .dispatch('app-inventory/fetchVendorOptions')
+        .then((response) => {
+          refVendorOptions.value = response.data.payload
+        })
+        .catch(() => {
+          toast({
+            component: ToastificationContent,
+            props: {
+              title: "Error fetching vendors",
+              icon: 'AlertTriangleIcon',
+              variant: 'danger',
+            },
+          })
+        })
     }
 
     const refetchInventoryData = () => {
-        refInventoryOptions.value.refresh()
+      refInventoryOptions.value.refresh()
     }
 
     const refetchVendorData = () => {
-        refVendorOptions.value.refresh()
+      refVendorOptions.value.refresh()
     }
 
     const {
@@ -666,6 +743,9 @@ export default {
       refetchVendorData,
       fetchAllVendor,
       fetchAllInventory,
+      inventorySearchOptions,
+      inventoryLoading,
+      searchInventory,
     }
   },
 }

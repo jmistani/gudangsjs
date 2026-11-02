@@ -8355,27 +8355,22 @@ __webpack_require__.r(__webpack_exports__);
     title: 'Dashboard',
     route: 'inventory-dashboard',
     resource: 'inventory',
-    action: 'read'
+    action: 'list'
   }, {
     title: 'Daftar Barang',
     route: 'inventory-list',
     resource: 'inventory',
-    action: 'manage'
+    action: 'list'
   }, {
     title: 'Terima Barang',
     route: 'inventory-receive-add',
     resource: 'inventory',
-    action: 'manage'
+    action: 'receive'
   }, {
     title: 'Keluar Barang',
     route: 'inventory-consume-add',
     resource: 'inventory',
-    action: 'manage'
-  }, {
-    title: 'Tiket',
-    route: 'inventory-ticket-add',
-    resource: 'inventory',
-    action: 'manage'
+    action: 'checkout'
   }]
 }]);
 

@@ -43,7 +43,8 @@ export default class SanctumService {
 
                 // if (status === 401) {
                 if (response && response.status === 401) {
-                    window.location.replace("http://gudangsjs.local/login")
+     //               window.location.replace("https://gudangsjsv2.serasijayasejati.com/login")
+                    window.location.replace("https://gudangsjs.local/login")
                 }
                 return Promise.reject(error)
             },

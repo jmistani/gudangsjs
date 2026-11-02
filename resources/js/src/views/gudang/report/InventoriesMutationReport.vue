@@ -1,337 +1,218 @@
-
 <template>
-  <div class="container">
-    <b-row class="mb-2">
-      <b-col cols="12">
-        <b-button-toolbar class="d-flex justify-content-center">
-          <b-button-group>
-            <b-button
-              size="sm"
-              variant="primary"
-              :disabled="!pdfReady || pdfLoading"
-              @click="printPDF"
-            >
-              Print
-            </b-button>
-            <b-button
-              size="sm"
-              variant="outline-primary"
-              :disabled="!pdfReady"
-              @click="openPDF"
-            >
-              Buka PDF
-            </b-button>
-            <b-button
-              size="sm"
-              variant="outline-primary"
-              :disabled="!pdfReady"
-              @click="downloadPDF"
-            >
-              Download
-            </b-button>
-            <b-button
-              size="sm"
-              variant="outline-secondary"
-              @click="$router.go(-1)"
-            >
-              Kembali
-            </b-button>
-          </b-button-group>
-        </b-button-toolbar>
-      </b-col>
-    </b-row>
+  <section class="mutation-report">
+    <b-card>
+      <h4 class="mb-2">Laporan Mutasi Barang</h4>
 
-    <div v-if="pdfLoading" class="text-center py-3">
-      <b-spinner variant="primary" />
-      <p class="mt-2">Memuat PDF...</p>
-    </div>
+      <b-form @submit.prevent="loadReport">
+        <b-row>
+          <b-col cols="12" md="5" lg="4">
+            <b-form-group label="Tanggal Mulai" label-for="mutation-start">
+              <b-form-datepicker
+                id="mutation-start"
+                v-model="dateStart"
+                locale="id"
+                :max="dateEnd || today"
+                required
+              />
+            </b-form-group>
+          </b-col>
 
-    <b-alert :show="!!pdfError" variant="danger">
-      {{ pdfError }}
-    </b-alert>
+          <b-col cols="12" md="5" lg="4">
+            <b-form-group label="Tanggal Akhir" label-for="mutation-end">
+              <b-form-datepicker
+                id="mutation-end"
+                v-model="dateEnd"
+                locale="id"
+                :min="dateStart"
+                :max="today"
+                required
+              />
+            </b-form-group>
+          </b-col>
 
-    <iframe
-      ref="pdfFrame"
-      title="Bukti Penerimaan Barang"
-      :src="pdfURL || 'about:blank'"
-      width="100%"
-      height="650"
-      frameborder="0"
-      @load="onPDFLoaded"
-    />
-  </div>
+          <b-col cols="12" md="2" lg="4" class="d-flex align-items-end mb-1">
+            <b-button type="submit" variant="primary" block :disabled="loading">
+              {{ loading ? 'Memuat...' : 'Tampilkan' }}
+            </b-button>
+          </b-col>
+        </b-row>
+      </b-form>
+
+      <b-alert show variant="light" class="mb-0">
+        Pilih rentang tanggal lalu klik Tampilkan untuk melihat mutasi stok.
+      </b-alert>
+    </b-card>
+
+    <b-card v-if="reportURL || loading || errorMessage" class="mt-2">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-1">
+        <h5 class="mb-1">Hasil Mutasi Barang</h5>
+        <div class="d-flex flex-wrap report-actions mb-1">
+          <b-button size="sm" variant="primary" :disabled="!ready" @click="printReport">
+            Print
+          </b-button>
+          <b-button size="sm" variant="outline-primary" :disabled="!ready" @click="openReport">
+            Buka Laporan
+          </b-button>
+          <b-button size="sm" variant="outline-primary" :disabled="!ready" @click="downloadReport">
+            Download HTML
+          </b-button>
+          <b-button size="sm" variant="outline-secondary" @click="$router.go(-1)">
+            Kembali
+          </b-button>
+        </div>
+      </div>
+
+      <b-alert :show="!!errorMessage" variant="danger">{{ errorMessage }}</b-alert>
+
+      <div v-if="loading" class="text-center py-3">
+        <b-spinner variant="primary" />
+        <p class="mt-1">Memuat laporan mutasi barang...</p>
+      </div>
+
+      <iframe
+        v-if="reportURL"
+        ref="reportFrame"
+        :src="reportURL"
+        title="Laporan Mutasi Barang"
+        class="report-frame"
+        @load="onFrameLoad"
+      />
+    </b-card>
+  </section>
 </template>
 
 <script>
 import axios from '@axios'
-
 import {
-  BRow,
-  BCol,
-  BButton,
-  BButtonGroup,
-  BButtonToolbar,
-  BSpinner,
-  BAlert,
+  BAlert, BButton, BCard, BCol, BForm, BFormDatepicker,
+  BFormGroup, BRow, BSpinner,
 } from 'bootstrap-vue'
 
+function localDate(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export default {
-  name: 'InventoryReceivePDF',
-
+  name: 'InventoriesMutationReport',
   components: {
-    BRow,
-    BCol,
-    BButton,
-    BButtonGroup,
-    BButtonToolbar,
-    BSpinner,
-    BAlert,
+    BAlert, BButton, BCard, BCol, BForm,
+    BFormDatepicker, BFormGroup, BRow, BSpinner,
   },
-
-  props: {
-    receiveId: {
-      type: [String, Number],
-      default: null,
-    },
-  },
-
   data() {
+    const now = new Date()
     return {
-      pdfURL: '',
-      pdfReady: false,
-      pdfLoading: false,
-      pdfError: '',
-      pendingRevokeURL: '',
-      requestId: 0,
+      dateStart: localDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+      dateEnd: localDate(now),
+      today: localDate(now),
+      reportURL: '',
+      reportHTML: '',
+      ready: false,
+      loading: false,
+      errorMessage: '',
+      requestVersion: 0,
     }
-  },
-
-  computed: {
-    documentId() {
-      return this.receiveId || this.$route.params.id
-    },
-  },
-
-  watch: {
-    documentId: {
-      immediate: true,
-      handler(id) {
-        if (
-          id !== null &&
-          id !== undefined &&
-          String(id).trim() !== ''
-        ) {
-          this.loadPDF(id)
-        } else {
-          this.pdfError =
-            'ID penerimaan barang tidak ditemukan.'
-        }
-      },
-    },
-  },
-  mounted() {
-    console.log('InventoryReceivePDF component mounted')
   },
   beforeDestroy() {
-    this.requestId += 1
-
-    if (this.pdfURL) {
-      URL.revokeObjectURL(this.pdfURL)
-    }
-
-    if (this.pendingRevokeURL) {
-      URL.revokeObjectURL(this.pendingRevokeURL)
-    }
+    this.requestVersion += 1
+    if (this.reportURL) URL.revokeObjectURL(this.reportURL)
   },
-
   methods: {
-    async loadPDF(id) {
-      console.log('InventoryReceivePDF loadPDF called:', id)
+    async loadReport() {
+      if (!this.dateStart || !this.dateEnd || this.dateStart > this.dateEnd) {
+        this.errorMessage = 'Rentang tanggal tidak valid.'
+        return
+      }
 
-      const currentRequest = ++this.requestId
+      const version = ++this.requestVersion
+      this.loading = true
+      this.ready = false
+      this.errorMessage = ''
 
-      this.pdfLoading = true
-      this.pdfReady = false
-      this.pdfError = ''
+      if (this.reportURL) {
+        URL.revokeObjectURL(this.reportURL)
+        this.reportURL = ''
+      }
 
       try {
-        // Read JWT token from Vuexy localStorage
-        const token = localStorage.getItem('accessToken')
+        const endpoint = `inventory/report/inventory-mutation/${this.dateStart}/${this.dateEnd}`
+        const response = await axios.get(endpoint, {
+          responseType: 'text',
+          headers: { Accept: 'text/html' },
+        })
 
-        if (
-          !token ||
-          token === 'undefined' ||
-          token === 'null'
-        ) {
-          throw new Error(
-            'JWT token tidak ditemukan. Silakan login kembali.'
-          )
+        if (version !== this.requestVersion) return
+
+        const contentType = String(response.headers['content-type'] || '').toLowerCase()
+        const html = typeof response.data === 'string' ? response.data : ''
+
+        if (!contentType.includes('text/html') || !/<html|<!doctype html/i.test(html)) {
+          throw new Error('Server tidak mengembalikan halaman laporan HTML.')
         }
 
-        // Request PDF through authenticated Axios
-        const response = await axios.get(
-          `/inventory-receives/showPDF/${encodeURIComponent(id)}`,
-          {
-            responseType: 'blob',
-            headers: {
-              Accept: 'application/pdf, application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        // A login redirect can also return HTML: never show it as a report.
+        if (/name=["'](?:password|login-password)["']|auth-login-form/i.test(html)) {
+          throw new Error('Sesi login sudah berakhir. Silakan login kembali.')
+        }
+
+        this.reportHTML = html
+        this.reportURL = URL.createObjectURL(
+          new Blob([html], { type: 'text/html;charset=utf-8' })
         )
-
-        if (currentRequest !== this.requestId) {
-          return
-        }
-
-        // Detect unexpected login redirect
-        const finalURL =
-          response.request &&
-          response.request.responseURL
-            ? response.request.responseURL
-            : ''
-
-        console.log('PDF status:', response.status)
-        console.log('PDF final URL:', finalURL)
-        console.log(
-          'PDF Content-Type:',
-          response.headers['content-type']
-        )
-
-        if (
-          /\/login(?:[/?#]|$)|\/auth-login(?:[/?#]|$)/i.test(finalURL)
-        ) {
-          throw new Error(
-            'Server mengalihkan permintaan PDF ke halaman login.'
-          )
-        }
-
-        // Verify that Laravel returned a real PDF
-        const contentType = String(
-          response.headers['content-type'] || ''
-        ).toLowerCase()
-
-        const signature = await response.data
-          .slice(0, 5)
-          .text()
-
-        if (currentRequest !== this.requestId) {
-          return
-        }
-
-        if (
-          !contentType.includes('application/pdf') ||
-          signature !== '%PDF-'
-        ) {
-          throw new Error(
-            `Respons bukan PDF. Content-Type: ${
-              contentType || 'tidak ada'
-            }`
-          )
-        }
-
-        // Create a browser-local PDF URL
-        const nextURL = URL.createObjectURL(
-          new Blob(
-            [response.data],
-            { type: 'application/pdf' }
-          )
-        )
-
-        if (this.pendingRevokeURL) {
-          URL.revokeObjectURL(this.pendingRevokeURL)
-        }
-
-        this.pendingRevokeURL = this.pdfURL
-        this.pdfURL = nextURL
-
       } catch (error) {
-        if (currentRequest !== this.requestId) {
-          return
-        }
-
-        const status =
-          error.response && error.response.status
-
-        if (status === 401) {
-          this.pdfError =
-            'JWT tidak valid atau sudah kedaluwarsa. Silakan login kembali.'
-        } else if (status === 403) {
-          this.pdfError =
-            'Anda tidak memiliki izin untuk melihat PDF ini.'
-        } else {
-          this.pdfError =
-            error.message || 'Gagal memuat PDF.'
-        }
-
-        console.error(
-          'Inventory Receive PDF error:',
-          error
-        )
-
+        if (version !== this.requestVersion) return
+        const status = error.response && error.response.status
+        this.errorMessage = status === 401
+          ? 'Sesi login sudah berakhir. Silakan login kembali.'
+          : status === 403
+            ? 'Anda tidak memiliki izin untuk membuka laporan.'
+            : (error.message || 'Gagal memuat laporan.')
+        console.error('Mutation report error:', error)
       } finally {
-        if (currentRequest === this.requestId) {
-          this.pdfLoading = false
-        }
+        if (version === this.requestVersion) this.loading = false
       }
     },
-
-    onPDFLoaded() {
-      if (!this.pdfURL) return
-
-      this.pdfReady = true
-
-      if (this.pendingRevokeURL) {
-        URL.revokeObjectURL(this.pendingRevokeURL)
-        this.pendingRevokeURL = ''
+    onFrameLoad() {
+      this.ready = Boolean(this.reportURL)
+    },
+    printReport() {
+      if (!this.ready || !this.$refs.reportFrame) return
+      try {
+        const frame = this.$refs.reportFrame.contentWindow
+        frame.focus()
+        frame.print()
+      } catch (error) {
+        this.errorMessage = 'Print langsung gagal. Gunakan Buka Laporan lalu cetak.'
       }
     },
-
-    openPDF() {
-      if (!this.pdfReady) return
-
-      window.open(
-        this.pdfURL,
-        '_blank',
-        'noopener,noreferrer'
-      )
+    openReport() {
+      if (this.ready) window.open(this.reportURL, '_blank', 'noopener,noreferrer')
     },
-
-    downloadPDF() {
-      if (!this.pdfReady) return
-
+    downloadReport() {
+      if (!this.ready) return
       const link = document.createElement('a')
-
-      link.href = this.pdfURL
-      link.download =
-        `inventory-receive-${this.documentId}.pdf`
-
+      link.href = this.reportURL
+      link.download = `mutasi-barang-${this.dateStart}-${this.dateEnd}.html`
       document.body.appendChild(link)
       link.click()
-      document.body.removeChild(link)
-    },
-
-    printPDF() {
-      if (!this.pdfReady) return
-
-      try {
-        const frame = this.$refs.pdfFrame
-
-        frame.contentWindow.focus()
-        frame.contentWindow.print()
-
-      } catch (error) {
-        this.pdfError =
-          'Tidak bisa print dari iframe. Gunakan Buka PDF lalu print dari browser.'
-      }
+      link.remove()
     },
   },
 }
 </script>
 
 <style scoped>
-iframe {
+.report-frame {
   display: block;
-  border: 0;
+  width: 100%;
+  min-height: 75vh;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 0.4rem;
+  background: white;
+}
+.report-actions {
+  gap: 0.5rem;
 }
 </style>

@@ -2,7 +2,8 @@ import Vue from 'vue'
 import axios from 'axios'
 
 const axiosIns = axios.create({
-  baseURL: 'https://gudangsjs.local/api/',
+//  baseURL: 'https://gudangsjsv2.serasijayasejati.com/api',
+  baseURL: 'https://gudangsjs.local/api',
   timeout: 1200000,
 
   headers: {

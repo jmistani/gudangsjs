@@ -24,34 +24,34 @@
             :clearable="false"
             class="per-page-selector d-inline-block ml-50 mr-1"
           />
-        <b-form-radio
-              v-model="bagianFilter"
-              name="bagian-barang"
-              value="semua"
-              selected
-              plain
-              class="radio-inventory-category-filter"
-            >
-              Semua
-            </b-form-radio>
-            <b-form-radio
-              v-model="bagianFilter"
-              name="bagian-barang"
-              value="pabrik"
-              plain
-              class="radio-inventory-category-filter"
-            >
-              Pabrik
-            </b-form-radio>
-            <b-form-radio
-              v-model="bagianFilter"
-              name="bagian-barang"
-              value="pengangkutan"
-              plain
-              class="radio-inventory-category-filter"
-            >
-              Pengangkutan
-            </b-form-radio>
+          <b-form-radio
+            v-model="bagianFilter"
+            name="bagian-barang"
+            value="semua"
+            selected
+            plain
+            class="radio-inventory-category-filter"
+          >
+            Semua
+          </b-form-radio>
+          <b-form-radio
+            v-model="bagianFilter"
+            name="bagian-barang"
+            value="pabrik"
+            plain
+            class="radio-inventory-category-filter"
+          >
+            Pabrik
+          </b-form-radio>
+          <b-form-radio
+            v-model="bagianFilter"
+            name="bagian-barang"
+            value="pengangkutan"
+            plain
+            class="radio-inventory-category-filter"
+          >
+            Pengangkutan
+          </b-form-radio>
         </b-col>
 
         <!-- Search -->
@@ -71,8 +71,9 @@
               placeholder="Tag Filter..."
             />
             <b-button
-              @click="isAddNewInventorySidebarActive = true"
+              v-if="$can('create', 'inventory')"
               variant="primary"
+              @click="isAddNewInventorySidebarActive = true"
             >
               Tambah Barang
             </b-button>
@@ -96,7 +97,7 @@
       class="position-relative"
     >
       <template v-slot:table-busy>
-          <spinner message="Loading ..."></spinner>
+        <spinner message="Loading ..."></spinner>
       </template>
 
       <template #cell(code)="data">
@@ -111,119 +112,122 @@
       </template>
 
       <template #cell(name)="data">
-          {{ data.item.name | titlecase }}
+        {{ data.item.name | titlecase }}
       </template>
 
       <template #cell(category)="data">
-          <feather-icon
-            :icon="resolveInventoryCategoryAndIcon(data.item.category).icon"
-          />
-            <span class="align-text-top text-capitalize">{{ data.item.category | titlecase }}</span>
+        <feather-icon
+          :icon="resolveInventoryCategoryAndIcon(data.item.category).icon"
+        />
+        <span class="align-text-top text-capitalize">{{ data.item.category | titlecase }}</span>
       </template>
 
       <template #cell(unit)="data">
-          {{ data.item.unit | capital }}
+        {{ data.item.unit | capital }}
       </template>
 
       <template #cell(tags)="data">
-          <ul>
-            <li v-for="(tag, index) in parseTags(data.item.tags)" :key="`${data.item.id}-${index}`">
-              {{ tag | lowercase }}
-              <feather-icon size="16" icon="XIcon" class="cursor-pointer" @click="removeTag(data.item.id, tag)" />
-            </li>
-          </ul>
+        <ul>
+          <li v-for="(tag, index) in parseTags(data.item.tags)" :key="`${data.item.id}-${index}`">
+            {{ tag | lowercase }}
+            <feather-icon size="16" icon="XIcon" class="cursor-pointer" @click="removeTag(data.item.id, tag)" />
+          </li>
+        </ul>
       </template>
 
       <template #cell(actions)="data">
 
-          <feather-icon
-            :id="`form-inventory-list-tag-icon-${data.item.id}`"
-            size="16"
-            icon="FileIcon"
-            class="cursor-pointer"
-          />
+        <feather-icon
+          :id="`form-inventory-list-tag-icon-${data.item.id}`"
+          size="16"
+          icon="FileIcon"
+          class="cursor-pointer"
+        />
 
-          <b-popover
-            :ref="`popover-tag-${data.item.id}`"
-            :id="`popover-tag-${data.item.id}`"
-            :target="`form-inventory-list-tag-icon-${data.item.id}`"
-            triggers="click"
-            @refetch-data="refetchData"
+        <b-popover
+          :id="`popover-tag-${data.item.id}`"
+          :ref="`popover-tag-${data.item.id}`"
+          :target="`form-inventory-list-tag-icon-${data.item.id}`"
+          triggers="click"
+          @refetch-data="refetchData"
+        >
+          <b-form
+            :id="`form-inv-list-tag-${data.item.id}`"
+            :name="`form-inv-list-tag-${data.item.id}`"
+            @submit.prevent="addTag(data.item.id, newTagData[`${data.item.id}`])"
           >
-            <b-form
-              :id="`form-inv-list-tag-${data.item.id}`"
-              :name="`form-inv-list-tag-${data.item.id}`"
-              @submit.prevent="addTag(data.item.id, newTagData[`${data.item.id}`])"
-            >
-              <b-row>
+            <b-row>
 
-                <b-col cols="12">
-                  <b-form-group
-                    label="Tag"
-                    :label-for="`new-tag-data-${data.item.id}`"
-                  >
-                    <b-form-input
-                      v-model="newTagData[`${data.item.id}`]"
-                      :id="`new-tag-data-${data.item.id}`"
-                      type="text"
-                    />
-                  </b-form-group>
-                </b-col>
-
-                <b-col
-                  cols="12"
-                  class="d-flex justify-content-between mt-1"
+              <b-col cols="12">
+                <b-form-group
+                  label="Tag"
+                  :label-for="`new-tag-data-${data.item.id}`"
                 >
-                  <b-button
-                    variant="outline-primary"
-                    type="submit"
+                  <b-form-input
+                    :id="`new-tag-data-${data.item.id}`"
+                    v-model="newTagData[`${data.item.id}`]"
+                    type="text"
+                  />
+                </b-form-group>
+              </b-col>
 
-                  >
-                    Apply
-                  </b-button>
-                  <b-button
-                    variant="outline-secondary"
-                    @click="closeTag(data.item.id)"
-                  >
-                    Cancel
-                  </b-button>
-                </b-col>
-              </b-row>
-            </b-form>
-          </b-popover>
+              <b-col
+                cols="12"
+                class="d-flex justify-content-between mt-1"
+              >
+                <b-button
+                  variant="outline-primary"
+                  type="submit"
 
-          <feather-icon
-            size="16"
-            icon="ImageIcon"
-            class="cursor-pointer"
-            @click="openImageSidebar(data.item.id)"
-          />
-          <feather-icon
-            size="16"
-            icon="XIcon"
-            class="cursor-pointer"
-            @click="removeInventory(data.item.id)"
-          />
-          <!-- Dropdown -->
-          <b-dropdown
-            variant="link"
-            toggle-class="p-0"
-            no-caret
-            :right="$store.state.appConfig.isRTL"
+                >
+                  Apply
+                </b-button>
+                <b-button
+                  variant="outline-secondary"
+                  @click="closeTag(data.item.id)"
+                >
+                  Cancel
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-form>
+        </b-popover>
+
+        <feather-icon
+          size="16"
+          icon="ImageIcon"
+          class="cursor-pointer"
+          @click="openImageSidebar(data.item.id)"
+        />
+        <feather-icon
+          size="16"
+          icon="XIcon"
+          class="cursor-pointer"
+          @click="removeInventory(data.item.id)"
+        />
+        <!-- Dropdown -->
+        <b-dropdown
+          variant="link"
+          toggle-class="p-0"
+          no-caret
+          :right="$store.state.appConfig.isRTL"
+        >
+
+          <template #button-content>
+            <feather-icon
+              icon="MoreVerticalIcon"
+              size="16"
+              class="align-middle text-body"
+            />
+          </template>
+          <b-dropdown-item
+            v-if="$can('edit', 'inventory')"
+            @click="handleEdit(data.item.id)"
           >
-
-            <template #button-content>
-              <feather-icon
-                icon="MoreVerticalIcon"
-                size="16"
-                class="align-middle text-body"
-              />
-            </template>
-            <b-dropdown-item @click="handleEdit(data.item.id)">
-              <feather-icon icon="EditIcon" />
-              <span class="align-middle ml-50">Edit</span>
-            </b-dropdown-item>
-          </b-dropdown>
+            <feather-icon icon="EditIcon" />
+            <span class="align-middle ml-50">Edit</span>
+          </b-dropdown-item>
+        </b-dropdown>
       </template>
 
     </b-table>
@@ -279,13 +283,13 @@
     />
     <sidebar-edit-inventory
       :is-edit-inventory-sidebar-active.sync="isEditInventorySidebarActive"
-      @refetch-data="refetchData"
       :editid="editid"
+      @refetch-data="refetchData"
     />
     <sidebar-add-image-inventory
       :is-add-image-inventory-sidebar-active.sync="isAddImageInventorySidebarActive"
-      @refetch-data="refetchData"
       :editid="editid"
+      @refetch-data="refetchData"
     />
   </b-card>
 </template>

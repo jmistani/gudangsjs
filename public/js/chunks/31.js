@@ -1,1 +1,512 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[31],{"1YDh":function(t,e,r){"use strict";r.d(e,"a",(function(){return b}));var n=r("XuX8"),c=r.n(n),a=r("xjcK"),o=r("pyNs"),i=r("z3V6"),b=Object(i.d)({bgVariant:Object(i.c)(o.u),borderVariant:Object(i.c)(o.u),tag:Object(i.c)(o.u,"div"),textVariant:Object(i.c)(o.u)},a.l);c.a.extend({props:b})},"1uQM":function(t,e,r){"use strict";r.d(e,"a",(function(){return l}));var n=r("XuX8"),c=r.n(n),a=r("tC49"),o=r("xjcK"),i=r("pyNs"),b=r("z3V6"),u=Object(b.d)({textTag:Object(b.c)(i.u,"p")},o.s),l=c.a.extend({name:o.s,functional:!0,props:u,render:function(t,e){var r=e.props,n=e.data,c=e.children;return t(r.textTag,Object(a.a)(n,{staticClass:"card-text"}),c)}})},EG0M:function(t,e,r){"use strict";r.r(e);var n=r("IF94"),c=r("1uQM"),a=r("qlm0"),o={components:{BCard:n.a,BCardText:c.a,BLink:a.a}},i=r("KHd+"),b=Object(i.a)(o,(function(){var t=this,e=t.$createElement,r=t._self._c||e;return r("div",[r("b-card",{attrs:{title:"Kick start your project 🚀"}},[r("b-card-text",[t._v("All the best for your new project.")]),t._v(" "),r("b-card-text",[t._v("Please make sure to read our "),r("b-link",{attrs:{href:"https://pixinvent.com/demo/vuexy-vuejs-admin-dashboard-template/documentation/",target:"_blank"}},[t._v("\n      Template Documentation\n    ")]),t._v(" to understand where to go from here and how to use our template.")],1)],1),t._v(" "),r("b-card",{attrs:{title:"Want to integrate JWT? 🔒"}},[r("b-card-text",[t._v("We carefully crafted JWT flow so you can implement JWT with ease and with minimum efforts.")]),t._v(" "),r("b-card-text",[t._v("Please read our  JWT Documentation to get more out of JWT authentication.")])],1)],1)}),[],!1,null,null,null);e.default=b.exports},IF94:function(t,e,r){"use strict";r.d(e,"a",(function(){return B}));var n=r("XuX8"),c=r.n(n),a=r("tC49"),o=r("xjcK"),i=r("pyNs"),b=r("m3aq"),u=r("hpAl"),l=r("Nlw7"),s=r("2C+6"),O=r("z3V6"),p=r("1YDh"),d=r("YZfj"),f=r("uIXr");function j(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(t);e&&(n=n.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),r.push.apply(r,n)}return r}function g(t){for(var e=1;e<arguments.length;e++){var r=null!=arguments[e]?arguments[e]:{};e%2?j(Object(r),!0).forEach((function(e){h(t,e,r[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):j(Object(r)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(r,e))}))}return t}function h(t,e,r){return e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}var m=Object(O.d)(Object(s.m)(g(g({},Object(O.a)(p.a,O.f.bind(null,"footer"))),{},{footer:Object(O.c)(i.u),footerClass:Object(O.c)(i.e),footerHtml:Object(O.c)(i.u)})),o.n),y=c.a.extend({name:o.n,functional:!0,props:m,render:function(t,e){var r,n=e.props,c=e.data,o=e.children,i=n.footerBgVariant,b=n.footerBorderVariant,l=n.footerTextVariant;return t(n.footerTag,Object(a.a)(c,{staticClass:"card-footer",class:[n.footerClass,(r={},h(r,"bg-".concat(i),i),h(r,"border-".concat(b),b),h(r,"text-".concat(l),l),r)],domProps:o?{}:Object(u.a)(n.footerHtml,n.footer)}),o)}}),v=r("SRip");function w(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(t);e&&(n=n.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),r.push.apply(r,n)}return r}function P(t){for(var e=1;e<arguments.length;e++){var r=null!=arguments[e]?arguments[e]:{};e%2?w(Object(r),!0).forEach((function(e){x(t,e,r[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):w(Object(r)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(r,e))}))}return t}function x(t,e,r){return e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}var T=Object(O.d)(Object(s.m)(P(P({},Object(s.k)(v.b,["src","alt","width","height","left","right"])),{},{bottom:Object(O.c)(i.g,!1),end:Object(O.c)(i.g,!1),start:Object(O.c)(i.g,!1),top:Object(O.c)(i.g,!1)})),o.q),C=c.a.extend({name:o.q,functional:!0,props:T,render:function(t,e){var r=e.props,n=e.data,c=r.src,o=r.alt,i=r.width,b=r.height,u="card-img";return r.top?u+="-top":r.right||r.end?u+="-right":r.bottom?u+="-bottom":(r.left||r.start)&&(u+="-left"),t("img",Object(a.a)(n,{class:u,attrs:{src:c,alt:o,width:i,height:b}}))}});function D(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(t);e&&(n=n.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),r.push.apply(r,n)}return r}function V(t){for(var e=1;e<arguments.length;e++){var r=null!=arguments[e]?arguments[e]:{};e%2?D(Object(r),!0).forEach((function(e){k(t,e,r[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):D(Object(r)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(r,e))}))}return t}function k(t,e,r){return e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}var S=Object(O.a)(T,O.f.bind(null,"img"));S.imgSrc.required=!1;var X=Object(O.d)(Object(s.m)(V(V(V(V(V(V({},d.b),f.b),m),S),p.a),{},{align:Object(O.c)(i.u),noBody:Object(O.c)(i.g,!1)})),o.l),B=c.a.extend({name:o.l,functional:!0,props:X,render:function(t,e){var r,n=e.props,c=e.data,o=e.slots,i=e.scopedSlots,s=n.imgSrc,p=n.imgLeft,j=n.imgRight,g=n.imgStart,h=n.imgEnd,v=n.imgBottom,w=n.header,P=n.headerHtml,x=n.footer,T=n.footerHtml,D=n.align,V=n.textVariant,X=n.bgVariant,B=n.borderVariant,E=i||{},_=o(),z={},W=t(),K=t();if(s){var N=t(C,{props:Object(O.e)(S,n,O.h.bind(null,"img"))});v?K=N:W=N}var q=t(),H=Object(l.a)(b.q,E,_);(H||w||P)&&(q=t(f.a,{props:Object(O.e)(f.b,n),domProps:H?{}:Object(u.a)(P,w)},Object(l.b)(b.q,z,E,_)));var J=Object(l.b)(b.h,z,E,_);n.noBody||(J=t(d.a,{props:Object(O.e)(d.b,n)},J),n.overlay&&s&&(J=t("div",{staticClass:"position-relative"},[W,J,K]),W=t(),K=t()));var Y=t();return(Object(l.a)(b.p,E,_)||x||T)&&(Y=t(y,{props:Object(O.e)(m,n),domProps:H?{}:Object(u.a)(T,x)},Object(l.b)(b.p,z,E,_))),t(n.tag,Object(a.a)(c,{staticClass:"card",class:(r={"flex-row":p||g,"flex-row-reverse":(j||h)&&!(p||g)},k(r,"text-".concat(D),D),k(r,"bg-".concat(X),X),k(r,"border-".concat(B),B),k(r,"text-".concat(V),V),r)}),[W,q,J,Y,K])}})},SRip:function(t,e,r){"use strict";r.d(e,"b",(function(){return j})),r.d(e,"a",(function(){return g}));var n=r("XuX8"),c=r.n(n),a=r("tC49"),o=r("xjcK"),i=r("pyNs"),b=r("Iyau"),u=r("bAY6"),l=r("ex6f"),s=r("OljW"),O=r("z3V6"),p=r("+nMp");function d(t,e,r){return e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}var f='<svg width="%{w}" height="%{h}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %{w} %{h}" preserveAspectRatio="none"><rect width="100%" height="100%" style="fill:%{f};"></rect></svg>',j=Object(O.d)({alt:Object(O.c)(i.u),blank:Object(O.c)(i.g,!1),blankColor:Object(O.c)(i.u,"transparent"),block:Object(O.c)(i.g,!1),center:Object(O.c)(i.g,!1),fluid:Object(O.c)(i.g,!1),fluidGrow:Object(O.c)(i.g,!1),height:Object(O.c)(i.p),left:Object(O.c)(i.g,!1),right:Object(O.c)(i.g,!1),rounded:Object(O.c)(i.j,!1),sizes:Object(O.c)(i.f),src:Object(O.c)(i.u),srcset:Object(O.c)(i.f),thumbnail:Object(O.c)(i.g,!1),width:Object(O.c)(i.p)},o.U),g=c.a.extend({name:o.U,functional:!0,props:j,render:function(t,e){var r,n=e.props,c=e.data,o=n.alt,i=n.src,O=n.block,j=n.fluidGrow,g=n.rounded,h=Object(s.b)(n.width)||null,m=Object(s.b)(n.height)||null,y=null,v=Object(b.b)(n.srcset).filter(u.a).join(","),w=Object(b.b)(n.sizes).filter(u.a).join(",");return n.blank&&(!m&&h?m=h:!h&&m&&(h=m),h||m||(h=1,m=1),i=function(t,e,r){var n=encodeURIComponent(f.replace("%{w}",Object(p.g)(t)).replace("%{h}",Object(p.g)(e)).replace("%{f}",r));return"data:image/svg+xml;charset=UTF-8,".concat(n)}(h,m,n.blankColor||"transparent"),v=null,w=null),n.left?y="float-left":n.right?y="float-right":n.center&&(y="mx-auto",O=!0),t("img",Object(a.a)(c,{attrs:{src:i,alt:o,width:h?Object(p.g)(h):null,height:m?Object(p.g)(m):null,srcset:v||null,sizes:w||null},class:(r={"img-thumbnail":n.thumbnail,"img-fluid":n.fluid||j,"w-100":j,rounded:""===g||!0===g},d(r,"rounded-".concat(g),Object(l.m)(g)&&""!==g),d(r,y,y),d(r,"d-block",O),r)}))}})},SWgu:function(t,e,r){"use strict";r.d(e,"b",(function(){return l})),r.d(e,"a",(function(){return s}));var n=r("XuX8"),c=r.n(n),a=r("tC49"),o=r("xjcK"),i=r("pyNs"),b=r("z3V6"),u=r("+nMp"),l=Object(b.d)({title:Object(b.c)(i.u),titleTag:Object(b.c)(i.u,"h4")},o.t),s=c.a.extend({name:o.t,functional:!0,props:l,render:function(t,e){var r=e.props,n=e.data,c=e.children;return t(r.titleTag,Object(a.a)(n,{staticClass:"card-title"}),c||Object(u.g)(r.title))}})},YZfj:function(t,e,r){"use strict";r.d(e,"b",(function(){return h})),r.d(e,"a",(function(){return m}));var n=r("XuX8"),c=r.n(n),a=r("tC49"),o=r("xjcK"),i=r("pyNs"),b=r("2C+6"),u=r("z3V6"),l=r("1YDh"),s=r("SWgu"),O=r("+nMp"),p=Object(u.d)({subTitle:Object(u.c)(i.u),subTitleTag:Object(u.c)(i.u,"h6"),subTitleTextVariant:Object(u.c)(i.u,"muted")},o.r),d=c.a.extend({name:o.r,functional:!0,props:p,render:function(t,e){var r=e.props,n=e.data,c=e.children;return t(r.subTitleTag,Object(a.a)(n,{staticClass:"card-subtitle",class:[r.subTitleTextVariant?"text-".concat(r.subTitleTextVariant):null]}),c||Object(O.g)(r.subTitle))}});function f(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(t);e&&(n=n.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),r.push.apply(r,n)}return r}function j(t){for(var e=1;e<arguments.length;e++){var r=null!=arguments[e]?arguments[e]:{};e%2?f(Object(r),!0).forEach((function(e){g(t,e,r[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):f(Object(r)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(r,e))}))}return t}function g(t,e,r){return e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}var h=Object(u.d)(Object(b.m)(j(j(j(j({},s.b),p),Object(u.a)(l.a,u.f.bind(null,"body"))),{},{bodyClass:Object(u.c)(i.e),overlay:Object(u.c)(i.g,!1)})),o.m),m=c.a.extend({name:o.m,functional:!0,props:h,render:function(t,e){var r,n=e.props,c=e.data,o=e.children,i=n.bodyBgVariant,b=n.bodyBorderVariant,l=n.bodyTextVariant,O=t();n.title&&(O=t(s.a,{props:Object(u.e)(s.b,n)}));var f=t();return n.subTitle&&(f=t(d,{props:Object(u.e)(p,n),class:["mb-2"]})),t(n.bodyTag,Object(a.a)(c,{staticClass:"card-body",class:[(r={"card-img-overlay":n.overlay},g(r,"bg-".concat(i),i),g(r,"border-".concat(b),b),g(r,"text-".concat(l),l),r),n.bodyClass]}),[O,f,o])}})},uIXr:function(t,e,r){"use strict";r.d(e,"b",(function(){return f})),r.d(e,"a",(function(){return j}));var n=r("XuX8"),c=r.n(n),a=r("tC49"),o=r("xjcK"),i=r("pyNs"),b=r("hpAl"),u=r("2C+6"),l=r("z3V6"),s=r("1YDh");function O(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(t);e&&(n=n.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),r.push.apply(r,n)}return r}function p(t){for(var e=1;e<arguments.length;e++){var r=null!=arguments[e]?arguments[e]:{};e%2?O(Object(r),!0).forEach((function(e){d(t,e,r[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):O(Object(r)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(r,e))}))}return t}function d(t,e,r){return e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}var f=Object(l.d)(Object(u.m)(p(p({},Object(l.a)(s.a,l.f.bind(null,"header"))),{},{header:Object(l.c)(i.u),headerClass:Object(l.c)(i.e),headerHtml:Object(l.c)(i.u)})),o.p),j=c.a.extend({name:o.p,functional:!0,props:f,render:function(t,e){var r,n=e.props,c=e.data,o=e.children,i=n.headerBgVariant,u=n.headerBorderVariant,l=n.headerTextVariant;return t(n.headerTag,Object(a.a)(c,{staticClass:"card-header",class:[n.headerClass,(r={},d(r,"bg-".concat(i),i),d(r,"border-".concat(u),u),d(r,"text-".concat(l),l),r)],domProps:o?{}:Object(b.a)(n.headerHtml,n.header)}),o)}})}}]);
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[31],{
+
+/***/ "./node_modules/@babel/runtime/helpers/esm/typeof.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/typeof.js ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _typeof; });
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
+}
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/array-for-each.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/core-js/internals/array-for-each.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $forEach = __webpack_require__(/*! ../internals/array-iteration */ "./node_modules/core-js/internals/array-iteration.js").forEach;
+var arrayMethodIsStrict = __webpack_require__(/*! ../internals/array-method-is-strict */ "./node_modules/core-js/internals/array-method-is-strict.js");
+var arrayMethodUsesToLength = __webpack_require__(/*! ../internals/array-method-uses-to-length */ "./node_modules/core-js/internals/array-method-uses-to-length.js");
+
+var STRICT_METHOD = arrayMethodIsStrict('forEach');
+var USES_TO_LENGTH = arrayMethodUsesToLength('forEach');
+
+// `Array.prototype.forEach` method implementation
+// https://tc39.github.io/ecma262/#sec-array.prototype.foreach
+module.exports = (!STRICT_METHOD || !USES_TO_LENGTH) ? function forEach(callbackfn /* , thisArg */) {
+  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+} : [].forEach;
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/array-method-is-strict.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/core-js/internals/array-method-is-strict.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var fails = __webpack_require__(/*! ../internals/fails */ "./node_modules/core-js/internals/fails.js");
+
+module.exports = function (METHOD_NAME, argument) {
+  var method = [][METHOD_NAME];
+  return !!method && fails(function () {
+    // eslint-disable-next-line no-useless-call,no-throw-literal
+    method.call(null, argument || function () { throw 1; }, 1);
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/is-regexp.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/core-js/internals/is-regexp.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(/*! ../internals/is-object */ "./node_modules/core-js/internals/is-object.js");
+var classof = __webpack_require__(/*! ../internals/classof-raw */ "./node_modules/core-js/internals/classof-raw.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+
+var MATCH = wellKnownSymbol('match');
+
+// `IsRegExp` abstract operation
+// https://tc39.github.io/ecma262/#sec-isregexp
+module.exports = function (it) {
+  var isRegExp;
+  return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : classof(it) == 'RegExp');
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/species-constructor.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/core-js/internals/species-constructor.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var aFunction = __webpack_require__(/*! ../internals/a-function */ "./node_modules/core-js/internals/a-function.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+
+var SPECIES = wellKnownSymbol('species');
+
+// `SpeciesConstructor` abstract operation
+// https://tc39.github.io/ecma262/#sec-speciesconstructor
+module.exports = function (O, defaultConstructor) {
+  var C = anObject(O).constructor;
+  var S;
+  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? defaultConstructor : aFunction(S);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.array.join.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/core-js/modules/es.array.join.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var IndexedObject = __webpack_require__(/*! ../internals/indexed-object */ "./node_modules/core-js/internals/indexed-object.js");
+var toIndexedObject = __webpack_require__(/*! ../internals/to-indexed-object */ "./node_modules/core-js/internals/to-indexed-object.js");
+var arrayMethodIsStrict = __webpack_require__(/*! ../internals/array-method-is-strict */ "./node_modules/core-js/internals/array-method-is-strict.js");
+
+var nativeJoin = [].join;
+
+var ES3_STRINGS = IndexedObject != Object;
+var STRICT_METHOD = arrayMethodIsStrict('join', ',');
+
+// `Array.prototype.join` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.join
+$({ target: 'Array', proto: true, forced: ES3_STRINGS || !STRICT_METHOD }, {
+  join: function join(separator) {
+    return nativeJoin.call(toIndexedObject(this), separator === undefined ? ',' : separator);
+  }
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.array.map.js":
+/*!******************************************************!*\
+  !*** ./node_modules/core-js/modules/es.array.map.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var $map = __webpack_require__(/*! ../internals/array-iteration */ "./node_modules/core-js/internals/array-iteration.js").map;
+var arrayMethodHasSpeciesSupport = __webpack_require__(/*! ../internals/array-method-has-species-support */ "./node_modules/core-js/internals/array-method-has-species-support.js");
+var arrayMethodUsesToLength = __webpack_require__(/*! ../internals/array-method-uses-to-length */ "./node_modules/core-js/internals/array-method-uses-to-length.js");
+
+var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('map');
+// FF49- issue
+var USES_TO_LENGTH = arrayMethodUsesToLength('map');
+
+// `Array.prototype.map` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.map
+// with adding support of @@species
+$({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGTH }, {
+  map: function map(callbackfn /* , thisArg */) {
+    return $map(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.string.split.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/core-js/modules/es.string.split.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var fixRegExpWellKnownSymbolLogic = __webpack_require__(/*! ../internals/fix-regexp-well-known-symbol-logic */ "./node_modules/core-js/internals/fix-regexp-well-known-symbol-logic.js");
+var isRegExp = __webpack_require__(/*! ../internals/is-regexp */ "./node_modules/core-js/internals/is-regexp.js");
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var requireObjectCoercible = __webpack_require__(/*! ../internals/require-object-coercible */ "./node_modules/core-js/internals/require-object-coercible.js");
+var speciesConstructor = __webpack_require__(/*! ../internals/species-constructor */ "./node_modules/core-js/internals/species-constructor.js");
+var advanceStringIndex = __webpack_require__(/*! ../internals/advance-string-index */ "./node_modules/core-js/internals/advance-string-index.js");
+var toLength = __webpack_require__(/*! ../internals/to-length */ "./node_modules/core-js/internals/to-length.js");
+var callRegExpExec = __webpack_require__(/*! ../internals/regexp-exec-abstract */ "./node_modules/core-js/internals/regexp-exec-abstract.js");
+var regexpExec = __webpack_require__(/*! ../internals/regexp-exec */ "./node_modules/core-js/internals/regexp-exec.js");
+var fails = __webpack_require__(/*! ../internals/fails */ "./node_modules/core-js/internals/fails.js");
+
+var arrayPush = [].push;
+var min = Math.min;
+var MAX_UINT32 = 0xFFFFFFFF;
+
+// babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
+var SUPPORTS_Y = !fails(function () { return !RegExp(MAX_UINT32, 'y'); });
+
+// @@split logic
+fixRegExpWellKnownSymbolLogic('split', 2, function (SPLIT, nativeSplit, maybeCallNative) {
+  var internalSplit;
+  if (
+    'abbc'.split(/(b)*/)[1] == 'c' ||
+    'test'.split(/(?:)/, -1).length != 4 ||
+    'ab'.split(/(?:ab)*/).length != 2 ||
+    '.'.split(/(.?)(.?)/).length != 4 ||
+    '.'.split(/()()/).length > 1 ||
+    ''.split(/.?/).length
+  ) {
+    // based on es5-shim implementation, need to rework it
+    internalSplit = function (separator, limit) {
+      var string = String(requireObjectCoercible(this));
+      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
+      if (lim === 0) return [];
+      if (separator === undefined) return [string];
+      // If `separator` is not a regex, use native split
+      if (!isRegExp(separator)) {
+        return nativeSplit.call(string, separator, lim);
+      }
+      var output = [];
+      var flags = (separator.ignoreCase ? 'i' : '') +
+                  (separator.multiline ? 'm' : '') +
+                  (separator.unicode ? 'u' : '') +
+                  (separator.sticky ? 'y' : '');
+      var lastLastIndex = 0;
+      // Make `global` and avoid `lastIndex` issues by working with a copy
+      var separatorCopy = new RegExp(separator.source, flags + 'g');
+      var match, lastIndex, lastLength;
+      while (match = regexpExec.call(separatorCopy, string)) {
+        lastIndex = separatorCopy.lastIndex;
+        if (lastIndex > lastLastIndex) {
+          output.push(string.slice(lastLastIndex, match.index));
+          if (match.length > 1 && match.index < string.length) arrayPush.apply(output, match.slice(1));
+          lastLength = match[0].length;
+          lastLastIndex = lastIndex;
+          if (output.length >= lim) break;
+        }
+        if (separatorCopy.lastIndex === match.index) separatorCopy.lastIndex++; // Avoid an infinite loop
+      }
+      if (lastLastIndex === string.length) {
+        if (lastLength || !separatorCopy.test('')) output.push('');
+      } else output.push(string.slice(lastLastIndex));
+      return output.length > lim ? output.slice(0, lim) : output;
+    };
+  // Chakra, V8
+  } else if ('0'.split(undefined, 0).length) {
+    internalSplit = function (separator, limit) {
+      return separator === undefined && limit === 0 ? [] : nativeSplit.call(this, separator, limit);
+    };
+  } else internalSplit = nativeSplit;
+
+  return [
+    // `String.prototype.split` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.split
+    function split(separator, limit) {
+      var O = requireObjectCoercible(this);
+      var splitter = separator == undefined ? undefined : separator[SPLIT];
+      return splitter !== undefined
+        ? splitter.call(separator, O, limit)
+        : internalSplit.call(String(O), separator, limit);
+    },
+    // `RegExp.prototype[@@split]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@split
+    //
+    // NOTE: This cannot be properly polyfilled in engines that don't support
+    // the 'y' flag.
+    function (regexp, limit) {
+      var res = maybeCallNative(internalSplit, regexp, this, limit, internalSplit !== nativeSplit);
+      if (res.done) return res.value;
+
+      var rx = anObject(regexp);
+      var S = String(this);
+      var C = speciesConstructor(rx, RegExp);
+
+      var unicodeMatching = rx.unicode;
+      var flags = (rx.ignoreCase ? 'i' : '') +
+                  (rx.multiline ? 'm' : '') +
+                  (rx.unicode ? 'u' : '') +
+                  (SUPPORTS_Y ? 'y' : 'g');
+
+      // ^(? + rx + ) is needed, in combination with some S slicing, to
+      // simulate the 'y' flag.
+      var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
+      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
+      if (lim === 0) return [];
+      if (S.length === 0) return callRegExpExec(splitter, S) === null ? [S] : [];
+      var p = 0;
+      var q = 0;
+      var A = [];
+      while (q < S.length) {
+        splitter.lastIndex = SUPPORTS_Y ? q : 0;
+        var z = callRegExpExec(splitter, SUPPORTS_Y ? S : S.slice(q));
+        var e;
+        if (
+          z === null ||
+          (e = min(toLength(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
+        ) {
+          q = advanceStringIndex(S, q, unicodeMatching);
+        } else {
+          A.push(S.slice(p, q));
+          if (A.length === lim) return A;
+          for (var i = 1; i <= z.length - 1; i++) {
+            A.push(z[i]);
+            if (A.length === lim) return A;
+          }
+          q = p = e;
+        }
+      }
+      A.push(S.slice(p));
+      return A;
+    }
+  ];
+}, !SUPPORTS_Y);
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/web.dom-collections.for-each.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/core-js/modules/web.dom-collections.for-each.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+var DOMIterables = __webpack_require__(/*! ../internals/dom-iterables */ "./node_modules/core-js/internals/dom-iterables.js");
+var forEach = __webpack_require__(/*! ../internals/array-for-each */ "./node_modules/core-js/internals/array-for-each.js");
+var createNonEnumerableProperty = __webpack_require__(/*! ../internals/create-non-enumerable-property */ "./node_modules/core-js/internals/create-non-enumerable-property.js");
+
+for (var COLLECTION_NAME in DOMIterables) {
+  var Collection = global[COLLECTION_NAME];
+  var CollectionPrototype = Collection && Collection.prototype;
+  // some Chrome versions have non-configurable methods on DOMTokenList
+  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  } catch (error) {
+    CollectionPrototype.forEach = forEach;
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-ripple-directive/src/ripple.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/vue-ripple-directive/src/ripple.js ***!
+  \*********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var Ripple = {
+    bind: function(el, binding){
+
+        // Default values.
+        var props = {
+            event: 'mousedown',
+            transition: 600
+        };
+
+        setProps(Object.keys(binding.modifiers),props);
+
+        el.addEventListener(props.event, function(event) {
+            rippler(event, el, binding.value);
+        });
+
+        var bg = binding.value || Ripple.color || 'rgba(0, 0, 0, 0.35)';
+        var zIndex = Ripple.zIndex || '9999';
+
+        function rippler(event, el) {
+            var target = el;
+            // Get border to avoid offsetting on ripple container position
+            var targetBorder = parseInt((getComputedStyle(target).borderWidth).replace('px', ''));
+
+            // Get necessary variables
+            var rect        = target.getBoundingClientRect(),
+                left        = rect.left,
+                top         = rect.top,
+                width       = target.offsetWidth,
+                height      = target.offsetHeight,
+                dx          = event.clientX - left,
+                dy          = event.clientY - top,
+                maxX        = Math.max(dx, width - dx),
+                maxY        = Math.max(dy, height - dy),
+                style       = window.getComputedStyle(target),
+                radius      = Math.sqrt((maxX * maxX) + (maxY * maxY)),
+                border      = (targetBorder > 0 ) ? targetBorder : 0;
+
+            // Create the ripple and its container
+            var ripple = document.createElement("div"),
+                rippleContainer = document.createElement("div");
+                rippleContainer.className = 'ripple-container';
+                ripple.className = 'ripple';
+
+            //Styles for ripple
+            ripple.style.marginTop= '0px';
+            ripple.style.marginLeft= '0px';
+            ripple.style.width= '1px';
+            ripple.style.height= '1px';
+            ripple.style.transition= 'all ' + props.transition + 'ms cubic-bezier(0.4, 0, 0.2, 1)';
+            ripple.style.borderRadius= '50%';
+            ripple.style.pointerEvents= 'none';
+            ripple.style.position= 'relative';
+            ripple.style.zIndex= zIndex;
+            ripple.style.backgroundColor  = bg;
+
+            //Styles for rippleContainer
+            rippleContainer.style.position= 'absolute';
+            rippleContainer.style.left = 0 - border + 'px';
+            rippleContainer.style.top = 0 - border + 'px';
+            rippleContainer.style.height = '0';
+            rippleContainer.style.width = '0';
+            rippleContainer.style.pointerEvents = 'none';
+            rippleContainer.style.overflow = 'hidden';
+
+            // Store target position to change it after
+            var storedTargetPosition =  ((target.style.position).length > 0) ? target.style.position : getComputedStyle(target).position;
+            // Change target position to relative to guarantee ripples correct positioning
+            if (storedTargetPosition !== 'relative') {
+                target.style.position = 'relative';
+            }
+
+            rippleContainer.appendChild(ripple);
+            target.appendChild(rippleContainer);
+
+            ripple.style.marginLeft   = dx + "px";
+            ripple.style.marginTop    = dy + "px";
+
+            // No need to set positioning because ripple should be child of target and to it's relative position.
+            // rippleContainer.style.left    = left + (((window.pageXOffset || document.scrollLeft) - (document.clientLeft || 0)) || 0) + "px";
+            // rippleContainer.style.top     = top + (((window.pageYOffset || document.scrollTop) - (document.clientTop || 0)) || 0) + "px";
+            rippleContainer.style.width   = width + "px";
+            rippleContainer.style.height  = height + "px";
+            rippleContainer.style.borderTopLeftRadius  = style.borderTopLeftRadius;
+            rippleContainer.style.borderTopRightRadius  = style.borderTopRightRadius;
+            rippleContainer.style.borderBottomLeftRadius  = style.borderBottomLeftRadius;
+            rippleContainer.style.borderBottomRightRadius  = style.borderBottomRightRadius;
+
+            rippleContainer.style.direction = 'ltr';
+
+            setTimeout(function() {
+                ripple.style.width  = radius * 2 + "px";
+                ripple.style.height = radius * 2 + "px";
+                ripple.style.marginLeft   = dx - radius + "px";
+                ripple.style.marginTop    = dy - radius + "px";
+            }, 0);
+
+            function clearRipple() {
+                setTimeout(function() {
+                    ripple.style.backgroundColor = "rgba(0, 0, 0, 0)";
+                }, 250);
+
+                // Timeout set to get a smooth removal of the ripple
+                setTimeout(function() {
+                    rippleContainer.parentNode.removeChild(rippleContainer);
+                }, 850);
+
+                el.removeEventListener('mouseup', clearRipple, false);
+
+                // After removing event set position to target to it's original one
+                // Timeout it's needed to avoid jerky effect of ripple jumping out parent target
+                setTimeout(function () {
+
+                    var clearPosition = true;
+                    for(var i = 0; i < target.childNodes.length; i++) {
+                        if(target.childNodes[i].className === 'ripple-container') {
+                            clearPosition = false;
+                        }
+                    }
+
+                    if(clearPosition) {
+                        if(storedTargetPosition !== 'static') {
+                            target.style.position = storedTargetPosition;
+                        } else {
+                            target.style.position = '';
+                        }
+                    }
+
+                }, props.transition + 250)
+            }
+
+            if(event.type === 'mousedown') {
+                el.addEventListener('mouseup', clearRipple, false);
+            } else {
+                clearRipple();
+            }
+        }
+    }
+};
+
+function setProps(modifiers,props) {
+    modifiers.forEach(function(item) {
+        if(isNaN(Number(item)))
+            props.event = item;
+        else
+            props.transition = item;
+    });
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Ripple);
+
+/***/ })
+
+}]);
