@@ -179,6 +179,7 @@ class AdminReceiveJournalController extends Controller
                     $oldTotal = (int) $line->getRawOriginal('subtotal');
                     $newTotal = (int) round((float) $item['qty'] * (int) $item['price']);
                     $delta = $newTotal - $oldTotal;
+                    $payable = null;
 
                     $line->update([
                         'memo' => $item['memo'] ?? null,
@@ -198,15 +199,16 @@ class AdminReceiveJournalController extends Controller
 
                     if ($delta !== 0) {
                         $payable = $this->findReceiptPayable($head, $record);
-                        $payable->credit = (int) $payable->getRawOriginal('credit') + $delta;
-                        if ((int) $payable->credit < 0) {
+                        $newPayableCredit = (int) $payable->getRawOriginal('credit') + $delta;
+                        if ($newPayableCredit < 0) {
                             throw ValidationException::withMessages(['items' => 'Saldo hutang penerimaan menjadi negatif.']);
                         }
+                        $payable->credit = $newPayableCredit;
                         $payable->save();
                     }
 
                     Account::findOrFail($expense->account_id)->resetCurrentBalances();
-                    if (isset($payable)) {
+                    if ($payable) {
                         Account::findOrFail($payable->account_id)->resetCurrentBalances();
                     }
                 }
