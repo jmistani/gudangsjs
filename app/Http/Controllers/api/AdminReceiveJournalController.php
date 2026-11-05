@@ -279,19 +279,54 @@ class AdminReceiveJournalController extends Controller
     {
         $this->authorizeAdmin();
         if (!in_array($type, ['stok', 'non-stok'], true)) abort(404);
+        if ($type === 'stok') {
+            return response()->json([
+                'message' => 'Hapus baris stok masih dibatasi karena memengaruhi histori persediaan.',
+            ], 409);
+        }
 
-        return DB::transaction(function () use ($id, $type, $itemId) {
+        DB::transaction(function () use ($id, $itemId) {
             $record = ReceiveJournal::findOrFail($id);
             $head = $record->journalhead;
             if (!$head) abort(409, 'Jurnal penerimaan tidak ditemukan.');
 
-            // Receipt lines have stock movements and/or expense, payable, and
-            // account transactions. Never remove a line without reversing all
-            // its postings and verifying downstream stock consumption.
-            return response()->json([
-                'message' => 'Baris tidak dapat dihapus langsung karena sudah memengaruhi stok atau pembukuan. Pembalikan jurnal harus diselesaikan terlebih dahulu.',
-            ], 409);
-        });
+            $line = NonStockInventory::where('journal_head_id', $head->id)
+                ->lockForUpdate()
+                ->findOrFail($itemId);
+
+            $otherCount = StockMutation::where('journal_head_id', $head->id)->count()
+                + NonStockInventory::where('journal_head_id', $head->id)->count();
+
+            if ($otherCount <= 1) {
+                throw ValidationException::withMessages([
+                    'items' => 'Tidak dapat menghapus baris terakhir. Transaksi harus tetap memiliki barang.',
+                ]);
+            }
+
+            $expense = $this->findNonStockExpense($head, $line);
+            $payable = $this->findReceiptPayable($head, $record);
+            $newCredit = (int) $payable->getRawOriginal('credit')
+                - (int) $line->getRawOriginal('subtotal');
+
+            if ($newCredit < 0) {
+                throw ValidationException::withMessages([
+                    'items' => 'Jumlah hutang vendor tidak mencukupi untuk menghapus baris ini.',
+                ]);
+            }
+
+            $expenseAccountId = $expense->account_id;
+            $payableAccountId = $payable->account_id;
+
+            $expense->delete();
+            $line->delete();
+            $payable->credit = $newCredit;
+            $payable->save();
+
+            Account::findOrFail($expenseAccountId)->resetCurrentBalances();
+            Account::findOrFail($payableAccountId)->resetCurrentBalances();
+        }, 3);
+
+        return $this->response->successResponse('OK', 'Baris non-stok dan jurnal biayanya berhasil dihapus.');
     }
 
     public function destroy($id)
