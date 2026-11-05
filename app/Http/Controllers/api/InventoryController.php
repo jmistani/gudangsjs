@@ -421,9 +421,12 @@ class InventoryController extends Controller
                         null,
                         $request['receive_code']
                     );
-                    $transaction->referencesObject($journalhead);
                     $nsInventory->assignToReceiveJournal($receiveJournal);
                     $nsInventory->assignToJournalHead($journalhead);
+                    // Link each expense debit to its exact non-stock receipt line.
+                    // Existing records may still reference the journal head.
+                    $transaction->referencesObject($nsInventory);
+                    $transaction->assignToJournalHead($journalhead);
                 }
 
             }
