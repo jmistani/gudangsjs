@@ -236,7 +236,9 @@ class AdminConsumeJournalController extends Controller
                 $mutation->delete();
             }
 
-            AccountTransaction::where('journal_head_id', $journalHead->id)->delete();
+            DB::table('accounting_account_transactions')
+                ->where('journal_head_id', $journalHead->id)
+                ->delete();
 
             $journalHead->code = $data['code'];
             $journalHead->post_date = Carbon::parse($data['post_date']);
@@ -340,7 +342,9 @@ class AdminConsumeJournalController extends Controller
                 $mutation->delete();
             }
 
-            AccountTransaction::where('journal_head_id', $journalHead->id)->delete();
+            DB::table('accounting_account_transactions')
+                ->where('journal_head_id', $journalHead->id)
+                ->delete();
 
             $journalHead->delete();
             $consume->delete();
@@ -392,7 +396,9 @@ class AdminConsumeJournalController extends Controller
             $mutation->delete();
         }
 
-        AccountTransaction::where('journal_head_id', $journalHead->id)->delete();
+        DB::table('accounting_account_transactions')
+            ->where('journal_head_id', $journalHead->id)
+            ->delete();
         $journalHead->delete();
         $consume->delete();
 
