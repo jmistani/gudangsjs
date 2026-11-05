@@ -238,7 +238,7 @@ class AdminConsumeJournalController extends Controller
                 $oldTotal = (int) $mutation->getRawOriginal('total');
 
                 $inventory->in_stock -= $oldAmount;
-                $inventory->stock_value -= $oldTotal;
+                $inventory->stock_value = (int) $inventory->getRawOriginal('stock_value') - $oldTotal;
                 $inventory->save();
 
                 $mutation->delete();
@@ -298,7 +298,7 @@ class AdminConsumeJournalController extends Controller
                 }
 
                 $inventory->in_stock -= $qty;
-                $inventory->stock_value -= $total;
+                $inventory->stock_value = (int) $inventory->getRawOriginal('stock_value') - $total;
                 $inventory->save();
 
                 $transaction = $accountCoa->account->addDebit(
@@ -356,7 +356,7 @@ class AdminConsumeJournalController extends Controller
                 $oldTotal = (int) $mutation->getRawOriginal('total');
 
                 $inventory->in_stock -= $oldAmount;
-                $inventory->stock_value -= $oldTotal;
+                $inventory->stock_value = (int) $inventory->getRawOriginal('stock_value') - $oldTotal;
                 $inventory->save();
 
                 $mutation->delete();
@@ -423,7 +423,7 @@ class AdminConsumeJournalController extends Controller
         foreach ($mutations as $mutation) {
             $inventory = Inventory::findOrFail($mutation->stockable_id);
             $inventory->in_stock -= (int) $mutation->getRawOriginal('amount');
-            $inventory->stock_value -= (int) $mutation->getRawOriginal('total');
+            $inventory->stock_value = (int) $inventory->getRawOriginal('stock_value') - (int) $mutation->getRawOriginal('total');
             $inventory->save();
             $mutation->delete();
         }
