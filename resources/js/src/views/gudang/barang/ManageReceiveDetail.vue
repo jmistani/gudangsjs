@@ -25,18 +25,18 @@
 
       <b-card class="mb-2" no-body>
         <div class="items-heading">
-          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Jumlah dan harga non-stok dapat diubah; perubahan saldo biaya dan hutang diperbarui otomatis. Untuk stok, hanya keterangan yang dapat diubah.</small></div>
+          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Jumlah dan harga non-stok dapat diubah; perubahan saldo biaya dan hutang diperbarui otomatis. Stok juga dapat dikoreksi jika belum memiliki mutasi berikutnya.</small></div>
           <b-form-input v-model.trim="itemSearch" placeholder="Cari nama atau kode barang..." class="item-search" />
         </div>
         <div class="item-list">
           <div v-for="entry in filteredItems" :key="entry.item.type + '-' + entry.item.id" class="receipt-item">
             <div class="item-heading">
               <div class="item-title"><span class="item-number">{{ entry.index + 1 }}</span><div><strong>{{ entry.item.name || 'Barang tanpa nama' }}</strong><div class="text-muted small">{{ entry.item.code && entry.item.code !== '-' ? entry.item.code : 'Non-stok' }}</div></div></div>
-              <div class="item-controls"><b-badge :variant="entry.item.type === 'stok' ? 'light-success' : 'light-info'">{{ entry.item.type }}</b-badge><b-button v-if="entry.item.type === 'non-stok'" size="sm" variant="outline-danger" :disabled="saving || detail.items.length <= 1" :title="detail.items.length <= 1 ? 'Baris terakhir tidak dapat dihapus' : 'Hapus baris non-stok'" @click="deleteItem(entry.item)">Hapus Baris</b-button></div>
+              <div class="item-controls"><b-badge :variant="entry.item.type === 'stok' ? 'light-success' : 'light-info'">{{ entry.item.type }}</b-badge><b-button size="sm" variant="outline-danger" :disabled="saving || detail.items.length <= 1" :title="detail.items.length <= 1 ? 'Baris terakhir tidak dapat dihapus' : 'Tandai baris untuk dihapus'" @click="deleteItem(entry.item)">Hapus Baris</b-button></div>
             </div>
             <b-row v-if="entry.item.type === 'non-stok'" class="mb-1"><b-col cols="12" md="8"><b-form-group label="Nama Barang"><b-form-input v-model.trim="entry.item.name" maxlength="191" /></b-form-group></b-col><b-col cols="12" md="4"><b-form-group label="Satuan"><b-form-input v-model.trim="entry.item.unit" maxlength="191" /></b-form-group></b-col></b-row>
             <div class="item-values">
-              <div><span class="value-label">Jumlah</span><b-form-input v-model.number="entry.item.qty" type="number" min="0.01" step="any" :readonly="entry.item.type === 'stok'" :disabled="saving" /></div>
+              <div><span class="value-label">Jumlah</span><b-form-input v-model.number="entry.item.qty" type="number" min="0.01" step="any"  :disabled="saving" /></div>
               <div><span class="value-label">Harga Satuan (Rp)</span><b-form-input v-model.number="entry.item.price" type="number" min="0" step="1" :readonly="entry.item.type === 'stok'" :disabled="saving" /></div>
               <div><span class="value-label">Subtotal</span><strong>{{ rupiah(Number(entry.item.qty || 0) * Number(entry.item.price || 0)) }}</strong></div>
             </div>
@@ -48,7 +48,7 @@
         </div>
       </b-card>
 
-      <b-alert show variant="light-info" class="mb-1">Perubahan jumlah/harga non-stok akan memperbarui jurnal biaya dan hutang vendor. Penghapusan baris non-stok hanya disimpan setelah klik Simpan Perubahan. Tombol Batal membuang semua perubahan.</b-alert>
+      <b-alert show variant="light-info" class="mb-1">Perubahan jumlah/harga non-stok akan memperbarui jurnal biaya dan hutang vendor. Penghapusan baris stok/non-stok hanya disimpan setelah klik Simpan Perubahan. Tombol Batal membuang semua perubahan.</b-alert>
       <div class="save-bar">
         <div><small class="text-muted d-block">Total Penerimaan</small><strong class="total-amount">{{ rupiah(totalAmount) }}</strong></div>
         <div class="save-actions">
@@ -69,7 +69,7 @@ import { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormText
 export default {
   name: 'ManageReceiveDetail',
   components: { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BRow, BSpinner },
-  data() { return { detail: null, loading: false, saving: false, error: '', itemSearch: '', deletedNonstockIds: [] } },
+  data() { return { detail: null, loading: false, saving: false, error: '', itemSearch: '', deletedNonstockIds: [], deletedStockIds: [] } },
   computed: {
     filteredItems() {
       const q = this.itemSearch.toLowerCase()
@@ -85,19 +85,20 @@ export default {
     message(e) { const data = e.response && e.response.data; return (data && data.message) || 'Terjadi kesalahan.' },
     async load() {
       this.loading = true; this.error = ''
-      try { const response = await axios.get('admin/inventory-receives/' + this.$route.params.id); this.detail = response.data.payload; this.deletedNonstockIds = [] }
+      try { const response = await axios.get('admin/inventory-receives/' + this.$route.params.id); this.detail = response.data.payload; this.deletedNonstockIds = []; this.deletedStockIds = [] }
       catch (e) { this.error = this.message(e) }
       finally { this.loading = false }
     },
     async deleteItem(item) {
-      if (this.saving || item.type !== 'non-stok' || this.detail.items.length <= 1) return
+      if (this.saving || this.detail.items.length <= 1) return
       const yes = await this.$bvModal.msgBoxConfirm(
-        'Tandai baris non-stok ' + (item.name || item.id) + ' untuk dihapus? Penghapusan baru berlaku setelah klik Simpan Perubahan.',
+        'Tandai baris ' + (item.name || item.id) + ' untuk dihapus? Penghapusan baru berlaku setelah klik Simpan Perubahan. Stok yang sudah memiliki mutasi berikutnya tidak dapat dikoreksi.',
         { title: 'Konfirmasi Hapus Baris', okTitle: 'Tandai Hapus', cancelTitle: 'Batal', okVariant: 'danger', centered: true },
       )
       if (!yes) return
-      this.deletedNonstockIds.push(item.id)
-      this.detail.items = this.detail.items.filter(x => !(x.type === 'non-stok' && x.id === item.id))
+      if (item.type === 'stok') this.deletedStockIds.push(item.id)
+      else this.deletedNonstockIds.push(item.id)
+      this.detail.items = this.detail.items.filter(x => !(x.type === item.type && x.id === item.id))
     },
     async save() {
       if (this.saving || !this.detail) return
@@ -112,6 +113,7 @@ export default {
           receiver: this.detail.receiver,
           items: this.detail.items.map(x => ({ type: x.type, id: x.id, name: x.name, unit: x.unit, qty: Number(x.qty), price: Number(x.price), memo: x.memo || '' })),
           deleted_nonstock_ids: this.deletedNonstockIds,
+          deleted_stock_ids: this.deletedStockIds,
         })
         this.$router.push({ name: 'inventory-receive-manage' })
       } catch (e) { this.error = this.message(e); window.scrollTo(0, 0) }
