@@ -1,24 +1,443 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[32],{
 
-/***/ "./node_modules/@babel/runtime/helpers/esm/typeof.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/esm/typeof.js ***!
-  \***********************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _typeof; });
-function _typeof(obj) {
-  "@babel/helpers - typeof";
+/* harmony import */ var D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js */ "./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js");
+/* harmony import */ var D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/objectSpread2.js */ "./node_modules/@babel/runtime/helpers/esm/objectSpread2.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/es.array.concat.js */ "./node_modules/core-js/modules/es.array.concat.js");
+/* harmony import */ var core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var core_js_modules_es_array_map_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/es.array.map.js */ "./node_modules/core-js/modules/es.array.map.js");
+/* harmony import */ var core_js_modules_es_array_map_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_map_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var core_js_modules_es_number_constructor_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.number.constructor.js */ "./node_modules/core-js/modules/es.number.constructor.js");
+/* harmony import */ var core_js_modules_es_number_constructor_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_number_constructor_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var core_js_modules_es_number_is_finite_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! core-js/modules/es.number.is-finite.js */ "./node_modules/core-js/modules/es.number.is-finite.js");
+/* harmony import */ var core_js_modules_es_number_is_finite_js__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_number_is_finite_js__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! core-js/modules/es.regexp.exec.js */ "./node_modules/core-js/modules/es.regexp.exec.js");
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var core_js_modules_es_string_match_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! core-js/modules/es.string.match.js */ "./node_modules/core-js/modules/es.string.match.js");
+/* harmony import */ var core_js_modules_es_string_match_js__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_match_js__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var core_js_modules_es_string_trim_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! core-js/modules/es.string.trim.js */ "./node_modules/core-js/modules/es.string.trim.js");
+/* harmony import */ var core_js_modules_es_string_trim_js__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_trim_js__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! core-js/modules/es.string.split.js */ "./node_modules/core-js/modules/es.string.split.js");
+/* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! core-js/modules/es.string.replace.js */ "./node_modules/core-js/modules/es.string.replace.js");
+/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! core-js/modules/es.object.to-string.js */ "./node_modules/core-js/modules/es.object.to-string.js");
+/* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each.js */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+/* harmony import */ var core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var core_js_modules_es_object_keys_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! core-js/modules/es.object.keys.js */ "./node_modules/core-js/modules/es.object.keys.js");
+/* harmony import */ var core_js_modules_es_object_keys_js__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_keys_js__WEBPACK_IMPORTED_MODULE_14__);
+/* harmony import */ var core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! core-js/modules/es.array.includes.js */ "./node_modules/core-js/modules/es.array.includes.js");
+/* harmony import */ var core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_15__);
+/* harmony import */ var bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! bootstrap-vue */ "./node_modules/bootstrap-vue/esm/index.js");
+/* harmony import */ var _axios__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @axios */ "./resources/js/src/libs/axios.js");
 
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, _typeof(obj);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+var emptyFilters = function emptyFilters() {
+  return {
+    inventory_id: '',
+    date_start: '',
+    date_end: '',
+    archive_batch_id: '',
+    search: '',
+    transaction_date_start: '',
+    transaction_date_end: ''
+  };
+};
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'ArchivedStockMutations',
+  components: {
+    BCard: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BCard"],
+    BRow: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BRow"],
+    BCol: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BCol"],
+    BFormGroup: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BFormGroup"],
+    BFormInput: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BFormInput"],
+    BFormSelect: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BFormSelect"],
+    BButton: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BButton"],
+    BAlert: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BAlert"],
+    BTable: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BTable"],
+    BPagination: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BPagination"],
+    BSpinner: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BSpinner"],
+    BLink: bootstrap_vue__WEBPACK_IMPORTED_MODULE_16__["BLink"]
+  },
+  data: function data() {
+    return {
+      loading: false,
+      errorMessage: '',
+      rows: [],
+      batches: [],
+      filters: Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_1__["default"])(Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_1__["default"])({}, emptyFilters()), {}, {
+        inventory_id: this.$route.query.inventory_id || ''
+      }),
+      currentPage: 1,
+      perPage: 25,
+      sortBy: 'archive_date',
+      sortDesc: true,
+      total: 0,
+      from: 0,
+      to: 0,
+      unassignedCount: 0,
+      fields: [{
+        key: 'archive_date',
+        sortable: true,
+        label: 'Tanggal Arsip'
+      }, {
+        key: 'archive_batch_id',
+        sortable: true,
+        label: 'Batch ID'
+      }, {
+        key: 'batch_period',
+        sortable: true,
+        label: 'Periode Batch'
+      }, {
+        key: 'inventory',
+        sortable: true,
+        label: 'Barang'
+      }, {
+        key: 'post_date',
+        sortable: true,
+        label: 'Tanggal Transaksi'
+      }, {
+        key: 'masuk',
+        sortable: true,
+        label: 'Masuk',
+        "class": 'text-right'
+      }, {
+        key: 'keluar',
+        sortable: true,
+        label: 'Keluar',
+        "class": 'text-right'
+      }, {
+        key: 'price',
+        sortable: true,
+        label: 'Harga',
+        "class": 'text-right'
+      }, {
+        key: 'total',
+        sortable: true,
+        label: 'Total',
+        "class": 'text-right'
+      }, {
+        key: 'reference',
+        sortable: true,
+        label: 'Referensi'
+      }, {
+        key: 'description',
+        sortable: true,
+        label: 'Deskripsi'
+      }]
+    };
+  },
+  computed: {
+    batchOptions: function batchOptions() {
+      var _this = this;
+
+      return [{
+        value: '',
+        text: 'Semua batch'
+      }].concat(this.batches.map(function (batch) {
+        return {
+          value: String(batch.id),
+          text: "#".concat(batch.id, " \u2014 ").concat(batch.created_at ? _this.formatDate(batch.created_at) : 'tanggal belum tersedia')
+        };
+      }));
+    }
+  },
+  watch: {
+    '$route.query.inventory_id': function $routeQueryInventory_id(id) {
+      this.filters.inventory_id = id || '';
+      this.currentPage = 1;
+      this.loadData();
+    }
+  },
+  mounted: function mounted() {
+    this.loadData();
+  },
+  methods: {
+    formatNumber: function formatNumber(value) {
+      var number = Number(value);
+      return Number.isFinite(number) ? new Intl.NumberFormat('id-ID').format(number) : '-';
+    },
+    formatDate: function formatDate(value) {
+      if (!value) return '-'; // Only extract date characters; do not convert timestamps between timezones.
+
+      var match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      return match ? "".concat(match[3], " ").concat(match[2], " ").concat(match[1]) : String(value);
+    },
+    parseTransactionDate: function parseTransactionDate(input, label) {
+      if (!input) return '';
+      var match = String(input).trim().match(/^(\d{2})[ \/-](\d{2})[ \/-](\d{4})$/);
+      if (!match) throw new Error("".concat(label, " harus berformat DD MM YYYY, contoh 27 10 2026."));
+      var day = Number(match[1]);
+      var month = Number(match[2]);
+      var year = Number(match[3]);
+      var date = new Date(Date.UTC(year, month - 1, day));
+
+      if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+        throw new Error("".concat(label, " tidak valid."));
+      }
+
+      return "".concat(match[3], "-").concat(match[2], "-").concat(match[1]);
+    },
+    shortType: function shortType(type) {
+      return String(type || '').split('\\').pop();
+    },
+    applyFilters: function applyFilters() {
+      this.currentPage = 1;
+      this.loadData();
+    },
+    resetFilters: function resetFilters() {
+      this.filters = emptyFilters();
+      this.currentPage = 1; // The URL filter should also be cleared so a future route change is predictable.
+
+      if (this.$route.query.inventory_id) {
+        var query = Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.$route.query);
+
+        delete query.inventory_id;
+        this.$router.replace({
+          query: query
+        })["catch"](function () {});
+      }
+
+      this.loadData();
+    },
+    onSortChanged: function onSortChanged(ctx) {
+      // Sorting is performed by Laravel across all archive rows (not just this page).
+      this.sortBy = ctx.sortBy || 'archive_date';
+      this.sortDesc = !!ctx.sortDesc;
+      this.currentPage = 1;
+      this.loadData();
+    },
+    onPageChange: function onPageChange(page) {
+      this.currentPage = page;
+      this.loadData();
+    },
+    loadData: function loadData() {
+      var _this2 = this;
+
+      return Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_2___default.a.mark(function _callee() {
+        var params, first, last, _yield$axios$get, data;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_2___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _this2.loading = true;
+                _this2.errorMessage = '';
+                _context.prev = 2;
+                params = {
+                  page: _this2.currentPage,
+                  per_page: _this2.perPage,
+                  sort_by: _this2.sortBy,
+                  sort_desc: _this2.sortDesc ? 1 : 0
+                };
+                Object.keys(_this2.filters).forEach(function (key) {
+                  if (['transaction_date_start', 'transaction_date_end'].includes(key)) return;
+                  if (_this2.filters[key] !== '' && _this2.filters[key] !== null) params[key] = _this2.filters[key];
+                });
+                first = _this2.parseTransactionDate(_this2.filters.transaction_date_start, 'Tanggal transaksi dari');
+                last = _this2.parseTransactionDate(_this2.filters.transaction_date_end, 'Tanggal transaksi sampai');
+
+                if (!(first && last && first > last)) {
+                  _context.next = 9;
+                  break;
+                }
+
+                throw new Error('Tanggal transaksi sampai tidak boleh lebih awal dari tanggal mulai.');
+
+              case 9:
+                if (first) params.transaction_date_start = first;
+                if (last) params.transaction_date_end = last;
+                _context.next = 13;
+                return _axios__WEBPACK_IMPORTED_MODULE_17__["default"].get('stock-mutations/archive', {
+                  params: params
+                });
+
+              case 13:
+                _yield$axios$get = _context.sent;
+                data = _yield$axios$get.data;
+                _this2.rows = Array.isArray(data.data) ? data.data : [];
+                _this2.total = Number(data.total) || 0;
+                _this2.from = Number(data.from) || 0;
+                _this2.to = Number(data.to) || 0;
+                _this2.batches = Array.isArray(data.batches) ? data.batches : [];
+                _this2.unassignedCount = Number(data.unassigned_count) || 0;
+                _context.next = 30;
+                break;
+
+              case 23:
+                _context.prev = 23;
+                _context.t0 = _context["catch"](2);
+                _this2.rows = [];
+                _this2.total = 0;
+                _this2.from = 0;
+                _this2.to = 0;
+                _this2.errorMessage = _context.t0.response && _context.t0.response.data && _context.t0.response.data.message || _context.t0.message || 'Gagal mengambil arsip mutasi stok. Periksa koneksi dan endpoint API.';
+
+              case 30:
+                _context.prev = 30;
+                _this2.loading = false;
+                return _context.finish(30);
+
+              case 33:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, null, [[2, 23, 30, 33]]);
+      }))();
+    }
+  }
+});
 
 /***/ }),
 
@@ -69,79 +488,52 @@ module.exports = function (METHOD_NAME, argument) {
 
 /***/ }),
 
-/***/ "./node_modules/core-js/internals/is-regexp.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/core-js/internals/is-regexp.js ***!
-  \*****************************************************/
+/***/ "./node_modules/core-js/internals/number-is-finite.js":
+/*!************************************************************!*\
+  !*** ./node_modules/core-js/internals/number-is-finite.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(/*! ../internals/is-object */ "./node_modules/core-js/internals/is-object.js");
-var classof = __webpack_require__(/*! ../internals/classof-raw */ "./node_modules/core-js/internals/classof-raw.js");
-var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
 
-var MATCH = wellKnownSymbol('match');
+var globalIsFinite = global.isFinite;
 
-// `IsRegExp` abstract operation
-// https://tc39.github.io/ecma262/#sec-isregexp
-module.exports = function (it) {
-  var isRegExp;
-  return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : classof(it) == 'RegExp');
+// `Number.isFinite` method
+// https://tc39.github.io/ecma262/#sec-number.isfinite
+module.exports = Number.isFinite || function isFinite(it) {
+  return typeof it == 'number' && globalIsFinite(it);
 };
 
 
 /***/ }),
 
-/***/ "./node_modules/core-js/internals/species-constructor.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/core-js/internals/species-constructor.js ***!
-  \***************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
-var aFunction = __webpack_require__(/*! ../internals/a-function */ "./node_modules/core-js/internals/a-function.js");
-var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
-
-var SPECIES = wellKnownSymbol('species');
-
-// `SpeciesConstructor` abstract operation
-// https://tc39.github.io/ecma262/#sec-speciesconstructor
-module.exports = function (O, defaultConstructor) {
-  var C = anObject(O).constructor;
-  var S;
-  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? defaultConstructor : aFunction(S);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/core-js/modules/es.array.join.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/core-js/modules/es.array.join.js ***!
-  \*******************************************************/
+/***/ "./node_modules/core-js/modules/es.array.includes.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/core-js/modules/es.array.includes.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
-var IndexedObject = __webpack_require__(/*! ../internals/indexed-object */ "./node_modules/core-js/internals/indexed-object.js");
-var toIndexedObject = __webpack_require__(/*! ../internals/to-indexed-object */ "./node_modules/core-js/internals/to-indexed-object.js");
-var arrayMethodIsStrict = __webpack_require__(/*! ../internals/array-method-is-strict */ "./node_modules/core-js/internals/array-method-is-strict.js");
+var $includes = __webpack_require__(/*! ../internals/array-includes */ "./node_modules/core-js/internals/array-includes.js").includes;
+var addToUnscopables = __webpack_require__(/*! ../internals/add-to-unscopables */ "./node_modules/core-js/internals/add-to-unscopables.js");
+var arrayMethodUsesToLength = __webpack_require__(/*! ../internals/array-method-uses-to-length */ "./node_modules/core-js/internals/array-method-uses-to-length.js");
 
-var nativeJoin = [].join;
+var USES_TO_LENGTH = arrayMethodUsesToLength('indexOf', { ACCESSORS: true, 1: 0 });
 
-var ES3_STRINGS = IndexedObject != Object;
-var STRICT_METHOD = arrayMethodIsStrict('join', ',');
-
-// `Array.prototype.join` method
-// https://tc39.github.io/ecma262/#sec-array.prototype.join
-$({ target: 'Array', proto: true, forced: ES3_STRINGS || !STRICT_METHOD }, {
-  join: function join(separator) {
-    return nativeJoin.call(toIndexedObject(this), separator === undefined ? ',' : separator);
+// `Array.prototype.includes` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.includes
+$({ target: 'Array', proto: true, forced: !USES_TO_LENGTH }, {
+  includes: function includes(el /* , fromIndex = 0 */) {
+    return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
+
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
+addToUnscopables('includes');
 
 
 /***/ }),
@@ -176,148 +568,44 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGT
 
 /***/ }),
 
-/***/ "./node_modules/core-js/modules/es.string.split.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/core-js/modules/es.string.split.js ***!
-  \*********************************************************/
+/***/ "./node_modules/core-js/modules/es.number.is-finite.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/core-js/modules/es.number.is-finite.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var numberIsFinite = __webpack_require__(/*! ../internals/number-is-finite */ "./node_modules/core-js/internals/number-is-finite.js");
 
-var fixRegExpWellKnownSymbolLogic = __webpack_require__(/*! ../internals/fix-regexp-well-known-symbol-logic */ "./node_modules/core-js/internals/fix-regexp-well-known-symbol-logic.js");
-var isRegExp = __webpack_require__(/*! ../internals/is-regexp */ "./node_modules/core-js/internals/is-regexp.js");
-var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
-var requireObjectCoercible = __webpack_require__(/*! ../internals/require-object-coercible */ "./node_modules/core-js/internals/require-object-coercible.js");
-var speciesConstructor = __webpack_require__(/*! ../internals/species-constructor */ "./node_modules/core-js/internals/species-constructor.js");
-var advanceStringIndex = __webpack_require__(/*! ../internals/advance-string-index */ "./node_modules/core-js/internals/advance-string-index.js");
-var toLength = __webpack_require__(/*! ../internals/to-length */ "./node_modules/core-js/internals/to-length.js");
-var callRegExpExec = __webpack_require__(/*! ../internals/regexp-exec-abstract */ "./node_modules/core-js/internals/regexp-exec-abstract.js");
-var regexpExec = __webpack_require__(/*! ../internals/regexp-exec */ "./node_modules/core-js/internals/regexp-exec.js");
+// `Number.isFinite` method
+// https://tc39.github.io/ecma262/#sec-number.isfinite
+$({ target: 'Number', stat: true }, { isFinite: numberIsFinite });
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.object.keys.js":
+/*!********************************************************!*\
+  !*** ./node_modules/core-js/modules/es.object.keys.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var toObject = __webpack_require__(/*! ../internals/to-object */ "./node_modules/core-js/internals/to-object.js");
+var nativeKeys = __webpack_require__(/*! ../internals/object-keys */ "./node_modules/core-js/internals/object-keys.js");
 var fails = __webpack_require__(/*! ../internals/fails */ "./node_modules/core-js/internals/fails.js");
 
-var arrayPush = [].push;
-var min = Math.min;
-var MAX_UINT32 = 0xFFFFFFFF;
+var FAILS_ON_PRIMITIVES = fails(function () { nativeKeys(1); });
 
-// babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
-var SUPPORTS_Y = !fails(function () { return !RegExp(MAX_UINT32, 'y'); });
-
-// @@split logic
-fixRegExpWellKnownSymbolLogic('split', 2, function (SPLIT, nativeSplit, maybeCallNative) {
-  var internalSplit;
-  if (
-    'abbc'.split(/(b)*/)[1] == 'c' ||
-    'test'.split(/(?:)/, -1).length != 4 ||
-    'ab'.split(/(?:ab)*/).length != 2 ||
-    '.'.split(/(.?)(.?)/).length != 4 ||
-    '.'.split(/()()/).length > 1 ||
-    ''.split(/.?/).length
-  ) {
-    // based on es5-shim implementation, need to rework it
-    internalSplit = function (separator, limit) {
-      var string = String(requireObjectCoercible(this));
-      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
-      if (lim === 0) return [];
-      if (separator === undefined) return [string];
-      // If `separator` is not a regex, use native split
-      if (!isRegExp(separator)) {
-        return nativeSplit.call(string, separator, lim);
-      }
-      var output = [];
-      var flags = (separator.ignoreCase ? 'i' : '') +
-                  (separator.multiline ? 'm' : '') +
-                  (separator.unicode ? 'u' : '') +
-                  (separator.sticky ? 'y' : '');
-      var lastLastIndex = 0;
-      // Make `global` and avoid `lastIndex` issues by working with a copy
-      var separatorCopy = new RegExp(separator.source, flags + 'g');
-      var match, lastIndex, lastLength;
-      while (match = regexpExec.call(separatorCopy, string)) {
-        lastIndex = separatorCopy.lastIndex;
-        if (lastIndex > lastLastIndex) {
-          output.push(string.slice(lastLastIndex, match.index));
-          if (match.length > 1 && match.index < string.length) arrayPush.apply(output, match.slice(1));
-          lastLength = match[0].length;
-          lastLastIndex = lastIndex;
-          if (output.length >= lim) break;
-        }
-        if (separatorCopy.lastIndex === match.index) separatorCopy.lastIndex++; // Avoid an infinite loop
-      }
-      if (lastLastIndex === string.length) {
-        if (lastLength || !separatorCopy.test('')) output.push('');
-      } else output.push(string.slice(lastLastIndex));
-      return output.length > lim ? output.slice(0, lim) : output;
-    };
-  // Chakra, V8
-  } else if ('0'.split(undefined, 0).length) {
-    internalSplit = function (separator, limit) {
-      return separator === undefined && limit === 0 ? [] : nativeSplit.call(this, separator, limit);
-    };
-  } else internalSplit = nativeSplit;
-
-  return [
-    // `String.prototype.split` method
-    // https://tc39.github.io/ecma262/#sec-string.prototype.split
-    function split(separator, limit) {
-      var O = requireObjectCoercible(this);
-      var splitter = separator == undefined ? undefined : separator[SPLIT];
-      return splitter !== undefined
-        ? splitter.call(separator, O, limit)
-        : internalSplit.call(String(O), separator, limit);
-    },
-    // `RegExp.prototype[@@split]` method
-    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@split
-    //
-    // NOTE: This cannot be properly polyfilled in engines that don't support
-    // the 'y' flag.
-    function (regexp, limit) {
-      var res = maybeCallNative(internalSplit, regexp, this, limit, internalSplit !== nativeSplit);
-      if (res.done) return res.value;
-
-      var rx = anObject(regexp);
-      var S = String(this);
-      var C = speciesConstructor(rx, RegExp);
-
-      var unicodeMatching = rx.unicode;
-      var flags = (rx.ignoreCase ? 'i' : '') +
-                  (rx.multiline ? 'm' : '') +
-                  (rx.unicode ? 'u' : '') +
-                  (SUPPORTS_Y ? 'y' : 'g');
-
-      // ^(? + rx + ) is needed, in combination with some S slicing, to
-      // simulate the 'y' flag.
-      var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
-      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
-      if (lim === 0) return [];
-      if (S.length === 0) return callRegExpExec(splitter, S) === null ? [S] : [];
-      var p = 0;
-      var q = 0;
-      var A = [];
-      while (q < S.length) {
-        splitter.lastIndex = SUPPORTS_Y ? q : 0;
-        var z = callRegExpExec(splitter, SUPPORTS_Y ? S : S.slice(q));
-        var e;
-        if (
-          z === null ||
-          (e = min(toLength(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
-        ) {
-          q = advanceStringIndex(S, q, unicodeMatching);
-        } else {
-          A.push(S.slice(p, q));
-          if (A.length === lim) return A;
-          for (var i = 1; i <= z.length - 1; i++) {
-            A.push(z[i]);
-            if (A.length === lim) return A;
-          }
-          q = p = e;
-        }
-      }
-      A.push(S.slice(p));
-      return A;
-    }
-  ];
-}, !SUPPORTS_Y);
+// `Object.keys` method
+// https://tc39.github.io/ecma262/#sec-object.keys
+$({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
+  keys: function keys(it) {
+    return nativeKeys(toObject(it));
+  }
+});
 
 
 /***/ }),
@@ -348,164 +636,807 @@ for (var COLLECTION_NAME in DOMIterables) {
 
 /***/ }),
 
-/***/ "./node_modules/vue-ripple-directive/src/ripple.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/vue-ripple-directive/src/ripple.js ***!
-  \*********************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css&":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css& ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.i, "\n.table[data-v-148e6446] { white-space: nowrap;\n}\n", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/dist/cjs.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css&":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader/dist/cjs.js??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css& ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../../../node_modules/css-loader/dist/cjs.js??ref--6-1!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true&":
+/*!**************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true& ***!
+  \**************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "b-card",
+    { attrs: { "no-body": "" } },
+    [
+      _c(
+        "div",
+        { staticClass: "p-2" },
+        [
+          _c(
+            "div",
+            {
+              staticClass:
+                "d-flex justify-content-between align-items-center flex-wrap mb-2",
+            },
+            [
+              _c("div", [
+                _c("h3", { staticClass: "mb-25" }, [
+                  _vm._v("Arsip Mutasi Stok"),
+                ]),
+                _vm._v(" "),
+                _c("small", { staticClass: "text-muted" }, [
+                  _vm._v(
+                    "Tanggal arsip berasal dari waktu proses pengarsipan (archived_at), terpisah dari tanggal transaksi."
+                  ),
+                ]),
+              ]),
+              _vm._v(" "),
+              _c(
+                "b-button",
+                {
+                  attrs: { variant: "outline-primary", disabled: _vm.loading },
+                  on: { click: _vm.loadData },
+                },
+                [
+                  _c("feather-icon", {
+                    staticClass: "mr-50",
+                    attrs: { icon: "RefreshCwIcon" },
+                  }),
+                  _vm._v("Muat Ulang\n      "),
+                ],
+                1
+              ),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "b-row",
+            [
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "ID Barang" } },
+                    [
+                      _c("b-form-input", {
+                        attrs: {
+                          type: "number",
+                          min: "1",
+                          placeholder: "Contoh: 341",
+                        },
+                        on: {
+                          keyup: function ($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.applyFilters.apply(null, arguments)
+                          },
+                        },
+                        model: {
+                          value: _vm.filters.inventory_id,
+                          callback: function ($$v) {
+                            _vm.$set(
+                              _vm.filters,
+                              "inventory_id",
+                              typeof $$v === "string" ? $$v.trim() : $$v
+                            )
+                          },
+                          expression: "filters.inventory_id",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "Diarsipkan mulai" } },
+                    [
+                      _c("b-form-input", {
+                        attrs: { type: "date" },
+                        model: {
+                          value: _vm.filters.date_start,
+                          callback: function ($$v) {
+                            _vm.$set(_vm.filters, "date_start", $$v)
+                          },
+                          expression: "filters.date_start",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "Diarsipkan sampai" } },
+                    [
+                      _c("b-form-input", {
+                        attrs: { type: "date" },
+                        model: {
+                          value: _vm.filters.date_end,
+                          callback: function ($$v) {
+                            _vm.$set(_vm.filters, "date_end", $$v)
+                          },
+                          expression: "filters.date_end",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "Batch arsip" } },
+                    [
+                      _c("b-form-select", {
+                        attrs: { options: _vm.batchOptions },
+                        model: {
+                          value: _vm.filters.archive_batch_id,
+                          callback: function ($$v) {
+                            _vm.$set(_vm.filters, "archive_batch_id", $$v)
+                          },
+                          expression: "filters.archive_batch_id",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "b-row",
+            [
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "Tanggal transaksi dari (DD MM YYYY)" } },
+                    [
+                      _c("b-form-input", {
+                        attrs: { placeholder: "01 01 2026", maxlength: "10" },
+                        on: {
+                          keyup: function ($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.applyFilters.apply(null, arguments)
+                          },
+                        },
+                        model: {
+                          value: _vm.filters.transaction_date_start,
+                          callback: function ($$v) {
+                            _vm.$set(
+                              _vm.filters,
+                              "transaction_date_start",
+                              typeof $$v === "string" ? $$v.trim() : $$v
+                            )
+                          },
+                          expression: "filters.transaction_date_start",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    {
+                      attrs: { label: "Tanggal transaksi sampai (DD MM YYYY)" },
+                    },
+                    [
+                      _c("b-form-input", {
+                        attrs: { placeholder: "31 12 2026", maxlength: "10" },
+                        on: {
+                          keyup: function ($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.applyFilters.apply(null, arguments)
+                          },
+                        },
+                        model: {
+                          value: _vm.filters.transaction_date_end,
+                          callback: function ($$v) {
+                            _vm.$set(
+                              _vm.filters,
+                              "transaction_date_end",
+                              typeof $$v === "string" ? $$v.trim() : $$v
+                            )
+                          },
+                          expression: "filters.transaction_date_end",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "Cari barang / deskripsi / kode" } },
+                    [
+                      _c("b-form-input", {
+                        attrs: { placeholder: "Cari..." },
+                        on: {
+                          keyup: function ($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.applyFilters.apply(null, arguments)
+                          },
+                        },
+                        model: {
+                          value: _vm.filters.search,
+                          callback: function ($$v) {
+                            _vm.$set(
+                              _vm.filters,
+                              "search",
+                              typeof $$v === "string" ? $$v.trim() : $$v
+                            )
+                          },
+                          expression: "filters.search",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { attrs: { cols: "12", md: "3" } },
+                [
+                  _c(
+                    "b-form-group",
+                    { attrs: { label: "Baris per halaman" } },
+                    [
+                      _c("b-form-select", {
+                        attrs: { options: [10, 25, 50, 100] },
+                        on: { change: _vm.applyFilters },
+                        model: {
+                          value: _vm.perPage,
+                          callback: function ($$v) {
+                            _vm.perPage = $$v
+                          },
+                          expression: "perPage",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                {
+                  staticClass: "d-flex align-items-center mb-1",
+                  attrs: { cols: "12", md: "4" },
+                },
+                [
+                  _c(
+                    "b-button",
+                    {
+                      staticClass: "mr-1",
+                      attrs: { variant: "primary", disabled: _vm.loading },
+                      on: { click: _vm.applyFilters },
+                    },
+                    [_vm._v("Terapkan")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-button",
+                    {
+                      attrs: {
+                        variant: "outline-secondary",
+                        disabled: _vm.loading,
+                      },
+                      on: { click: _vm.resetFilters },
+                    },
+                    [_vm._v("Reset")]
+                  ),
+                ],
+                1
+              ),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "b-alert",
+            { attrs: { variant: "danger", show: !!_vm.errorMessage } },
+            [_vm._v(_vm._s(_vm.errorMessage))]
+          ),
+          _vm._v(" "),
+          _c("small", { staticClass: "text-muted" }, [
+            _vm._v(
+              "Klik judul kolom untuk mengurutkan hasil filter. Urutan berlaku untuk seluruh halaman."
+            ),
+          ]),
+          _vm._v(" "),
+          _c(
+            "b-alert",
+            {
+              attrs: {
+                variant: "info",
+                show: _vm.unassignedCount > 0 && !_vm.loading,
+              },
+            },
+            [
+              _vm._v(
+                "\n      " +
+                  _vm._s(_vm.unassignedCount) +
+                  " mutasi arsip tidak memiliki archive_batch_id. Tanggal arsip untuk data tersebut mungkin belum tersedia.\n    "
+              ),
+            ]
+          ),
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("b-table", {
+        staticClass: "mb-0",
+        attrs: {
+          items: _vm.rows,
+          fields: _vm.fields,
+          busy: _vm.loading,
+          "sort-by": _vm.sortBy,
+          "sort-desc": _vm.sortDesc,
+          "no-local-sorting": true,
+          responsive: "",
+          striped: "",
+          "show-empty": "",
+          "empty-text": "Tidak ada mutasi arsip sesuai filter.",
+        },
+        on: {
+          "update:sortBy": function ($event) {
+            _vm.sortBy = $event
+          },
+          "update:sort-by": function ($event) {
+            _vm.sortBy = $event
+          },
+          "update:sortDesc": function ($event) {
+            _vm.sortDesc = $event
+          },
+          "update:sort-desc": function ($event) {
+            _vm.sortDesc = $event
+          },
+          "sort-changed": _vm.onSortChanged,
+        },
+        scopedSlots: _vm._u([
+          {
+            key: "table-busy",
+            fn: function () {
+              return [
+                _c(
+                  "div",
+                  { staticClass: "text-center p-2" },
+                  [
+                    _c("b-spinner", {
+                      staticClass: "mr-1",
+                      attrs: { small: "" },
+                    }),
+                    _vm._v(" Memuat arsip..."),
+                  ],
+                  1
+                ),
+              ]
+            },
+            proxy: true,
+          },
+          {
+            key: "cell(archive_date)",
+            fn: function (data) {
+              return [
+                data.item.archive_date
+                  ? _c("span", [
+                      _vm._v(_vm._s(_vm.formatDate(data.item.archive_date))),
+                    ])
+                  : _c("span", { staticClass: "text-muted" }, [
+                      _vm._v("Tidak diketahui"),
+                    ]),
+              ]
+            },
+          },
+          {
+            key: "cell(batch_period)",
+            fn: function (data) {
+              return [
+                data.item.range_start && data.item.range_end
+                  ? _c("span", [
+                      _vm._v(
+                        "\n        " +
+                          _vm._s(data.item.range_start) +
+                          " s.d. " +
+                          _vm._s(data.item.range_end) +
+                          "\n      "
+                      ),
+                    ])
+                  : _c("span", [_vm._v("-")]),
+              ]
+            },
+          },
+          {
+            key: "cell(inventory)",
+            fn: function (data) {
+              return [
+                data.item.inventory_id
+                  ? _c(
+                      "b-link",
+                      {
+                        attrs: {
+                          to: {
+                            name: "inventory-view",
+                            params: { id: data.item.inventory_id },
+                          },
+                        },
+                      },
+                      [
+                        _vm._v(
+                          "\n        " +
+                            _vm._s(
+                              data.item.inventory_code ||
+                                "#" + data.item.inventory_id
+                            ) +
+                            "\n      "
+                        ),
+                      ]
+                    )
+                  : _c("span", [_vm._v("-")]),
+                _vm._v(" "),
+                _c("div", { staticClass: "small text-muted" }, [
+                  _vm._v(
+                    _vm._s(data.item.inventory_name || "Barang tidak ditemukan")
+                  ),
+                ]),
+              ]
+            },
+          },
+          {
+            key: "cell(post_date)",
+            fn: function (data) {
+              return [_vm._v(_vm._s(_vm.formatDate(data.item.post_date)))]
+            },
+          },
+          {
+            key: "cell(masuk)",
+            fn: function (data) {
+              return [
+                _c("span", { staticClass: "text-success" }, [
+                  _vm._v(
+                    _vm._s(
+                      data.item.amount > 0
+                        ? _vm.formatNumber(data.item.amount)
+                        : "-"
+                    )
+                  ),
+                ]),
+              ]
+            },
+          },
+          {
+            key: "cell(keluar)",
+            fn: function (data) {
+              return [
+                _c("span", { staticClass: "text-danger" }, [
+                  _vm._v(
+                    _vm._s(
+                      data.item.amount < 0
+                        ? _vm.formatNumber(-data.item.amount)
+                        : "-"
+                    )
+                  ),
+                ]),
+              ]
+            },
+          },
+          {
+            key: "cell(price)",
+            fn: function (data) {
+              return [_vm._v(_vm._s(_vm.formatNumber(data.item.price)))]
+            },
+          },
+          {
+            key: "cell(total)",
+            fn: function (data) {
+              return [_vm._v(_vm._s(_vm.formatNumber(data.item.total)))]
+            },
+          },
+          {
+            key: "cell(reference)",
+            fn: function (data) {
+              return [
+                data.item.second_reference_type
+                  ? _c("span", [
+                      _vm._v(
+                        _vm._s(_vm.shortType(data.item.second_reference_type)) +
+                          " #" +
+                          _vm._s(data.item.second_reference_id || "-")
+                      ),
+                    ])
+                  : _c("span", [_vm._v("-")]),
+              ]
+            },
+          },
+          {
+            key: "cell(description)",
+            fn: function (data) {
+              return [_vm._v(_vm._s(data.item.description || "-"))]
+            },
+          },
+        ]),
+      }),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass:
+            "mx-2 my-2 d-flex justify-content-between align-items-center flex-wrap",
+        },
+        [
+          _c("span", { staticClass: "text-muted" }, [
+            _vm._v(
+              "Menampilkan " +
+                _vm._s(_vm.from) +
+                "–" +
+                _vm._s(_vm.to) +
+                " dari " +
+                _vm._s(_vm.total) +
+                " mutasi arsip"
+            ),
+          ]),
+          _vm._v(" "),
+          _c("b-pagination", {
+            attrs: {
+              "total-rows": _vm.total,
+              "per-page": _vm.perPage,
+              disabled: _vm.loading,
+            },
+            on: { change: _vm.onPageChange },
+            model: {
+              value: _vm.currentPage,
+              callback: function ($$v) {
+                _vm.currentPage = $$v
+              },
+              expression: "currentPage",
+            },
+          }),
+        ],
+        1
+      ),
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue":
+/*!*************************************************************************!*\
+  !*** ./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue ***!
+  \*************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var Ripple = {
-    bind: function(el, binding){
+/* harmony import */ var _ArchivedStockMutations_vue_vue_type_template_id_148e6446_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true& */ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true&");
+/* harmony import */ var _ArchivedStockMutations_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ArchivedStockMutations.vue?vue&type=script&lang=js& */ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _ArchivedStockMutations_vue_vue_type_style_index_0_id_148e6446_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css& */ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
-        // Default values.
-        var props = {
-            event: 'mousedown',
-            transition: 600
-        };
 
-        setProps(Object.keys(binding.modifiers),props);
 
-        el.addEventListener(props.event, function(event) {
-            rippler(event, el, binding.value);
-        });
 
-        var bg = binding.value || Ripple.color || 'rgba(0, 0, 0, 0.35)';
-        var zIndex = Ripple.zIndex || '9999';
 
-        function rippler(event, el) {
-            var target = el;
-            // Get border to avoid offsetting on ripple container position
-            var targetBorder = parseInt((getComputedStyle(target).borderWidth).replace('px', ''));
 
-            // Get necessary variables
-            var rect        = target.getBoundingClientRect(),
-                left        = rect.left,
-                top         = rect.top,
-                width       = target.offsetWidth,
-                height      = target.offsetHeight,
-                dx          = event.clientX - left,
-                dy          = event.clientY - top,
-                maxX        = Math.max(dx, width - dx),
-                maxY        = Math.max(dy, height - dy),
-                style       = window.getComputedStyle(target),
-                radius      = Math.sqrt((maxX * maxX) + (maxY * maxY)),
-                border      = (targetBorder > 0 ) ? targetBorder : 0;
+/* normalize component */
 
-            // Create the ripple and its container
-            var ripple = document.createElement("div"),
-                rippleContainer = document.createElement("div");
-                rippleContainer.className = 'ripple-container';
-                ripple.className = 'ripple';
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _ArchivedStockMutations_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ArchivedStockMutations_vue_vue_type_template_id_148e6446_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ArchivedStockMutations_vue_vue_type_template_id_148e6446_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "148e6446",
+  null
+  
+)
 
-            //Styles for ripple
-            ripple.style.marginTop= '0px';
-            ripple.style.marginLeft= '0px';
-            ripple.style.width= '1px';
-            ripple.style.height= '1px';
-            ripple.style.transition= 'all ' + props.transition + 'ms cubic-bezier(0.4, 0, 0.2, 1)';
-            ripple.style.borderRadius= '50%';
-            ripple.style.pointerEvents= 'none';
-            ripple.style.position= 'relative';
-            ripple.style.zIndex= zIndex;
-            ripple.style.backgroundColor  = bg;
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/src/views/gudang/barang/ArchivedStockMutations.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
-            //Styles for rippleContainer
-            rippleContainer.style.position= 'absolute';
-            rippleContainer.style.left = 0 - border + 'px';
-            rippleContainer.style.top = 0 - border + 'px';
-            rippleContainer.style.height = '0';
-            rippleContainer.style.width = '0';
-            rippleContainer.style.pointerEvents = 'none';
-            rippleContainer.style.overflow = 'hidden';
+/***/ }),
 
-            // Store target position to change it after
-            var storedTargetPosition =  ((target.style.position).length > 0) ? target.style.position : getComputedStyle(target).position;
-            // Change target position to relative to guarantee ripples correct positioning
-            if (storedTargetPosition !== 'relative') {
-                target.style.position = 'relative';
-            }
+/***/ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-            rippleContainer.appendChild(ripple);
-            target.appendChild(rippleContainer);
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./ArchivedStockMutations.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
-            ripple.style.marginLeft   = dx + "px";
-            ripple.style.marginTop    = dy + "px";
+/***/ }),
 
-            // No need to set positioning because ripple should be child of target and to it's relative position.
-            // rippleContainer.style.left    = left + (((window.pageXOffset || document.scrollLeft) - (document.clientLeft || 0)) || 0) + "px";
-            // rippleContainer.style.top     = top + (((window.pageYOffset || document.scrollTop) - (document.clientTop || 0)) || 0) + "px";
-            rippleContainer.style.width   = width + "px";
-            rippleContainer.style.height  = height + "px";
-            rippleContainer.style.borderTopLeftRadius  = style.borderTopLeftRadius;
-            rippleContainer.style.borderTopRightRadius  = style.borderTopRightRadius;
-            rippleContainer.style.borderBottomLeftRadius  = style.borderBottomLeftRadius;
-            rippleContainer.style.borderBottomRightRadius  = style.borderBottomRightRadius;
+/***/ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css&":
+/*!**********************************************************************************************************************************!*\
+  !*** ./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-            rippleContainer.style.direction = 'ltr';
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_dist_cjs_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_style_index_0_id_148e6446_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader!../../../../../../node_modules/css-loader/dist/cjs.js??ref--6-1!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/dist/cjs.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=style&index=0&id=148e6446&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_dist_cjs_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_style_index_0_id_148e6446_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_dist_cjs_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_style_index_0_id_148e6446_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_dist_cjs_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_style_index_0_id_148e6446_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_dist_cjs_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_style_index_0_id_148e6446_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 
-            setTimeout(function() {
-                ripple.style.width  = radius * 2 + "px";
-                ripple.style.height = radius * 2 + "px";
-                ripple.style.marginLeft   = dx - radius + "px";
-                ripple.style.marginTop    = dy - radius + "px";
-            }, 0);
 
-            function clearRipple() {
-                setTimeout(function() {
-                    ripple.style.backgroundColor = "rgba(0, 0, 0, 0)";
-                }, 250);
+/***/ }),
 
-                // Timeout set to get a smooth removal of the ripple
-                setTimeout(function() {
-                    rippleContainer.parentNode.removeChild(rippleContainer);
-                }, 850);
+/***/ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true&":
+/*!********************************************************************************************************************!*\
+  !*** ./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true& ***!
+  \********************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-                el.removeEventListener('mouseup', clearRipple, false);
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_template_id_148e6446_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue?vue&type=template&id=148e6446&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_template_id_148e6446_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-                // After removing event set position to target to it's original one
-                // Timeout it's needed to avoid jerky effect of ripple jumping out parent target
-                setTimeout(function () {
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ArchivedStockMutations_vue_vue_type_template_id_148e6446_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
-                    var clearPosition = true;
-                    for(var i = 0; i < target.childNodes.length; i++) {
-                        if(target.childNodes[i].className === 'ripple-container') {
-                            clearPosition = false;
-                        }
-                    }
 
-                    if(clearPosition) {
-                        if(storedTargetPosition !== 'static') {
-                            target.style.position = storedTargetPosition;
-                        } else {
-                            target.style.position = '';
-                        }
-                    }
-
-                }, props.transition + 250)
-            }
-
-            if(event.type === 'mousedown') {
-                el.addEventListener('mouseup', clearRipple, false);
-            } else {
-                clearRipple();
-            }
-        }
-    }
-};
-
-function setProps(modifiers,props) {
-    modifiers.forEach(function(item) {
-        if(isNaN(Number(item)))
-            props.event = item;
-        else
-            props.transition = item;
-    });
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (Ripple);
 
 /***/ })
 

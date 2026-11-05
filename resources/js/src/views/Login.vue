@@ -225,7 +225,7 @@ export default {
     return {
       status: '',
       password: '',
-      userUsername: '',
+      userUsername: localStorage.getItem('rememberedUsername') || '',
       sideImg: require('@/assets/images/pages/login-big-image.png'),
       // validation rulesimport store from '@/store/index'
       required,
@@ -249,42 +249,56 @@ export default {
     validationForm() {
       this.$refs.loginValidation.validate().then(success => {
         if (success) {
-            useSanctum.login({
-              username: this.userUsername,
-              password: this.password,
-            }).then(response => {
-              if(response.data.message == "Unauthorized")
-              {
-                this.$refs.loginValidation.setErrors({username: "username atau password salah", password: "*"})
+          useSanctum.login({
+            username: this.userUsername,
+            password: this.password,
+          }).then(response => {
+            if(response.data.message == "Unauthorized")
+            {
+              this.$refs.loginValidation.setErrors({username: "username atau password salah", password: "*"})
+            }
+            else
+            {
+              const { userData } = response.data.payload
+              const loginToken = response.data.accessToken || response.data.payload.accessToken
+
+              // Remove any previous token
+              localStorage.removeItem('accessToken')
+              sessionStorage.removeItem('accessToken')
+
+              // Remember Me checked = survive browser restart
+              if (this.status) {
+                localStorage.setItem('accessToken', loginToken)
+                localStorage.setItem('rememberedUsername', this.userUsername)
+              } else {
+                // Remember Me unchecked = only this browser session
+                sessionStorage.setItem('accessToken', loginToken)
+                localStorage.removeItem('rememberedUsername')
               }
-              else
-              {
-                const { userData } = response.data.payload
-                useSanctum.setToken(response.data.accessToken)
-                localStorage.setItem('userData', JSON.stringify(userData))
-                localStorage.setItem('token_type', response.data.payload.token_type)
-                localStorage.setItem(useSanctum.sanctumConfig.storageTokenKeyName, response.data.payload.accessToken)
-                this.$ability.update(userData.ability)
 
-                // ? This is just for demo purpose as well.
-                // ? Because we are showing eCommerce app's cart items count in navbar
-    //              this.$store.commit('app-ecommerce/UPDATE_CART_ITEMS_COUNT', userData.extras.eCommerceCartItemsCount)
+              localStorage.setItem('userData', JSON.stringify(userData))
+              localStorage.setItem('token_type', response.data.payload.token_type)
+              this.$ability.update(userData.ability)
 
-                // ? This is just for demo purpose. Don't think CASL is role based in this case, we used role in if condition just for ease
-                this.$router.push({ name: 'home' })
-                const toasting = {
-                  component: ToastificationContent,
-                  position: 'top-right',
-                  props: {
-                    title: `Welcome`,
-                    icon: 'CoffeeIcon',
-                    variant: 'success',
-                    text: `You have successfully logged in. Now you can start to explore!`,
-                  },
-                }
-                this.$toast(toasting)
-              }  
-            })
+              // ? This is just for demo purpose as well.
+              // ? Because we are showing eCommerce app's cart items count in navbar
+              //              this.$store.commit('app-ecommerce/UPDATE_CART_ITEMS_COUNT', userData.extras.eCommerceCartItemsCount)
+
+              // ? This is just for demo purpose. Don't think CASL is role based in this case, we used role in if condition just for ease
+              this.$router.push({ name: 'home' })
+              const toasting = {
+                component: ToastificationContent,
+                position: 'top-right',
+                props: {
+                  title: `Welcome`,
+                  icon: 'CoffeeIcon',
+                  variant: 'success',
+                  text: `You have successfully logged in. Now you can start to explore!`,
+                },
+              }
+              this.$toast(toasting)
+            }
+          })
             .catch(error => {
               this.$refs.loginValidation.setErrors({username: "username atau password salah", password: "*"})
             })

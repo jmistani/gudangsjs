@@ -241,55 +241,6 @@ function _arrayWithoutHoles(arr) {
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/esm/classCallCheck.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/esm/classCallCheck.js ***!
-  \*******************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _classCallCheck; });
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/esm/createClass.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/esm/createClass.js ***!
-  \****************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _createClass; });
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  Object.defineProperty(Constructor, "prototype", {
-    writable: false
-  });
-  return Constructor;
-}
-
-/***/ }),
-
 /***/ "./node_modules/@babel/runtime/helpers/esm/defineProperty.js":
 /*!*******************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/esm/defineProperty.js ***!
@@ -8459,15 +8410,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var LayoutVertical = function LayoutVertical() {
-  return Promise.all(/*! import() */[__webpack_require__.e(7), __webpack_require__.e(11), __webpack_require__.e(10), __webpack_require__.e(22)]).then(__webpack_require__.bind(null, /*! @/layouts/vertical/LayoutVertical.vue */ "./resources/js/src/layouts/vertical/LayoutVertical.vue"));
+  return Promise.all(/*! import() */[__webpack_require__.e(7), __webpack_require__.e(11), __webpack_require__.e(12), __webpack_require__.e(22), __webpack_require__.e(28)]).then(__webpack_require__.bind(null, /*! @/layouts/vertical/LayoutVertical.vue */ "./resources/js/src/layouts/vertical/LayoutVertical.vue"));
 };
 
 var LayoutHorizontal = function LayoutHorizontal() {
-  return Promise.all(/*! import() */[__webpack_require__.e(7), __webpack_require__.e(11), __webpack_require__.e(10), __webpack_require__.e(14)]).then(__webpack_require__.bind(null, /*! @/layouts/horizontal/LayoutHorizontal.vue */ "./resources/js/src/layouts/horizontal/LayoutHorizontal.vue"));
+  return Promise.all(/*! import() */[__webpack_require__.e(7), __webpack_require__.e(11), __webpack_require__.e(12), __webpack_require__.e(22), __webpack_require__.e(18)]).then(__webpack_require__.bind(null, /*! @/layouts/horizontal/LayoutHorizontal.vue */ "./resources/js/src/layouts/horizontal/LayoutHorizontal.vue"));
 };
 
 var LayoutFull = function LayoutFull() {
-  return __webpack_require__.e(/*! import() */ 34).then(__webpack_require__.bind(null, /*! @/layouts/full/LayoutFull.vue */ "./resources/js/src/layouts/full/LayoutFull.vue"));
+  return __webpack_require__.e(/*! import() */ 36).then(__webpack_require__.bind(null, /*! @/layouts/full/LayoutFull.vue */ "./resources/js/src/layouts/full/LayoutFull.vue"));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -55760,6 +55711,29 @@ module.exports = false;
 
 /***/ }),
 
+/***/ "./node_modules/core-js/internals/is-regexp.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/core-js/internals/is-regexp.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(/*! ../internals/is-object */ "./node_modules/core-js/internals/is-object.js");
+var classof = __webpack_require__(/*! ../internals/classof-raw */ "./node_modules/core-js/internals/classof-raw.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+
+var MATCH = wellKnownSymbol('match');
+
+// `IsRegExp` abstract operation
+// https://tc39.github.io/ecma262/#sec-isregexp
+module.exports = function (it) {
+  var isRegExp;
+  return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : classof(it) == 'RegExp');
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/internals/iterators-core.js":
 /*!**********************************************************!*\
   !*** ./node_modules/core-js/internals/iterators-core.js ***!
@@ -56619,6 +56593,30 @@ var store = __webpack_require__(/*! ../internals/shared-store */ "./node_modules
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 });
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/species-constructor.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/core-js/internals/species-constructor.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var aFunction = __webpack_require__(/*! ../internals/a-function */ "./node_modules/core-js/internals/a-function.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+
+var SPECIES = wellKnownSymbol('species');
+
+// `SpeciesConstructor` abstract operation
+// https://tc39.github.io/ecma262/#sec-speciesconstructor
+module.exports = function (O, defaultConstructor) {
+  var C = anObject(O).constructor;
+  var S;
+  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? defaultConstructor : aFunction(S);
+};
 
 
 /***/ }),
@@ -57796,6 +57794,152 @@ fixRegExpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, ma
     });
   }
 });
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.string.split.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/core-js/modules/es.string.split.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var fixRegExpWellKnownSymbolLogic = __webpack_require__(/*! ../internals/fix-regexp-well-known-symbol-logic */ "./node_modules/core-js/internals/fix-regexp-well-known-symbol-logic.js");
+var isRegExp = __webpack_require__(/*! ../internals/is-regexp */ "./node_modules/core-js/internals/is-regexp.js");
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var requireObjectCoercible = __webpack_require__(/*! ../internals/require-object-coercible */ "./node_modules/core-js/internals/require-object-coercible.js");
+var speciesConstructor = __webpack_require__(/*! ../internals/species-constructor */ "./node_modules/core-js/internals/species-constructor.js");
+var advanceStringIndex = __webpack_require__(/*! ../internals/advance-string-index */ "./node_modules/core-js/internals/advance-string-index.js");
+var toLength = __webpack_require__(/*! ../internals/to-length */ "./node_modules/core-js/internals/to-length.js");
+var callRegExpExec = __webpack_require__(/*! ../internals/regexp-exec-abstract */ "./node_modules/core-js/internals/regexp-exec-abstract.js");
+var regexpExec = __webpack_require__(/*! ../internals/regexp-exec */ "./node_modules/core-js/internals/regexp-exec.js");
+var fails = __webpack_require__(/*! ../internals/fails */ "./node_modules/core-js/internals/fails.js");
+
+var arrayPush = [].push;
+var min = Math.min;
+var MAX_UINT32 = 0xFFFFFFFF;
+
+// babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
+var SUPPORTS_Y = !fails(function () { return !RegExp(MAX_UINT32, 'y'); });
+
+// @@split logic
+fixRegExpWellKnownSymbolLogic('split', 2, function (SPLIT, nativeSplit, maybeCallNative) {
+  var internalSplit;
+  if (
+    'abbc'.split(/(b)*/)[1] == 'c' ||
+    'test'.split(/(?:)/, -1).length != 4 ||
+    'ab'.split(/(?:ab)*/).length != 2 ||
+    '.'.split(/(.?)(.?)/).length != 4 ||
+    '.'.split(/()()/).length > 1 ||
+    ''.split(/.?/).length
+  ) {
+    // based on es5-shim implementation, need to rework it
+    internalSplit = function (separator, limit) {
+      var string = String(requireObjectCoercible(this));
+      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
+      if (lim === 0) return [];
+      if (separator === undefined) return [string];
+      // If `separator` is not a regex, use native split
+      if (!isRegExp(separator)) {
+        return nativeSplit.call(string, separator, lim);
+      }
+      var output = [];
+      var flags = (separator.ignoreCase ? 'i' : '') +
+                  (separator.multiline ? 'm' : '') +
+                  (separator.unicode ? 'u' : '') +
+                  (separator.sticky ? 'y' : '');
+      var lastLastIndex = 0;
+      // Make `global` and avoid `lastIndex` issues by working with a copy
+      var separatorCopy = new RegExp(separator.source, flags + 'g');
+      var match, lastIndex, lastLength;
+      while (match = regexpExec.call(separatorCopy, string)) {
+        lastIndex = separatorCopy.lastIndex;
+        if (lastIndex > lastLastIndex) {
+          output.push(string.slice(lastLastIndex, match.index));
+          if (match.length > 1 && match.index < string.length) arrayPush.apply(output, match.slice(1));
+          lastLength = match[0].length;
+          lastLastIndex = lastIndex;
+          if (output.length >= lim) break;
+        }
+        if (separatorCopy.lastIndex === match.index) separatorCopy.lastIndex++; // Avoid an infinite loop
+      }
+      if (lastLastIndex === string.length) {
+        if (lastLength || !separatorCopy.test('')) output.push('');
+      } else output.push(string.slice(lastLastIndex));
+      return output.length > lim ? output.slice(0, lim) : output;
+    };
+  // Chakra, V8
+  } else if ('0'.split(undefined, 0).length) {
+    internalSplit = function (separator, limit) {
+      return separator === undefined && limit === 0 ? [] : nativeSplit.call(this, separator, limit);
+    };
+  } else internalSplit = nativeSplit;
+
+  return [
+    // `String.prototype.split` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.split
+    function split(separator, limit) {
+      var O = requireObjectCoercible(this);
+      var splitter = separator == undefined ? undefined : separator[SPLIT];
+      return splitter !== undefined
+        ? splitter.call(separator, O, limit)
+        : internalSplit.call(String(O), separator, limit);
+    },
+    // `RegExp.prototype[@@split]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@split
+    //
+    // NOTE: This cannot be properly polyfilled in engines that don't support
+    // the 'y' flag.
+    function (regexp, limit) {
+      var res = maybeCallNative(internalSplit, regexp, this, limit, internalSplit !== nativeSplit);
+      if (res.done) return res.value;
+
+      var rx = anObject(regexp);
+      var S = String(this);
+      var C = speciesConstructor(rx, RegExp);
+
+      var unicodeMatching = rx.unicode;
+      var flags = (rx.ignoreCase ? 'i' : '') +
+                  (rx.multiline ? 'm' : '') +
+                  (rx.unicode ? 'u' : '') +
+                  (SUPPORTS_Y ? 'y' : 'g');
+
+      // ^(? + rx + ) is needed, in combination with some S slicing, to
+      // simulate the 'y' flag.
+      var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
+      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
+      if (lim === 0) return [];
+      if (S.length === 0) return callRegExpExec(splitter, S) === null ? [S] : [];
+      var p = 0;
+      var q = 0;
+      var A = [];
+      while (q < S.length) {
+        splitter.lastIndex = SUPPORTS_Y ? q : 0;
+        var z = callRegExpExec(splitter, SUPPORTS_Y ? S : S.slice(q));
+        var e;
+        if (
+          z === null ||
+          (e = min(toLength(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
+        ) {
+          q = advanceStringIndex(S, q, unicodeMatching);
+        } else {
+          A.push(S.slice(p, q));
+          if (A.length === lim) return A;
+          for (var i = 1; i <= z.length - 1; i++) {
+            A.push(z[i]);
+            if (A.length === lim) return A;
+          }
+          q = p = e;
+        }
+      }
+      A.push(S.slice(p));
+      return A;
+    }
+  ];
+}, !SUPPORTS_Y);
 
 
 /***/ }),
@@ -128067,210 +128211,6 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./resources/js/src/@core/auth/sanctum/sanctumDefaultConfig.js":
-/*!*********************************************************************!*\
-  !*** ./resources/js/src/@core/auth/sanctum/sanctumDefaultConfig.js ***!
-  \*********************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ({
-  // Endpoints
-  loginEndpoint: '/auth/login',
-  registerEndpoint: '/auth/register',
-  refreshEndpoint: '/auth/refresh',
-  logoutEndpoint: '/auth/logout',
-  // This will be prefixed in authorization header with token
-  // e.g. Authorization: Bearer <token>
-  tokenType: 'Bearer',
-  // Value of this property will be used as key to store JWT token in storage
-  storageTokenKeyName: 'accessToken'
-});
-
-/***/ }),
-
-/***/ "./resources/js/src/@core/auth/sanctum/sanctumService.js":
-/*!***************************************************************!*\
-  !*** ./resources/js/src/@core/auth/sanctum/sanctumService.js ***!
-  \***************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SanctumService; });
-/* harmony import */ var D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/objectSpread2.js */ "./node_modules/@babel/runtime/helpers/esm/objectSpread2.js");
-/* harmony import */ var D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_classCallCheck_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/classCallCheck.js */ "./node_modules/@babel/runtime/helpers/esm/classCallCheck.js");
-/* harmony import */ var D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_createClass_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/createClass.js */ "./node_modules/@babel/runtime/helpers/esm/createClass.js");
-/* harmony import */ var D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_defineProperty_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/defineProperty.js */ "./node_modules/@babel/runtime/helpers/esm/defineProperty.js");
-/* harmony import */ var core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/es.array.concat.js */ "./node_modules/core-js/modules/es.array.concat.js");
-/* harmony import */ var core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.object.to-string.js */ "./node_modules/core-js/modules/es.object.to-string.js");
-/* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! core-js/modules/es.regexp.exec.js */ "./node_modules/core-js/modules/es.regexp.exec.js");
-/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! core-js/modules/es.string.replace.js */ "./node_modules/core-js/modules/es.string.replace.js");
-/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var core_js_modules_es_array_filter_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! core-js/modules/es.array.filter.js */ "./node_modules/core-js/modules/es.array.filter.js");
-/* harmony import */ var core_js_modules_es_array_filter_js__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_filter_js__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _sanctumDefaultConfig__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sanctumDefaultConfig */ "./resources/js/src/@core/auth/sanctum/sanctumDefaultConfig.js");
-
-
-
-
-
-
-
-
-
-
-
-var SanctumService = /*#__PURE__*/function () {
-  // Will be used by this service for making API calls
-  // sanctumConfig <= Will be used by this service
-  // For Refreshing Token
-  // For Refreshing Token
-  function SanctumService(axiosIns, sanctumOverrideConfig) {
-    var _this = this;
-
-    Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_classCallCheck_js__WEBPACK_IMPORTED_MODULE_1__["default"])(this, SanctumService);
-
-    Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_defineProperty_js__WEBPACK_IMPORTED_MODULE_3__["default"])(this, "axiosIns", null);
-
-    Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_defineProperty_js__WEBPACK_IMPORTED_MODULE_3__["default"])(this, "sanctumConfig", Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_0__["default"])({}, _sanctumDefaultConfig__WEBPACK_IMPORTED_MODULE_9__["default"]));
-
-    Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_defineProperty_js__WEBPACK_IMPORTED_MODULE_3__["default"])(this, "isAlreadyFetchingAccessToken", false);
-
-    Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_defineProperty_js__WEBPACK_IMPORTED_MODULE_3__["default"])(this, "subscribers", []);
-
-    this.axiosIns = axiosIns;
-    this.sanctumConfig = Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_objectSpread2_js__WEBPACK_IMPORTED_MODULE_0__["default"])({}, this.sanctumConfig), sanctumOverrideConfig); // Request Interceptor
-
-    this.axiosIns.interceptors.request.use(function (config) {
-      // Get token from localStorage
-      var accessToken = _this.getToken(); // If token is present add it to request's Authorization Header
-
-
-      if (accessToken) {
-        // eslint-disable-next-line no-param-reassign
-        config.headers.Authorization = "".concat(_this.sanctumConfig.tokenType, " ").concat(accessToken);
-      }
-
-      return config;
-    }, function (error) {
-      return Promise.reject(error);
-    }); // Add request/response interceptor
-
-    this.axiosIns.interceptors.response.use(function (response) {
-      return response;
-    }, function (error) {
-      // const { config, response: { status } } = error
-      var config = error.config,
-          response = error.response;
-      var originalRequest = config; // if (status === 401) {
-
-      if (response && response.status === 401) {
-        //               window.location.replace("https://gudangsjsv2.serasijayasejati.com/login")
-        window.location.replace("https://gudangsjs.local/login");
-      }
-
-      return Promise.reject(error);
-    });
-  }
-
-  Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_createClass_js__WEBPACK_IMPORTED_MODULE_2__["default"])(SanctumService, [{
-    key: "onAccessTokenFetched",
-    value: function onAccessTokenFetched(accessToken) {
-      this.subscribers = this.subscribers.filter(function (callback) {
-        return callback(accessToken);
-      });
-    }
-  }, {
-    key: "addSubscriber",
-    value: function addSubscriber(callback) {
-      this.subscribers.push(callback);
-    }
-  }, {
-    key: "getToken",
-    value: function getToken() {
-      return localStorage.getItem(this.sanctumConfig.storageTokenKeyName);
-    }
-  }, {
-    key: "getRefreshToken",
-    value: function getRefreshToken() {
-      return localStorage.getItem(this.sanctumConfig.storageRefreshTokenKeyName);
-    }
-  }, {
-    key: "setToken",
-    value: function setToken(value) {
-      localStorage.setItem(this.sanctumConfig.storageTokenKeyName, value);
-    }
-  }, {
-    key: "setRefreshToken",
-    value: function setRefreshToken(value) {
-      localStorage.setItem(this.sanctumConfig.storageRefreshTokenKeyName, value);
-    }
-  }, {
-    key: "login",
-    value: function login() {
-      var _this$axiosIns;
-
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return (_this$axiosIns = this.axiosIns).post.apply(_this$axiosIns, [this.sanctumConfig.loginEndpoint].concat(args));
-    }
-  }, {
-    key: "register",
-    value: function register() {
-      var _this$axiosIns2;
-
-      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      return (_this$axiosIns2 = this.axiosIns).post.apply(_this$axiosIns2, [this.sanctumConfig.registerEndpoint].concat(args));
-    }
-  }, {
-    key: "refreshToken",
-    value: function refreshToken() {
-      return this.axiosIns.get(this.sanctumConfig.refreshEndpoint); // return this.axiosIns.post(this.sanctumConfig.refreshEndpoint, {
-      //     refreshToken: this.getRefreshToken(),
-      // })
-    }
-  }]);
-
-  return SanctumService;
-}();
-
-
-
-/***/ }),
-
-/***/ "./resources/js/src/@core/auth/sanctum/useSanctum.js":
-/*!***********************************************************!*\
-  !*** ./resources/js/src/@core/auth/sanctum/useSanctum.js ***!
-  \***********************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return useSanctum; });
-/* harmony import */ var _sanctumService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sanctumService */ "./resources/js/src/@core/auth/sanctum/sanctumService.js");
-
-function useSanctum(axiosIns, sanctumOverrideConfig) {
-  var sanctum = new _sanctumService__WEBPACK_IMPORTED_MODULE_0__["default"](axiosIns, sanctumOverrideConfig);
-  return {
-    sanctum: sanctum
-  };
-}
-
-/***/ }),
-
 /***/ "./resources/js/src/@core/components/feather-icon/FeatherIcon.vue":
 /*!************************************************************************!*\
   !*** ./resources/js/src/@core/components/feather-icon/FeatherIcon.vue ***!
@@ -128509,27 +128449,6 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./resources/js/src/auth/sanctum/useSanctum.js":
-/*!*****************************************************!*\
-  !*** ./resources/js/src/auth/sanctum/useSanctum.js ***!
-  \*****************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _core_auth_sanctum_useSanctum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @core/auth/sanctum/useSanctum */ "./resources/js/src/@core/auth/sanctum/useSanctum.js");
-/* harmony import */ var _axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @axios */ "./resources/js/src/libs/axios.js");
-
-
-
-var _useSanctum = Object(_core_auth_sanctum_useSanctum__WEBPACK_IMPORTED_MODULE_0__["default"])(_axios__WEBPACK_IMPORTED_MODULE_1__["default"], {}),
-    sanctum = _useSanctum.sanctum;
-
-/* harmony default export */ __webpack_exports__["default"] = (sanctum);
-
-/***/ }),
-
 /***/ "./resources/js/src/global-components.js":
 /*!***********************************************!*\
   !*** ./resources/js/src/global-components.js ***!
@@ -128624,26 +128543,37 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(_casl_vue__WEBPACK_IMPORTED_MODUL
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.object.to-string.js */ "./node_modules/core-js/modules/es.object.to-string.js");
 /* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.regexp.exec.js */ "./node_modules/core-js/modules/es.regexp.exec.js");
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es.string.replace.js */ "./node_modules/core-js/modules/es.string.replace.js");
+/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_4__);
 
 
 
-var axiosIns = axios__WEBPACK_IMPORTED_MODULE_2___default.a.create({
+
+
+var axiosIns = axios__WEBPACK_IMPORTED_MODULE_4___default.a.create({
+  // Use the current domain.
+  // This works for both local and V2 production.
   //  baseURL: 'https://gudangsjsv2.serasijayasejati.com/api',
-  baseURL: 'https://gudangsjs.local/api',
+  baseURL: '/api',
   timeout: 1200000,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
   },
   withCredentials: false
-}); // Attach JWT Bearer token to every API request
+}); // ---------------------------------------------------------
+// REQUEST INTERCEPTOR
+// Attach JWT access token to every API request
+// ---------------------------------------------------------
 
 axiosIns.interceptors.request.use(function (config) {
-  var token = localStorage.getItem('accessToken');
+  var token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
   if (token && token !== 'undefined' && token !== 'null') {
     config.headers.Authorization = "Bearer ".concat(token);
@@ -128652,8 +128582,31 @@ axiosIns.interceptors.request.use(function (config) {
   return config;
 }, function (error) {
   return Promise.reject(error);
+}); // ---------------------------------------------------------
+// RESPONSE INTERCEPTOR
+// Handle expired / invalid JWT sessions globally
+// ---------------------------------------------------------
+
+axiosIns.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  var status = error.response && error.response.status;
+
+  if (status === 401) {
+    // Remove expired/invalid authentication data
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('token_type');
+    localStorage.removeItem('userData'); // Prevent redirect loop if we are already on login
+
+    if (window.location.pathname !== '/login') {
+      window.location.replace('/login');
+    }
+  }
+
+  return Promise.reject(error);
 });
-vue__WEBPACK_IMPORTED_MODULE_1___default.a.prototype.$http = axiosIns;
+vue__WEBPACK_IMPORTED_MODULE_3___default.a.prototype.$http = axiosIns;
 /* harmony default export */ __webpack_exports__["default"] = (axiosIns);
 
 /***/ }),
@@ -129001,7 +128954,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/dashboard',
   name: 'inventory-dashboard',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(1), __webpack_require__.e(31), __webpack_require__.e(46), __webpack_require__.e(27)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/Dashboard.vue */ "./resources/js/src/views/gudang/barang/Dashboard.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(1), __webpack_require__.e(33), __webpack_require__.e(47)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/Dashboard.vue */ "./resources/js/src/views/gudang/barang/Dashboard.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129022,7 +128975,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/list',
   name: 'inventory-list',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(35), __webpack_require__.e(46), __webpack_require__.e(8), __webpack_require__.e(15)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/InventoryList.vue */ "./resources/js/src/views/gudang/barang/InventoryList.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(37), __webpack_require__.e(33), __webpack_require__.e(8), __webpack_require__.e(15)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/InventoryList.vue */ "./resources/js/src/views/gudang/barang/InventoryList.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129048,7 +129001,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/receive/add',
   name: 'inventory-receive-add',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(5), __webpack_require__.e(9), __webpack_require__.e(39), __webpack_require__.e(46), __webpack_require__.e(4), __webpack_require__.e(8), __webpack_require__.e(20)]).then(__webpack_require__.bind(null, /*! @/views/gudang/terima-add/ReceiveAdd.vue */ "./resources/js/src/views/gudang/terima-add/ReceiveAdd.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(5), __webpack_require__.e(9), __webpack_require__.e(40), __webpack_require__.e(33), __webpack_require__.e(4), __webpack_require__.e(8), __webpack_require__.e(20)]).then(__webpack_require__.bind(null, /*! @/views/gudang/terima-add/ReceiveAdd.vue */ "./resources/js/src/views/gudang/terima-add/ReceiveAdd.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129074,7 +129027,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/view/:id',
   name: 'inventory-view',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(33), __webpack_require__.e(45)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/InventoryView.vue */ "./resources/js/src/views/gudang/barang/InventoryView.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(35), __webpack_require__.e(46)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/InventoryView.vue */ "./resources/js/src/views/gudang/barang/InventoryView.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129105,7 +129058,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/consume/add',
   name: 'inventory-consume-add',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(5), __webpack_require__.e(9), __webpack_require__.e(3), __webpack_require__.e(46), __webpack_require__.e(4), __webpack_require__.e(8), __webpack_require__.e(47)]).then(__webpack_require__.bind(null, /*! @/views/gudang/consume-add/ConsumeAdd.vue */ "./resources/js/src/views/gudang/consume-add/ConsumeAdd.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(5), __webpack_require__.e(9), __webpack_require__.e(19), __webpack_require__.e(33), __webpack_require__.e(4), __webpack_require__.e(8), __webpack_require__.e(31)]).then(__webpack_require__.bind(null, /*! @/views/gudang/consume-add/ConsumeAdd.vue */ "./resources/js/src/views/gudang/consume-add/ConsumeAdd.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129131,7 +129084,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/display-inventory-receive/:id',
   name: 'display-inventory-receive',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(6), __webpack_require__.e(43)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/DisplayReceiveJournal.vue */ "./resources/js/src/views/gudang/barang/DisplayReceiveJournal.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(6), __webpack_require__.e(44)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/DisplayReceiveJournal.vue */ "./resources/js/src/views/gudang/barang/DisplayReceiveJournal.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129157,7 +129110,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/display-inventory-consume/:id',
   name: 'display-inventory-consume',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(6), __webpack_require__.e(42)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/DisplayConsumeJournal.vue */ "./resources/js/src/views/gudang/barang/DisplayConsumeJournal.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(6), __webpack_require__.e(43)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/DisplayConsumeJournal.vue */ "./resources/js/src/views/gudang/barang/DisplayConsumeJournal.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129183,7 +129136,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/display-ticket/:id',
   name: 'display-ticket',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(13), __webpack_require__.e(44)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/DisplayTicket.vue */ "./resources/js/src/views/gudang/barang/DisplayTicket.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(13), __webpack_require__.e(45)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/DisplayTicket.vue */ "./resources/js/src/views/gudang/barang/DisplayTicket.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129209,7 +129162,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/ticket/add',
   name: 'inventory-ticket-add',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(5), __webpack_require__.e(9), __webpack_require__.e(46), __webpack_require__.e(4), __webpack_require__.e(23)]).then(__webpack_require__.bind(null, /*! @/views/gudang/ticket/TicketAdd.vue */ "./resources/js/src/views/gudang/ticket/TicketAdd.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(5), __webpack_require__.e(9), __webpack_require__.e(33), __webpack_require__.e(4), __webpack_require__.e(23)]).then(__webpack_require__.bind(null, /*! @/views/gudang/ticket/TicketAdd.vue */ "./resources/js/src/views/gudang/ticket/TicketAdd.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129235,7 +129188,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/ticket/view/:id',
   name: 'inventory-ticket-view',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(1), __webpack_require__.e(32), __webpack_require__.e(46), __webpack_require__.e(18)]).then(__webpack_require__.bind(null, /*! @/views/gudang/ticket/TicketView.vue */ "./resources/js/src/views/gudang/ticket/TicketView.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(1), __webpack_require__.e(33), __webpack_require__.e(3)]).then(__webpack_require__.bind(null, /*! @/views/gudang/ticket/TicketView.vue */ "./resources/js/src/views/gudang/ticket/TicketView.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129261,7 +129214,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/setting/inventory/group',
   name: 'setting-inventory-group',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(5), __webpack_require__.e(4), __webpack_require__.e(28)]).then(__webpack_require__.bind(null, /*! @/views/pengaturan/GrupBarang.vue */ "./resources/js/src/views/pengaturan/GrupBarang.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(5), __webpack_require__.e(4), __webpack_require__.e(29)]).then(__webpack_require__.bind(null, /*! @/views/pengaturan/GrupBarang.vue */ "./resources/js/src/views/pengaturan/GrupBarang.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129287,7 +129240,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/setting/inventory/unit',
   name: 'setting-inventory-unit',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(5), __webpack_require__.e(4), __webpack_require__.e(29)]).then(__webpack_require__.bind(null, /*! @/views/pengaturan/UnitBarang.vue */ "./resources/js/src/views/pengaturan/UnitBarang.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(5), __webpack_require__.e(4), __webpack_require__.e(30)]).then(__webpack_require__.bind(null, /*! @/views/pengaturan/UnitBarang.vue */ "./resources/js/src/views/pengaturan/UnitBarang.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129313,7 +129266,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/archived-mutations',
   name: 'inventory-archived-mutations',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(30), __webpack_require__.e(37)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/ArchivedStockMutations.vue */ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(32)]).then(__webpack_require__.bind(null, /*! @/views/gudang/barang/ArchivedStockMutations.vue */ "./resources/js/src/views/gudang/barang/ArchivedStockMutations.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129343,18 +129296,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_string_iterator_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_iterator_js__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/web.dom-collections.iterator.js */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
 /* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var core_js_modules_es_function_name_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.function.name.js */ "./node_modules/core-js/modules/es.function.name.js");
-/* harmony import */ var core_js_modules_es_function_name_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_function_name_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _axios__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @axios */ "./resources/js/src/libs/axios.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
-/* harmony import */ var _admin_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./admin.js */ "./resources/js/src/router/admin.js");
-/* harmony import */ var _gudang_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./gudang.js */ "./resources/js/src/router/gudang.js");
-/* harmony import */ var _laporan_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./laporan.js */ "./resources/js/src/router/laporan.js");
-/* harmony import */ var _auth_sanctum_useSanctum__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/auth/sanctum/useSanctum */ "./resources/js/src/auth/sanctum/useSanctum.js");
-/* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! nprogress */ "./node_modules/nprogress/nprogress.js");
-/* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(nprogress__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.regexp.exec.js */ "./node_modules/core-js/modules/es.regexp.exec.js");
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! core-js/modules/es.string.replace.js */ "./node_modules/core-js/modules/es.string.replace.js");
+/* harmony import */ var core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_replace_js__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! core-js/modules/es.string.split.js */ "./node_modules/core-js/modules/es.string.split.js");
+/* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var core_js_modules_es_function_name_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! core-js/modules/es.function.name.js */ "./node_modules/core-js/modules/es.function.name.js");
+/* harmony import */ var core_js_modules_es_function_name_js__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_function_name_js__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _axios__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @axios */ "./resources/js/src/libs/axios.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
+/* harmony import */ var _admin_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./admin.js */ "./resources/js/src/router/admin.js");
+/* harmony import */ var _gudang_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./gudang.js */ "./resources/js/src/router/gudang.js");
+/* harmony import */ var _laporan_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./laporan.js */ "./resources/js/src/router/laporan.js");
+/* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! nprogress */ "./node_modules/nprogress/nprogress.js");
+/* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(nprogress__WEBPACK_IMPORTED_MODULE_15__);
 
 
 
@@ -129369,8 +129327,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_7___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]);
-var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
+
+
+vue__WEBPACK_IMPORTED_MODULE_10___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_11__["default"]);
+var router = new vue_router__WEBPACK_IMPORTED_MODULE_11__["default"]({
   mode: 'history',
   base: process.env.BASE_URL,
   scrollBehavior: function scrollBehavior() {
@@ -129383,7 +129343,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
     path: '/',
     name: 'home',
     component: function component() {
-      return __webpack_require__.e(/*! import() */ 40).then(__webpack_require__.bind(null, /*! @/views/Home.vue */ "./resources/js/src/views/Home.vue"));
+      return __webpack_require__.e(/*! import() */ 41).then(__webpack_require__.bind(null, /*! @/views/Home.vue */ "./resources/js/src/views/Home.vue"));
     },
     meta: {
       requiresAuth: true,
@@ -129397,7 +129357,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
     path: '/second-page',
     name: 'second-page',
     component: function component() {
-      return __webpack_require__.e(/*! import() */ 41).then(__webpack_require__.bind(null, /*! @/views/SecondPage.vue */ "./resources/js/src/views/SecondPage.vue"));
+      return __webpack_require__.e(/*! import() */ 42).then(__webpack_require__.bind(null, /*! @/views/SecondPage.vue */ "./resources/js/src/views/SecondPage.vue"));
     },
     meta: {
       requiresAuth: true,
@@ -129411,7 +129371,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
     path: '/login',
     name: 'login',
     component: function component() {
-      return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(12), __webpack_require__.e(24)]).then(__webpack_require__.bind(null, /*! @/views/Login.vue */ "./resources/js/src/views/Login.vue"));
+      return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(12), __webpack_require__.e(24), __webpack_require__.e(34)]).then(__webpack_require__.bind(null, /*! @/views/Login.vue */ "./resources/js/src/views/Login.vue"));
     },
     meta: {
       layout: 'full'
@@ -129421,7 +129381,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
     name: 'add-user',
     requiresAuth: true,
     component: function component() {
-      return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(12), __webpack_require__.e(25)]).then(__webpack_require__.bind(null, /*! @/views/AddUser.vue */ "./resources/js/src/views/AddUser.vue"));
+      return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(24), __webpack_require__.e(26)]).then(__webpack_require__.bind(null, /*! @/views/AddUser.vue */ "./resources/js/src/views/AddUser.vue"));
     },
     meta: {
       layout: 'full'
@@ -129430,16 +129390,16 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
   //     path: '/userrole',
   //     name: 'user-role',
   //     component: () =>
-  //         import ('@/views/UserRole.vue'),
+  //         import('@/views/UserRole.vue'),
   //     meta: {
   //         pageTitle: 'Home',
-  //         breadcrumb: [{
+  //         breadcrumb: [
+  //             {
   //                 text: 'Home',
   //                 to: { name: 'home' }
   //             },
   //             {
   //                 text: 'User',
-  //                 //                    to: { name: 'bank-dashboard' },
   //             },
   //             {
   //                 text: 'Add Role',
@@ -129452,7 +129412,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
     path: '/error-404',
     name: 'error-404',
     component: function component() {
-      return __webpack_require__.e(/*! import() */ 26).then(__webpack_require__.bind(null, /*! @/views/error/Error404.vue */ "./resources/js/src/views/error/Error404.vue"));
+      return __webpack_require__.e(/*! import() */ 27).then(__webpack_require__.bind(null, /*! @/views/error/Error404.vue */ "./resources/js/src/views/error/Error404.vue"));
     },
     meta: {
       layout: 'full'
@@ -129460,7 +129420,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
   }, {
     path: '*',
     redirect: 'error-404'
-  }].concat(Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_toConsumableArray_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_admin_js__WEBPACK_IMPORTED_MODULE_9__["default"]), Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_toConsumableArray_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_gudang_js__WEBPACK_IMPORTED_MODULE_10__["default"]), Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_toConsumableArray_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_laporan_js__WEBPACK_IMPORTED_MODULE_11__["default"]))
+  }].concat(Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_toConsumableArray_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_admin_js__WEBPACK_IMPORTED_MODULE_12__["default"]), Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_toConsumableArray_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_gudang_js__WEBPACK_IMPORTED_MODULE_13__["default"]), Object(D_wamp_www_gudangsjs_node_modules_babel_runtime_helpers_esm_toConsumableArray_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_laporan_js__WEBPACK_IMPORTED_MODULE_14__["default"]))
 }); // ? For splash screen
 // Remove afterEach hook if you are not using splash screen
 
@@ -129471,20 +129431,58 @@ router.afterEach(function () {
   if (appLoading) {
     appLoading.style.display = 'none';
   }
-});
+}); // Authentication guard
+
 router.beforeEach(function (to, from, next) {
-  var token = _auth_sanctum_useSanctum__WEBPACK_IMPORTED_MODULE_12__["default"].getToken();
+  // Get token from either persistent login or session login
+  var token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
   if (to.meta.requiresAuth) {
-    if (token == null || token == undefined) {
-      next({
-        name: 'login'
+    // No token at all
+    if (!token) {
+      return next({
+        name: 'login',
+        query: {
+          redirect: to.fullPath
+        }
+      });
+    } // Validate JWT expiration
+
+
+    try {
+      var payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); // Token expired
+
+      if (payload.exp && payload.exp * 1000 <= Date.now()) {
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token_type');
+        localStorage.removeItem('refreshToken');
+        return next({
+          name: 'login',
+          query: {
+            redirect: to.fullPath
+          }
+        });
+      }
+    } catch (error) {
+      // Invalid JWT
+      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
+      localStorage.removeItem('userData');
+      localStorage.removeItem('token_type');
+      localStorage.removeItem('refreshToken');
+      return next({
+        name: 'login',
+        query: {
+          redirect: to.fullPath
+        }
       });
     }
   }
 
   if (to.name) {
-    nprogress__WEBPACK_IMPORTED_MODULE_13___default.a.start();
+    nprogress__WEBPACK_IMPORTED_MODULE_15___default.a.start();
   }
 
   next();
@@ -129516,7 +129514,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/report/balance-perdate',
   name: 'report-balance-perdate',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(13), __webpack_require__.e(36)]).then(__webpack_require__.bind(null, /*! @/views/gudang/report/InventoriesBalance.vue */ "./resources/js/src/views/gudang/report/InventoriesBalance.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(13), __webpack_require__.e(38)]).then(__webpack_require__.bind(null, /*! @/views/gudang/report/InventoriesBalance.vue */ "./resources/js/src/views/gudang/report/InventoriesBalance.vue"));
   },
   meta: {
     requiresAuth: true,
@@ -129542,7 +129540,7 @@ __webpack_require__.r(__webpack_exports__);
   path: '/inventory/report/mutation',
   name: 'report-mutation',
   component: function component() {
-    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(6), __webpack_require__.e(38)]).then(__webpack_require__.bind(null, /*! @/views/gudang/report/InventoriesMutationReport.vue */ "./resources/js/src/views/gudang/report/InventoriesMutationReport.vue"));
+    return Promise.all(/*! import() */[__webpack_require__.e(2), __webpack_require__.e(6), __webpack_require__.e(25)]).then(__webpack_require__.bind(null, /*! @/views/gudang/report/InventoriesMutationReport.vue */ "./resources/js/src/views/gudang/report/InventoriesMutationReport.vue"));
   },
   meta: {
     requiresAuth: true,
