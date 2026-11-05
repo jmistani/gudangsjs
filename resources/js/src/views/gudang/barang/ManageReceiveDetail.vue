@@ -25,19 +25,20 @@
 
       <b-card class="mb-2" no-body>
         <div class="items-heading">
-          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Jumlah dan harga terkunci demi konsistensi jurnal</small></div>
+          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Ubah detail non-stok dan keterangan. Jumlah/harga hanya dapat diubah setelah pembalikan jurnal tersedia</small></div>
           <b-form-input v-model.trim="itemSearch" placeholder="Cari nama atau kode barang..." class="item-search" />
         </div>
         <div class="item-list">
           <div v-for="entry in filteredItems" :key="entry.item.type + '-' + entry.item.id" class="receipt-item">
             <div class="item-heading">
               <div class="item-title"><span class="item-number">{{ entry.index + 1 }}</span><div><strong>{{ entry.item.name || 'Barang tanpa nama' }}</strong><div class="text-muted small">{{ entry.item.code && entry.item.code !== '-' ? entry.item.code : 'Non-stok' }}</div></div></div>
-              <b-badge :variant="entry.item.type === 'stok' ? 'light-success' : 'light-info'">{{ entry.item.type }}</b-badge>
+              <div class="item-controls"><b-badge :variant="entry.item.type === 'stok' ? 'light-success' : 'light-info'">{{ entry.item.type }}</b-badge><b-button size="sm" variant="outline-danger" :disabled="saving" @click="deleteItem(entry.item)">Hapus Baris</b-button></div>
             </div>
+            <b-row v-if="entry.item.type === 'non-stok'" class="mb-1"><b-col cols="12" md="8"><b-form-group label="Nama Barang"><b-form-input v-model.trim="entry.item.name" maxlength="191" /></b-form-group></b-col><b-col cols="12" md="4"><b-form-group label="Satuan"><b-form-input v-model.trim="entry.item.unit" maxlength="191" /></b-form-group></b-col></b-row>
             <div class="item-values">
-              <div><span class="value-label">Jumlah</span><strong>{{ formatQty(entry.item.qty) }} {{ entry.item.unit || '' }}</strong></div>
-              <div><span class="value-label">Harga Satuan</span><strong>{{ rupiah(entry.item.price) }}</strong></div>
-              <div><span class="value-label">Subtotal</span><strong>{{ rupiah(entry.item.subtotal) }}</strong></div>
+              <div><span class="value-label">Jumlah</span><b-form-input v-model.number="entry.item.qty" type="number" min="0.01" step="any" /></div>
+              <div><span class="value-label">Harga Satuan (Rp)</span><b-form-input v-model.number="entry.item.price" type="number" min="0" step="1" /></div>
+              <div><span class="value-label">Subtotal</span><strong>{{ rupiah(Number(entry.item.qty || 0) * Number(entry.item.price || 0)) }}</strong></div>
             </div>
             <b-form-group label="Keterangan" class="mb-0">
               <b-form-textarea v-model="entry.item.memo" rows="2" max-rows="4" maxlength="2000" placeholder="Keterangan barang (opsional)" />
@@ -74,7 +75,7 @@ export default {
       return (this.detail ? this.detail.items : []).map((item, index) => ({ item, index }))
         .filter(({ item }) => !q || (String(item.name || '') + ' ' + String(item.code || '')).toLowerCase().includes(q))
     },
-    totalAmount() { return this.detail ? this.detail.items.reduce((sum, x) => sum + Number(x.subtotal || 0), 0) : 0 },
+    totalAmount() { return this.detail ? this.detail.items.reduce((sum, x) => sum + Number(x.qty || 0) * Number(x.price || 0), 0) : 0 },
   },
   created() { this.load() },
   methods: {
@@ -87,6 +88,18 @@ export default {
       catch (e) { this.error = this.message(e) }
       finally { this.loading = false }
     },
+    async deleteItem(item) {
+      const yes = await this.$bvModal.msgBoxConfirm(
+        'Hapus baris ' + (item.name || item.id) + '? Penghapusan hanya akan berhasil jika pembalikan stok dan jurnal aman.',
+        { title: 'Konfirmasi Hapus Baris', okTitle: 'Hapus', cancelTitle: 'Batal', okVariant: 'danger', centered: true },
+      )
+      if (!yes) return
+      this.error = ''
+      try {
+        await axios.delete('admin/inventory-receives/' + this.detail.id + '/items/' + item.type + '/' + item.id)
+        await this.load()
+      } catch (e) { this.error = this.message(e) }
+    },
     async save() {
       if (this.saving || !this.detail) return
       this.saving = true; this.error = ''
@@ -94,7 +107,7 @@ export default {
         await axios.put('admin/inventory-receives/' + this.detail.id, {
           giver: this.detail.giver,
           receiver: this.detail.receiver,
-          items: this.detail.items.map(x => ({ type: x.type, id: x.id, memo: x.memo || '' })),
+          items: this.detail.items.map(x => ({ type: x.type, id: x.id, name: x.name, unit: x.unit, qty: Number(x.qty), price: Number(x.price), memo: x.memo || '' })),
         })
         this.$router.push({ name: 'inventory-receive-manage' })
       } catch (e) { this.error = this.message(e); window.scrollTo(0, 0) }
@@ -115,7 +128,7 @@ export default {
 .item-search { max-width: 360px; }
 .item-list { padding: 1rem; display: grid; gap: 1rem; }
 .receipt-item { border: 1px solid rgba(128,128,128,.23); border-radius: .6rem; padding: 1.1rem; min-width: 0; }
-.item-heading { align-items: flex-start; margin-bottom: 1rem; }
+.item-heading { align-items: flex-start; margin-bottom: 1rem; } .item-controls { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .item-title { justify-content: flex-start; min-width: 0; }
 .item-title strong { overflow-wrap: anywhere; }
 .item-number { display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0; width: 32px; height: 32px; border-radius: .5rem; background: rgba(115,103,240,.13); color: #7367f0; font-weight: 700; }
