@@ -78,11 +78,11 @@ class AccountTransaction extends Model
     }
 
     /**
-     * NewAccount relation.
+     * Account relation.
      */
     public function account()
     {
-        return $this->belongsTo(NewAccount::class);
+        return $this->belongsTo(Account::class);
     }   
     /**
      * Set reference object.
