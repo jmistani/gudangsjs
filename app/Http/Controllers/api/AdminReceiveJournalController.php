@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ReceiveJournal;
 use App\Models\StockMutation;
+use App\Models\Inventory;
 use App\Models\NonStockInventory;
 use App\Models\JournalHead;
 use App\Models\AccountTransaction;
@@ -121,6 +122,8 @@ class AdminReceiveJournalController extends Controller
             'items' => ['required', 'array', 'min:1'],
             'deleted_nonstock_ids' => ['sometimes', 'array'],
             'deleted_nonstock_ids.*' => ['required', 'integer', 'distinct'],
+            'deleted_stock_ids' => ['sometimes', 'array'],
+            'deleted_stock_ids.*' => ['required', 'integer', 'distinct'],
             'items.*.type' => ['required', 'in:stok,non-stok'],
             'items.*.id' => ['required', 'integer'],
             'items.*.memo' => ['nullable', 'string', 'max:2000'],
@@ -139,8 +142,10 @@ class AdminReceiveJournalController extends Controller
             $expected = $stock->map(function ($x) { return 'stok:'.$x->id; })
                 ->concat($nonstock->map(function ($x) { return 'non-stok:'.$x->id; }))->sort()->values()->all();
             $deletedIds = collect($data['deleted_nonstock_ids'] ?? []);
+            $deletedStockIds = collect($data['deleted_stock_ids'] ?? []);
             $given = collect($data['items'])->map(function ($x) { return $x['type'].':'.$x['id']; })
-                ->concat($deletedIds->map(function ($id) { return 'non-stok:'.$id; }))->sort()->values()->all();
+                ->concat($deletedIds->map(function ($id) { return 'non-stok:'.$id; }))
+                ->concat($deletedStockIds->map(function ($id) { return 'stok:'.$id; }))->sort()->values()->all();
             if ($expected !== $given) {
                 throw ValidationException::withMessages(['items' => 'Detail barang telah berubah. Muat ulang halaman.']);
             }
@@ -153,8 +158,7 @@ class AdminReceiveJournalController extends Controller
                 $expenseMatches[$line->id] = $this->findNonStockExpense($head, $line);
             }
 
-            // Financial edits require reversing linked stock and ledger postings.
-            // Reject them explicitly instead of silently leaving balances inconsistent.
+            // Validate stock changes before any database mutation.
             foreach ($data['items'] as $item) {
                 $existing = $item['type'] === 'stok'
                     ? $stock->firstWhere('id', $item['id'])
@@ -165,9 +169,7 @@ class AdminReceiveJournalController extends Controller
                 $qtyChanged = (float) $existing->getRawOriginal('amount') != (float) $item['qty'];
                 $priceChanged = (int) $existing->getRawOriginal('price') !== (int) $item['price'];
                 if ($item['type'] === 'stok' && ($qtyChanged || $priceChanged)) {
-                    throw ValidationException::withMessages([
-                        'items' => 'Perubahan stok memerlukan rekonsiliasi inventory dan tetap dibatasi.',
-                    ]);
+                    $this->assertStockLineEditable($head, $existing);
                 }
             }
 
@@ -176,7 +178,14 @@ class AdminReceiveJournalController extends Controller
             $record->save();
             foreach ($data['items'] as $item) {
                 if ($item['type'] === 'stok') {
-                    $stock->firstWhere('id', $item['id'])->update(['description' => $item['memo'] ?? null]);
+                    $line = $stock->firstWhere('id', $item['id']);
+                    $qtyChanged = (float) $line->getRawOriginal('amount') != (float) $item['qty'];
+                    $priceChanged = (int) $line->getRawOriginal('price') !== (int) $item['price'];
+                    if ($qtyChanged || $priceChanged) {
+                        $this->applyStockLineChange($head, $record, $line, (float) $item['qty'], (int) $item['price']);
+                    }
+                    $line->description = $item['memo'] ?? null;
+                    $line->save();
                 } else {
                     $line = $nonstock->firstWhere('id', $item['id']);
                     $expense = $expenseMatches[$line->id];
@@ -218,6 +227,12 @@ class AdminReceiveJournalController extends Controller
                 }
             }
 
+            foreach ($deletedStockIds as $deletedStockId) {
+                $line = $stock->firstWhere('id', $deletedStockId);
+                $this->assertStockLineEditable($head, $line);
+                $this->applyStockLineChange($head, $record, $line, 0, 0, true);
+            }
+
             // Apply staged deletions in the SAME transaction as all field edits.
             // If any posting cannot be reconciled, the entire save is rolled back.
             foreach ($deletedIds as $deletedId) {
@@ -242,6 +257,94 @@ class AdminReceiveJournalController extends Controller
             }
         }, 3);
         return $this->response->successResponse('OK', 'Detail penerimaan berhasil diperbarui.');
+    }
+
+    /**
+     * Stock purchase corrections are safe only if no later mutation exists.
+     * Later consumption or receipts may have used the old weighted average cost.
+     */
+    private function assertStockLineEditable(JournalHead $head, StockMutation $line): void
+    {
+        if ((float) $line->getRawOriginal('amount') <= 0
+            || $line->stockable_type !== Inventory::class) {
+            throw ValidationException::withMessages(['items' => 'Baris bukan penerimaan stok yang valid.']);
+        }
+        if (StockMutation::where('stockable_type', Inventory::class)
+            ->where('stockable_id', $line->stockable_id)
+            ->where('id', '>', $line->id)->exists()) {
+            throw ValidationException::withMessages([
+                'items' => 'Stok ini sudah memiliki mutasi setelah penerimaan. Koreksi memerlukan rekonsiliasi histori terlebih dahulu.',
+            ]);
+        }
+        $this->findStockDebit($head, $line);
+    }
+
+    private function findStockDebit(JournalHead $head, StockMutation $line): AccountTransaction
+    {
+        $inventory = Inventory::findOrFail($line->stockable_id);
+        $matches = AccountTransaction::where('journal_head_id', $head->id)
+            ->where('ref_class', Inventory::class)
+            ->where('ref_class_id', $inventory->id)
+            ->where('account_id', $inventory->account->id)
+            ->whereNotNull('debit')
+            ->lockForUpdate()->get();
+        // Legacy receipts may contain multiple rows for the same inventory.
+        // Never guess which debit corresponds to which row.
+        if ($matches->count() !== 1
+            || StockMutation::where('journal_head_id', $head->id)
+                ->where('stockable_type', Inventory::class)
+                ->where('stockable_id', $inventory->id)->count() !== 1) {
+            throw ValidationException::withMessages([
+                'items' => 'Jurnal pembelian stok tidak dapat dicocokkan secara unik. Perlu pemeriksaan manual.',
+            ]);
+        }
+        return $matches->first();
+    }
+
+    private function applyStockLineChange(
+        JournalHead $head,
+        ReceiveJournal $record,
+        StockMutation $line,
+        float $quantity,
+        int $price,
+        bool $delete = false
+    ): void {
+        $this->assertStockLineEditable($head, $line);
+        $inventory = Inventory::whereKey($line->stockable_id)->lockForUpdate()->firstOrFail();
+        $debit = $this->findStockDebit($head, $line);
+        $payable = $this->findReceiptPayable($head, $record);
+        $oldTotal = (int) $line->getRawOriginal('total');
+        $oldQuantity = (float) $line->getRawOriginal('amount');
+        $newTotal = $delete ? 0 : (int) round($quantity * $price);
+        $newQuantity = $delete ? 0 : $quantity;
+        $delta = $newTotal - $oldTotal;
+        $newPayable = (int) $payable->getRawOriginal('credit') + $delta;
+        $newStock = (float) $inventory->getRawOriginal('in_stock') + $newQuantity - $oldQuantity;
+        $newValue = (int) $inventory->getRawOriginal('stock_value') + $delta;
+        if ($newPayable < 0 || $newStock < 0 || $newValue < 0) {
+            throw ValidationException::withMessages([
+                'items' => 'Perubahan stok menyebabkan saldo stok, nilai stok, atau hutang negatif.',
+            ]);
+        }
+        if ($delete) {
+            $debit->delete();
+            $line->delete(); // SoftDeletes retains the original mutation for audit.
+        } else {
+            $line->amount = $newQuantity;
+            $line->price = $price;
+            $line->total = $newTotal;
+            $line->save();
+            $debit->debit = $newTotal;
+            $debit->save();
+        }
+        $payable->credit = $newPayable;
+        $payable->save();
+        $inventory->in_stock = $newStock;
+        $inventory->stock_value = $newValue;
+        $inventory->avg_value = $newStock > 0 ? (int) round($newValue / $newStock) : 0;
+        $inventory->save();
+        Account::findOrFail($debit->account_id)->resetCurrentBalances();
+        Account::findOrFail($payable->account_id)->resetCurrentBalances();
     }
 
     private function findNonStockExpense(JournalHead $head, NonStockInventory $line)
