@@ -23,6 +23,24 @@ export default [{
             action: 'manage',
         },
         {
+            title: 'Kelola Terima Barang',
+            route: 'inventory-receive-manage',
+            resource: 'inventory',
+            action: 'manage',
+        },
+        {
+            title: 'Grup Barang',
+            route: 'setting-inventory-group',
+            resource: 'inventory',
+            action: 'manage',
+        },
+        {
+            title: 'Satuan Barang',
+            route: 'setting-inventory-unit',
+            resource: 'inventory',
+            action: 'manage',
+        },
+        {
             title: 'Kelola Keluar Barang',
             route: 'inventory-consume-manage',
             resource: 'inventory',
