@@ -120,6 +120,10 @@ class AdminReceiveJournalController extends Controller
             'items.*.type' => ['required', 'in:stok,non-stok'],
             'items.*.id' => ['required', 'integer'],
             'items.*.memo' => ['nullable', 'string', 'max:2000'],
+            'items.*.name' => ['nullable', 'string', 'max:191'],
+            'items.*.unit' => ['nullable', 'string', 'max:191'],
+            'items.*.qty' => ['required', 'numeric', 'gt:0'],
+            'items.*.price' => ['required', 'integer', 'min:0'],
         ]);
 
         DB::transaction(function () use ($id, $data) {
@@ -134,6 +138,23 @@ class AdminReceiveJournalController extends Controller
             if ($expected !== $given) {
                 throw ValidationException::withMessages(['items' => 'Detail barang telah berubah. Muat ulang halaman.']);
             }
+            // Financial edits require reversing linked stock and ledger postings.
+            // Reject them explicitly instead of silently leaving balances inconsistent.
+            foreach ($data['items'] as $item) {
+                $existing = $item['type'] === 'stok'
+                    ? $stock->firstWhere('id', $item['id'])
+                    : $nonstock->firstWhere('id', $item['id']);
+                if (!$existing) {
+                    throw ValidationException::withMessages(['items' => 'Item tidak ditemukan.']);
+                }
+                if ((float) $existing->getRawOriginal('amount') != (float) $item['qty']
+                    || (int) $existing->getRawOriginal('price') !== (int) $item['price']) {
+                    throw ValidationException::withMessages([
+                        'items' => 'Jumlah dan harga belum dapat diubah karena transaksi sudah tercatat pada stok dan pembukuan.',
+                    ]);
+                }
+            }
+
             $record->giver = $data['giver'];
             $record->receiver = $data['receiver'];
             $record->save();
@@ -141,11 +162,34 @@ class AdminReceiveJournalController extends Controller
                 if ($item['type'] === 'stok') {
                     $stock->firstWhere('id', $item['id'])->update(['description' => $item['memo'] ?? null]);
                 } else {
-                    $nonstock->firstWhere('id', $item['id'])->update(['memo' => $item['memo'] ?? null]);
+                    $nonstock->firstWhere('id', $item['id'])->update([
+                        'memo' => $item['memo'] ?? null,
+                        'name' => $item['name'] ?? $nonstock->firstWhere('id', $item['id'])->name,
+                        'unit' => $item['unit'] ?? $nonstock->firstWhere('id', $item['id'])->unit,
+                    ]);
                 }
             }
         }, 3);
         return $this->response->successResponse('OK', 'Detail penerimaan berhasil diperbarui.');
+    }
+
+    public function deleteItem($id, $type, $itemId)
+    {
+        $this->authorizeAdmin();
+        if (!in_array($type, ['stok', 'non-stok'], true)) abort(404);
+
+        return DB::transaction(function () use ($id, $type, $itemId) {
+            $record = ReceiveJournal::findOrFail($id);
+            $head = $record->journalhead;
+            if (!$head) abort(409, 'Jurnal penerimaan tidak ditemukan.');
+
+            // Receipt lines have stock movements and/or expense, payable, and
+            // account transactions. Never remove a line without reversing all
+            // its postings and verifying downstream stock consumption.
+            return response()->json([
+                'message' => 'Baris tidak dapat dihapus langsung karena sudah memengaruhi stok atau pembukuan. Pembalikan jurnal harus diselesaikan terlebih dahulu.',
+            ], 409);
+        });
     }
 
     public function destroy($id)
