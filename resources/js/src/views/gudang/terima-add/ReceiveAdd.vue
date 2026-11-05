@@ -1240,7 +1240,28 @@ background-color:$product-details-bg;
     .row .border {
       background-color: $theme-dark-card-bg;
     }
+  }
 
+  // Repeatable Terima Barang rows
+  .receive-item-card {
+    background-color: $theme-dark-card-bg !important;
+    border-color: $theme-dark-border-color !important;
+    color: $theme-dark-body-color;
+  }
+
+  .receive-item-card .border-left,
+  .receive-item-card .receive-item-actions {
+    border-color: $theme-dark-border-color !important;
+  }
+
+  .receive-item-card .text-muted,
+  .receive-item-card label,
+  .receive-item-card .custom-control-label {
+    color: $theme-dark-body-color;
+  }
+
+  .receive-item-card .v-select.item-selector-title {
+    background-color: transparent;
   }
 }
 .bd-highlight {
