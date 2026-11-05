@@ -169,6 +169,9 @@ class AdminReceiveJournalController extends Controller
                 $qtyChanged = (float) $existing->getRawOriginal('amount') != (float) $item['qty'];
                 $priceChanged = (int) $existing->getRawOriginal('price') !== (int) $item['price'];
                 if ($item['type'] === 'stok' && ($qtyChanged || $priceChanged)) {
+                    if ((float) $item['qty'] != floor((float) $item['qty'])) {
+                        throw ValidationException::withMessages(['items' => 'Jumlah stok harus bilangan bulat.']);
+                    }
                     $this->assertStockLineEditable($head, $existing);
                 }
             }
