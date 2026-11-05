@@ -123,8 +123,9 @@ class StockReceiptWorkflowTest extends TestCase
             'type' => 'non-stok', 'id' => $other->id, 'name' => 'TEST OTHER',
             'unit' => 'pcs', 'qty' => 1, 'price' => 100, 'memo' => '',
         ]]);
-        $this->assertNull($f['line']->fresh());
-        $this->assertNotNull(StockMutation::withTrashed()->find($f['line']->id));
+        $this->assertNull(StockMutation::find($f['line']->id));
+        $deletedMutation = StockMutation::withTrashed()->findOrFail($f['line']->id);
+        $this->assertNotNull($deletedMutation->deleted_at);
         $this->assertNull($f['debit']->fresh());
         $this->assertSame(0, (int) $f['inventory']->fresh()->getRawOriginal('in_stock'));
         $this->assertSame(0, (int) $f['inventory']->fresh()->getRawOriginal('stock_value'));
