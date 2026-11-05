@@ -1067,6 +1067,21 @@ export default {
   max-width: 100%;
   overflow-x: hidden;
 
+  // Dark mode: the complete repeatable-items table area must use the
+  // same dark card background, not only the individual item rows.
+  .dark-layout & {
+    .form-add-stock,
+    .receive-items-section,
+    .receive-items-header {
+      background-color: $theme-dark-card-bg !important;
+      color: $theme-dark-body-color;
+    }
+
+    .receive-items-header {
+      border-color: $theme-dark-border-color;
+    }
+  }
+
   .wizard-nav {
     overflow-x: auto;
     overflow-y: hidden;
