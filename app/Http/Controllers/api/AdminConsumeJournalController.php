@@ -200,6 +200,16 @@ class AdminConsumeJournalController extends Controller
                 ]);
             }
 
+            $duplicateCode = \App\Models\JournalHead::where('code', $data['code'])
+                ->where('id', '!=', $journalHead->id)
+                ->exists();
+
+            if ($duplicateCode) {
+                throw ValidationException::withMessages([
+                    'code' => 'Kode transaksi sudah digunakan.',
+                ]);
+            }
+
             $accountCoa = CompanyCoa::where('code', $data['account_code'])->first();
 
             if (!$accountCoa || !$accountCoa->account) {
