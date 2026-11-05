@@ -190,6 +190,26 @@ export default {
       })
     },
 
+    fetchAdminConsumes(ctx, queryParams) {
+      return axios.get('admin/inventory-consumes', { params: queryParams })
+    },
+
+    fetchAdminConsume(ctx, id) {
+      return axios.get(`admin/inventory-consumes/${id}`)
+    },
+
+    updateAdminConsume(ctx, { id, data }) {
+      return axios.put(`admin/inventory-consumes/${id}`, data)
+    },
+
+    deleteAdminConsume(ctx, id) {
+      return axios.delete(`admin/inventory-consumes/${id}`)
+    },
+
+    bulkDeleteAdminConsumes(ctx, ids) {
+      return axios.post('admin/inventory-consumes/bulk-delete', { ids })
+    },
+
     fetchInventoryWithMutation(ctx, queryParams) {
       return new Promise((resolve, reject) => {
         axios
