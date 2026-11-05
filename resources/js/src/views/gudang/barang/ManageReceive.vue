@@ -21,43 +21,17 @@
       </b-table>
       <div class="footer"><span>{{ total }} transaksi</span><b-pagination v-model="page" :per-page="perPage" :total-rows="total" @change="fetchRecords" /></div>
     </b-card>
-    <b-modal v-model="showModal" size="xl" scrollable centered title="Detail Penerimaan" hide-footer>
-      <div v-if="detailLoading" class="text-center p-4"><b-spinner /></div>
-      <div v-else-if="detail">
-        <b-alert v-if="detailError" show variant="danger">{{ detailError }}</b-alert>
-        <b-row>
-          <b-col cols="12" md="4"><b-form-group label="Kode"><b-form-input :value="detail.code" readonly /></b-form-group></b-col>
-          <b-col cols="12" md="4"><b-form-group label="Tanggal"><b-form-input :value="detail.post_date" readonly /></b-form-group></b-col>
-          <b-col cols="12" md="4"><b-form-group label="Vendor"><b-form-input v-model.trim="detail.giver" /></b-form-group></b-col>
-          <b-col cols="12" md="6"><b-form-group label="Diterima oleh"><b-form-input v-model.trim="detail.receiver" /></b-form-group></b-col>
-        </b-row>
-        <h5 class="mt-1">Barang diterima</h5>
-        <p class="text-muted">Jumlah, harga, kode dan tanggal dikunci untuk menjaga histori stok dan jurnal. Keterangan dapat diperbaiki.</p>
-        <div v-for="(item, i) in detail.items" :key="item.type + item.id" class="item-card">
-          <div class="d-flex justify-content-between flex-wrap mb-1"><strong>{{ i + 1 }}. {{ item.name }}</strong><b-badge variant="light-info">{{ item.type }}</b-badge></div>
-          <b-row>
-            <b-col cols="6" md="3"><b-form-group label="Jumlah"><b-form-input :value="item.qty + ' ' + (item.unit || '')" readonly /></b-form-group></b-col>
-            <b-col cols="6" md="3"><b-form-group label="Harga"><b-form-input :value="rupiah(item.price)" readonly /></b-form-group></b-col>
-            <b-col cols="12" md="6"><b-form-group label="Subtotal"><b-form-input :value="rupiah(item.subtotal)" readonly /></b-form-group></b-col>
-            <b-col cols="12"><b-form-group label="Keterangan"><b-form-textarea v-model="item.memo" rows="2" /></b-form-group></b-col>
-          </b-row>
-        </div>
-        <div class="actions">
-          <b-button variant="outline-secondary" @click="showModal = false">Tutup</b-button>
-          <b-button variant="primary" :disabled="saving" @click="save"><b-spinner v-if="saving" small /> Simpan Perubahan</b-button>
-        </div>
-      </div>
-    </b-modal>
+
   </section>
 </template>
 
 <script>
 import axios from '@axios'
-import { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BModal, BPagination, BRow, BSpinner, BTable } from 'bootstrap-vue'
+import { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BPagination, BRow, BSpinner, BTable } from 'bootstrap-vue'
 export default {
   name: 'ManageReceive',
-  components: { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BModal, BPagination, BRow, BSpinner, BTable },
-  data() { return { query: '', page: 1, perPage: 20, total: 0, records: [], loading: false, error: '', showModal: false, detail: null, detailLoading: false, detailError: '', saving: false,
+  components: { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BPagination, BRow, BSpinner, BTable },
+  data() { return { query: '', page: 1, perPage: 20, total: 0, records: [], loading: false, error: '', detail: null, detailLoading: false, detailError: '', saving: false,
     fields: [{ key: 'code', label: 'Kode' }, { key: 'post_date', label: 'Tanggal' }, { key: 'giver', label: 'Vendor' }, { key: 'receiver', label: 'Penerima' }, { key: 'item_count', label: 'Item' }, { key: 'total', label: 'Total' }, { key: 'actions', label: 'Aksi' }] } },
   created() { this.fetchRecords(1) },
   methods: {
@@ -71,23 +45,8 @@ export default {
         this.records = p.data || []; this.total = p.total || 0; this.page = p.current_page || page
       } catch (e) { this.error = this.message(e) } finally { this.loading = false }
     },
-    async openDetail(id) {
-      this.showModal = true; this.detailLoading = true; this.detail = null; this.detailError = ''
-      try { const r = await axios.get('admin/inventory-receives/' + id); this.detail = r.data.payload }
-      catch (e) { this.detailError = this.message(e) }
-      finally { this.detailLoading = false }
-    },
-    async save() {
-      if (!this.detail || this.saving) return
-      this.saving = true; this.detailError = ''
-      try {
-        await axios.put('admin/inventory-receives/' + this.detail.id, {
-          giver: this.detail.giver, receiver: this.detail.receiver,
-          items: this.detail.items.map(x => ({ id: x.id, type: x.type, memo: x.memo || '' })),
-        })
-        this.showModal = false; await this.fetchRecords(this.page)
-      } catch (e) { this.detailError = this.message(e) }
-      finally { this.saving = false }
+    openDetail(id) {
+      this.$router.push({ name: 'inventory-receive-manage-detail', params: { id } })
     },
   },
 }
