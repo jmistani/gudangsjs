@@ -1,134 +1,44 @@
 <template>
-  <section class="">
-    <b-row class="">
-      <b-col
-        cols="12"
-        xl="4"
-      >
-        <ValidationObserver 
-          ref="refFormObserver"
-          v-slot="{ handleSubmit }"
-        >
-        <b-form ref="form" @submit.prevent="handleSubmit(onSubmit)">
-          <b-card
-            no-body
-            class=""
-          >
-            <!-- Header -->
-            <b-card-body class="pb-0">
-
-              <b-row class="">
-
-                <!-- Col: Invoice To -->
-                <b-col
-                  cols="12"
-                  md="12"
-                  class=""
-                >
-                  <ValidationProvider
-                    #default="validationContext"
-                    ref="group-add-name"
-                    name="group-add-name"
-                    :rules="{ requiredGrupBarang : true }"
-                  >
-                  <b-form-group
-                    label="Nama"
-                    label-for="group-add-input-name"
-                    id="group-add-name"
-                    :state="getValidationState(validationContext)"
-                  >
-                    <b-form-input
-                      id="group-add-input-name"
-                      v-model="groupData.name"
-                    />
-                    <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                      {{ validationContext.errors[0] }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                  </ValidationProvider>
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col
-                  cols="12"
-                  xl="6"
-                  class="mt-xl-0 mt-3  align-items-end flex-column  d-xl-flex d-block"
-                >
-                </b-col>
-                <b-col
-                  cols="12"
-                  xl="6"
-                  class="mt-xl-0 mt-3  align-items-end flex-column  d-xl-flex d-block"
-                >
-                    <!-- Button: Send Invoice -->
-                    <b-button
-                      v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-                      variant="primary"
-                      class="mb-75"
-                      block
-                      pill
-                      type="submit"
-                    >
-                      Simpan
-                    </b-button>
-
-                    <!-- Button: DOwnload -->
-                    <b-button
-                      v-ripple.400="'rgba(113, 102, 240, 0.15)'"
-                      variant="outline-primary"
-                      class="mb-75"
-                      block
-                      :to="{ name: 'inventory-list'}"
-                      pill
-                    >
-                      Cancel
-                    </b-button>
-                </b-col> 
-              </b-row>
-            </b-card-body>
-            <hr class="">
-          </b-card>
+  <section class="settings-page">
+    <b-row>
+      <b-col cols="12" lg="4">
+        <b-card class="settings-card">
+          <h4 class="mb-50">Tambah Grup Barang</h4>
+          <p class="text-muted">Buat grup barang baru untuk pilihan pada data inventory.</p>
+          <b-form @submit.prevent="add">
+            <b-form-group label="Nama" label-for="setting-name">
+              <b-form-input id="setting-name" v-model.trim="name" :state="name ? null : false" placeholder="Masukkan nama..." maxlength="191" required />
+              <b-form-invalid-feedback>Nama wajib diisi.</b-form-invalid-feedback>
+            </b-form-group>
+            <b-button variant="primary" type="submit" block :disabled="saving || !name">
+              <b-spinner v-if="saving" small class="mr-50" />Simpan
+            </b-button>
           </b-form>
-        </ValidationObserver>
+          <b-alert v-if="formError" show variant="danger" class="mt-1 mb-0">{{ formError }}</b-alert>
+        </b-card>
       </b-col>
-      <b-col
-        cols="12"
-        xl="8"
-      >
-        <b-card
-          no-body
-          class=""
-        >
-          <!-- Header -->
-          <b-card-body class="pb-2">
-            <b-row>
-              <b-col
-                cols="12"
-                md="4"
-                class="d-flex align-items-center justify-content-center justify-content-sm-start"
-              >                    
-                <b-table
-                  ref="refGroupList"
-                  :items="fetchAllGroups"
-                  striped
-                  responsive
-                  primary-key="id"
-                  :fields="tableColumns"
-                  show-empty
-                  empty-text="No matching records found"
-                >
-                  <template #cell(name)="data">
-                      <span>{{ data.item.name | titlecase }}</span>
-                      <feather-icon
-                        class="text-danger cursor-pointer"
-                        icon="XIcon"
-                        @click="removeGroup(data.item.id)"
-                      />
-                  </template>
-                </b-table>
-              </b-col>
-            </b-row>
-          </b-card-body>
+      <b-col cols="12" lg="8">
+        <b-card class="settings-card">
+          <div class="list-header">
+            <div><h4 class="mb-25">Daftar Grup Barang</h4><small class="text-muted">{{ filtered.length }} dari {{ rows.length }} data</small></div>
+            <b-button variant="outline-primary" size="sm" :disabled="loading" @click="load">Refresh</b-button>
+          </div>
+          <b-form-input v-model.trim="search" class="mb-1" placeholder="Cari nama..." />
+          <b-alert v-if="listError" show variant="danger">{{ listError }}</b-alert>
+          <div v-if="loading" class="text-center p-3"><b-spinner variant="primary" /></div>
+          <b-table v-else responsive hover :items="paged" :fields="fields" show-empty empty-text="Tidak ada data yang cocok." class="mb-0">
+            <template #cell(index)="row">{{ (page - 1) * perPage + row.index + 1 }}</template>
+            <template #cell(name)="row"><span class="font-weight-bold">{{ row.item.name }}</span></template>
+            <template #cell(actions)="row">
+              <b-button size="sm" variant="outline-danger" :disabled="deleting === row.item.id" @click="remove(row.item)">
+                <feather-icon icon="Trash2Icon" class="mr-25" /> Hapus
+              </b-button>
+            </template>
+          </b-table>
+          <div class="list-footer">
+            <small class="text-muted">Menampilkan {{ paged.length }} data</small>
+            <b-pagination v-model="page" :per-page="perPage" :total-rows="filtered.length" class="mb-0" />
+          </div>
         </b-card>
       </b-col>
     </b-row>
@@ -136,255 +46,61 @@
 </template>
 
 <script>
-import Ripple from 'vue-ripple-directive'
-import store from '@/store'
-import {
-  BRow, BCol, BCard, BCardBody, BButton, BLink, BListGroup, BListGroupItem,
-  BCardText, BForm, BFormGroup, BFormInput, BInputGroup, BTable, BPagination,
-  BInputGroupPrepend, BFormTextarea, BFormCheckbox, BPopover, VBToggle, BFormInvalidFeedback
-} from 'bootstrap-vue'
-import pengaturanStoreModule from './pengaturanStoreModule'
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate'
-import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
-import { ref, onUnmounted, computed, watch } from '@vue/composition-api'
-import { requiredGrupBarang } from '@validationsInventory/setting-grup-barang.js'
-import formValidation from '@core/comp-functions/forms/form-validation'
-import { useToast } from 'vue-toastification/composition'
+import axios from '@axios'
+import { BAlert, BButton, BCard, BCol, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BPagination, BRow, BSpinner, BTable } from 'bootstrap-vue'
 
 export default {
-  components: {
-    BRow,
-    BCol,
-    BCard,
-    BCardBody,
-    BButton,
-    BCardText,
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BInputGroup,
-    BInputGroupPrepend,
-    BFormTextarea,
-    BFormCheckbox,
-    BPopover,
-    BListGroup,
-    BListGroupItem,
-    BFormInvalidFeedback,
-    BTable,
-    BLink,
-    ValidationProvider,
-    ValidationObserver,
-    ToastificationContent,
-    requiredGrupBarang,
-    BPagination,
-  },
-  directives: {
-    Ripple,
-    'b-toggle': VBToggle,
-
-  },
+  name: 'GroupBarangSettings',
+  components: { BAlert, BButton, BCard, BCol, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BPagination, BRow, BSpinner, BTable },
   data() {
     return {
-          }
+      name: '', search: '', rows: [], page: 1, perPage: 10, saving: false, loading: false, deleting: null, formError: '', listError: '',
+      fields: [{ key: 'index', label: '#', thStyle: { width: '55px' } }, { key: 'name', label: 'Nama' }, { key: 'actions', label: 'Aksi', thStyle: { width: '115px' } }],
+    }
   },
-  mixins: [],
-  mounted() {
+  computed: {
+    filtered() { return this.rows.filter(x => String(x.name || '').toLowerCase().includes(this.search.toLowerCase())) },
+    paged() { return this.filtered.slice((this.page - 1) * this.perPage, this.page * this.perPage) },
   },
-  created() {
-  },
-  destroyed() {
-  },
+  watch: { search() { this.page = 1 } },
+  created() { this.load() },
   methods: {
-  },
-  watch: {
-  },
-  setup() {
-    const toast = useToast()
-
-    const PENGATURAN_APP_STORE_MODULE_NAME = 'app-pengaturan'
-
-    // Register module
-    if (!store.hasModule(PENGATURAN_APP_STORE_MODULE_NAME)) {
-      store.registerModule(PENGATURAN_APP_STORE_MODULE_NAME, pengaturanStoreModule)
-    }
-    // UnRegister on leave
-    onUnmounted(() => {
-      if (store.hasModule(PENGATURAN_APP_STORE_MODULE_NAME)) store.unregisterModule(PENGATURAN_APP_STORE_MODULE_NAME)
-
-    })
-
-    const refGroupList = ref(null)
-
-
-
-    const blankGroup = ref({
-        name: '',
-    })
-  
-    const groupData = ref(JSON.parse(JSON.stringify(blankGroup)))
-
-    const resetGroup = () => {
-      groupData.value = JSON.parse(JSON.stringify(blankGroup))
-    }
-
-    const onSubmit = () => {
-      store.dispatch('app-pengaturan/addGroup', groupData.value)
-        .then(() => {
-          refetchData()
-          resetForm()
-        })
-    }
-
-    const removeGroup = (id) => {
-      if (confirm("Yakin akan menghapus grup?")) {
-        store.dispatch('app-pengaturan/removeGroup', {id})
-          .then(() => {
-            refetchData()
-          })
-      }
-    }
-
-    const refetchData = () => {
-        refGroupList.value.refresh()
-    }
-    
-    const fetchAllGroups = (ctx, callback) => {
-      store
-        .dispatch('app-pengaturan/fetchAllGroups', {
-        })
-        .then((response) => {
-            callback(response.data.payload)
-        })
-        .catch(() => {
-            toast({
-              component: ToastificationContent,
-              props: {
-                  title: "Error pengambilan data",
-                  icon: 'AlertTriangleIcon',
-                  variant: 'danger',
-              },
-          })
+    message(e) { return (e.response && e.response.data && e.response.data.message) || 'Permintaan gagal. Coba lagi.' },
+    async load() {
+      this.loading = true; this.listError = ''
+      try { const r = await axios.get('inventory-groups/all'); this.rows = Array.isArray(r.data.payload) ? r.data.payload : [] }
+      catch (e) { this.listError = this.message(e) }
+      finally { this.loading = false }
+    },
+    async add() {
+      if (!this.name || this.saving) return
+      this.saving = true; this.formError = ''
+      try {
+        await axios.post('inventory-groups', { name: this.name })
+        this.name = ''; this.page = 1; await this.load()
+      } catch (e) { this.formError = this.message(e) }
+      finally { this.saving = false }
+    },
+    async remove(row) {
+      const yes = await this.$bvModal.msgBoxConfirm('Hapus "' + row.name + '"? Pastikan tidak digunakan oleh barang lain.', {
+        title: 'Konfirmasi Hapus', okTitle: 'Hapus', cancelTitle: 'Batal', okVariant: 'danger', centered: true,
       })
-    }
-    const tableColumns = [
-        { key: 'name', label: 'Grup', sortable: false },
-    ]
-    const {
-      refFormObserver,
-      getValidationState,
-      resetForm,
-    } = formValidation(resetGroup)
-    
-    return {
-      groupData,
-      onSubmit,
-      removeGroup,
-      fetchAllGroups,
-      tableColumns,
-
-      refGroupList,
-      refFormObserver,
-      getValidationState,
-      resetForm,
-    }
+      if (!yes) return
+      this.deleting = row.id; this.listError = ''
+      try { await axios.delete('inventory-groups/' + row.id); await this.load(); if (this.page > 1 && !this.paged.length) this.page-- }
+      catch (e) { this.listError = this.message(e) }
+      finally { this.deleting = null }
+    },
   },
 }
 </script>
 
-<style lang="scss">
-@import '@core/scss/vue/libs/vue-select.scss';
-@import '@core/scss/vue/libs/vue-flatpicker.scss';
-.invoice-add-wrapper {
-  .add-new-vendor-header {
-    padding: $options-padding-y $options-padding-x;
-      color: $success;
-
-    &:hover {
-      background-color: rgba($success, 0.12);
-    }
-  }
-  .add-new-inventory-header {
-    padding: $options-padding-y $options-padding-x;
-      color: $primary;
-
-    &:hover {
-      background-color: rgba($success, 0.12);
-    }
-  }
-}
+<style scoped>
+.settings-page { max-width: 1500px; margin: 0 auto; }
+.settings-card { min-height: 200px; }
+.list-header,.list-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+.list-header { margin-bottom: 1rem; }
+.list-footer { padding-top: 1rem; }
+@media (max-width: 991px) { .settings-card { margin-bottom: 1rem; } }
+@media (max-width: 575px) { .list-footer { flex-direction: column; align-items: stretch; } .list-footer .pagination { justify-content: center; } }
 </style>
-
-
-<style lang="scss" scoped>
-@import "~@core/scss/base/pages/app-inventory.scss";
-@import '~@core/scss/base/components/variables-dark';
-@import '~@core/scss/base/custom/custom.scss';
-
-.form-item-section {
-background-color:$product-details-bg;
-}
-
-.form-item-action-col {
-  width: 27px;
-}
-
-.repeater-form {
-  // overflow: hidden;
-  transition: .35s height;
-}
-
-.v-select {
-  &.item-selector-title,
-  &.payment-selector {
-    background-color: #fff;
-
-    .dark-layout & {
-      background-color: unset;
-    }
-  }
-}
-.select-option-capitalize {
-  text-transform: capitalize;
-}
-.dark-layout {
-  .form-item-section {
-    background-color: $theme-dark-body-bg;
-
-    .row .border {
-      background-color: $theme-dark-card-bg;
-    }
-
-  }
-}
-.bd-highlight {
-    background-color: rgba(86,61,124,0.15);
-    border: 1px solid rgba(86,61,124,0.15);
-}
-#style1.vue-numeric {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-#style1.vue-numeric-input.updown .numeric-input {
-  padding-right: 5px !important;
-  padding-left: 5px !important;
-}
-#style1.vue-numeric-input.updown .btn {
-  background: #6fbbff !important;
-}
-#style1.vue-numeric-input.updown .btn-increment {
-  height: 1.5rem;
-  width: 100%;
-  right: 0 !important;
-  left:0 !important;
-  top: 0 !important;
-  bottom: auto !important;
-}
-#style1.vue-numeric-input.updown .btn-decrement {
-  height: 1.5rem;
-  width: 100%;
-  left: 0 !important;
-  right: 0 !important;
-  top: auto !important;
-  bottom: 0 !important;
-}
-</style></style>
