@@ -25,19 +25,19 @@
 
       <b-card class="mb-2" no-body>
         <div class="items-heading">
-          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Ubah detail non-stok dan keterangan. Jumlah/harga hanya dapat diubah setelah pembalikan jurnal tersedia</small></div>
+          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Jumlah dan harga non-stok dapat diubah; perubahan saldo biaya dan hutang diperbarui otomatis. Untuk stok, hanya keterangan yang dapat diubah.</small></div>
           <b-form-input v-model.trim="itemSearch" placeholder="Cari nama atau kode barang..." class="item-search" />
         </div>
         <div class="item-list">
           <div v-for="entry in filteredItems" :key="entry.item.type + '-' + entry.item.id" class="receipt-item">
             <div class="item-heading">
               <div class="item-title"><span class="item-number">{{ entry.index + 1 }}</span><div><strong>{{ entry.item.name || 'Barang tanpa nama' }}</strong><div class="text-muted small">{{ entry.item.code && entry.item.code !== '-' ? entry.item.code : 'Non-stok' }}</div></div></div>
-              <div class="item-controls"><b-badge :variant="entry.item.type === 'stok' ? 'light-success' : 'light-info'">{{ entry.item.type }}</b-badge><b-button size="sm" variant="outline-danger" :disabled="saving" @click="deleteItem(entry.item)">Hapus Baris</b-button></div>
+              <div class="item-controls"><b-badge :variant="entry.item.type === 'stok' ? 'light-success' : 'light-info'">{{ entry.item.type }}</b-badge><b-button v-if="entry.item.type === 'non-stok'" size="sm" variant="outline-danger" :disabled="saving || detail.items.length <= 1" :title="detail.items.length <= 1 ? 'Baris terakhir tidak dapat dihapus' : 'Hapus baris non-stok'" @click="deleteItem(entry.item)">Hapus Baris</b-button></div>
             </div>
             <b-row v-if="entry.item.type === 'non-stok'" class="mb-1"><b-col cols="12" md="8"><b-form-group label="Nama Barang"><b-form-input v-model.trim="entry.item.name" maxlength="191" /></b-form-group></b-col><b-col cols="12" md="4"><b-form-group label="Satuan"><b-form-input v-model.trim="entry.item.unit" maxlength="191" /></b-form-group></b-col></b-row>
             <div class="item-values">
-              <div><span class="value-label">Jumlah</span><b-form-input v-model.number="entry.item.qty" type="number" min="0.01" step="any" /></div>
-              <div><span class="value-label">Harga Satuan (Rp)</span><b-form-input v-model.number="entry.item.price" type="number" min="0" step="1" /></div>
+              <div><span class="value-label">Jumlah</span><b-form-input v-model.number="entry.item.qty" type="number" min="0.01" step="any" :readonly="entry.item.type === 'stok'" :disabled="saving" /></div>
+              <div><span class="value-label">Harga Satuan (Rp)</span><b-form-input v-model.number="entry.item.price" type="number" min="0" step="1" :readonly="entry.item.type === 'stok'" :disabled="saving" /></div>
               <div><span class="value-label">Subtotal</span><strong>{{ rupiah(Number(entry.item.qty || 0) * Number(entry.item.price || 0)) }}</strong></div>
             </div>
             <b-form-group label="Keterangan" class="mb-0">
@@ -48,6 +48,7 @@
         </div>
       </b-card>
 
+      <b-alert show variant="light-info" class="mb-1">Perubahan jumlah/harga non-stok akan memperbarui jurnal biaya dan hutang vendor. Penghapusan baris non-stok langsung disimpan dan tidak dapat dibatalkan melalui tombol Batal.</b-alert>
       <div class="save-bar">
         <div><small class="text-muted d-block">Total Penerimaan</small><strong class="total-amount">{{ rupiah(totalAmount) }}</strong></div>
         <div class="save-actions">
@@ -89,19 +90,25 @@ export default {
       finally { this.loading = false }
     },
     async deleteItem(item) {
+      if (this.saving || item.type !== 'non-stok' || this.detail.items.length <= 1) return
       const yes = await this.$bvModal.msgBoxConfirm(
-        'Hapus baris ' + (item.name || item.id) + '? Penghapusan hanya akan berhasil jika pembalikan stok dan jurnal aman.',
+        'Hapus baris non-stok ' + (item.name || item.id) + '? Jurnal biaya akan dihapus dan hutang vendor dikurangi. Perubahan lain yang belum disimpan akan hilang.',
         { title: 'Konfirmasi Hapus Baris', okTitle: 'Hapus', cancelTitle: 'Batal', okVariant: 'danger', centered: true },
       )
       if (!yes) return
-      this.error = ''
+      this.saving = true; this.error = ''
       try {
         await axios.delete('admin/inventory-receives/' + this.detail.id + '/items/' + item.type + '/' + item.id)
         await this.load()
       } catch (e) { this.error = this.message(e) }
+      finally { this.saving = false }
     },
     async save() {
       if (this.saving || !this.detail) return
+      if (this.detail.items.some(x => x.type === 'non-stok' && (!Number.isFinite(Number(x.qty)) || Number(x.qty) <= 0 || !Number.isInteger(Number(x.price)) || Number(x.price) < 0))) {
+        this.error = 'Jumlah harus lebih dari nol dan harga non-stok harus bilangan bulat tidak negatif.'
+        return
+      }
       this.saving = true; this.error = ''
       try {
         await axios.put('admin/inventory-receives/' + this.detail.id, {
