@@ -97,6 +97,22 @@ export default [
     },
   },
   {
+    path: '/inventory/receive/manage/:id',
+    name: 'inventory-receive-manage-detail',
+    component: () => import('@/views/gudang/barang/ManageReceiveDetail.vue'),
+    meta: {
+      requiresAuth: true,
+      pageTitle: 'Detail Terima Barang',
+      breadcrumb: [
+        { text: 'Home', to: { name: 'home' } },
+        { text: 'Kelola Terima Barang', to: { name: 'inventory-receive-manage' } },
+        { text: 'Detail', active: true },
+      ],
+      resource: 'inventory',
+      action: 'manage',
+    },
+  },
+  {
     path: '/inventory/receive/manage',
     name: 'inventory-receive-manage',
     component: () => import('@/views/gudang/barang/ManageReceive.vue'),
