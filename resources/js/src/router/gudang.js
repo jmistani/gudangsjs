@@ -97,6 +97,22 @@ export default [
     },
   },
   {
+    path: '/inventory/consume/manage',
+    name: 'inventory-consume-manage',
+    component: () => import('@/views/gudang/barang/ManageConsume.vue'),
+    meta: {
+      requiresAuth: true,
+      pageTitle: 'Kelola Keluar Barang',
+      breadcrumb: [
+        { text: 'Home', to: { name: 'home' } },
+        { text: 'Inventory Dashboard', to: { name: 'inventory-dashboard' } },
+        { text: 'Keluar Barang', active: true },
+      ],
+      resource: 'inventory',
+      action: 'manage',
+    },
+  },
+  {
     path: '/inventory/display-inventory-consume/:id',
     name: 'display-inventory-consume',
     component: () => import('@/views/gudang/barang/DisplayConsumeJournal.vue'),
