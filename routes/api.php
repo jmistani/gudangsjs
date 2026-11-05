@@ -136,6 +136,7 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('admin/inventory-receives', 'AdminReceiveJournalController@index');
   Route::get('admin/inventory-receives/{id}', 'AdminReceiveJournalController@show');
   Route::put('admin/inventory-receives/{id}', 'AdminReceiveJournalController@update');
+  Route::delete('admin/inventory-receives/{id}/items/{type}/{itemId}', 'AdminReceiveJournalController@deleteItem');
   Route::delete('admin/inventory-receives/{id}', 'AdminReceiveJournalController@destroy');
 
   Route::get('inventory-receives/showPDF/{id}', 'ReceiveJournalController@showPDF');
