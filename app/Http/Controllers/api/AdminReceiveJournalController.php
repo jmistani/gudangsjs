@@ -8,6 +8,8 @@ use App\Models\ReceiveJournal;
 use App\Models\StockMutation;
 use App\Models\NonStockInventory;
 use App\Models\JournalHead;
+use App\Models\AccountTransaction;
+use App\Models\Account;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -138,6 +140,15 @@ class AdminReceiveJournalController extends Controller
             if ($expected !== $given) {
                 throw ValidationException::withMessages(['items' => 'Detail barang telah berubah. Muat ulang halaman.']);
             }
+            // Resolve non-stock expense postings before making any changes.
+            // Older receipts use the journal head as their expense reference.
+            $expenseMatches = [];
+            foreach ($data['items'] as $item) {
+                if ($item['type'] !== 'non-stok') continue;
+                $line = $nonstock->firstWhere('id', $item['id']);
+                $expenseMatches[$line->id] = $this->findNonStockExpense($head, $line);
+            }
+
             // Financial edits require reversing linked stock and ledger postings.
             // Reject them explicitly instead of silently leaving balances inconsistent.
             foreach ($data['items'] as $item) {
@@ -147,10 +158,11 @@ class AdminReceiveJournalController extends Controller
                 if (!$existing) {
                     throw ValidationException::withMessages(['items' => 'Item tidak ditemukan.']);
                 }
-                if ((float) $existing->getRawOriginal('amount') != (float) $item['qty']
-                    || (int) $existing->getRawOriginal('price') !== (int) $item['price']) {
+                $qtyChanged = (float) $existing->getRawOriginal('amount') != (float) $item['qty'];
+                $priceChanged = (int) $existing->getRawOriginal('price') !== (int) $item['price'];
+                if ($item['type'] === 'stok' && ($qtyChanged || $priceChanged)) {
                     throw ValidationException::withMessages([
-                        'items' => 'Jumlah dan harga belum dapat diubah karena transaksi sudah tercatat pada stok dan pembukuan.',
+                        'items' => 'Perubahan stok memerlukan rekonsiliasi inventory dan tetap dibatasi.',
                     ]);
                 }
             }
@@ -162,15 +174,103 @@ class AdminReceiveJournalController extends Controller
                 if ($item['type'] === 'stok') {
                     $stock->firstWhere('id', $item['id'])->update(['description' => $item['memo'] ?? null]);
                 } else {
-                    $nonstock->firstWhere('id', $item['id'])->update([
+                    $line = $nonstock->firstWhere('id', $item['id']);
+                    $expense = $expenseMatches[$line->id];
+                    $oldTotal = (int) $line->getRawOriginal('subtotal');
+                    $newTotal = (int) round((float) $item['qty'] * (int) $item['price']);
+                    $delta = $newTotal - $oldTotal;
+
+                    $line->update([
                         'memo' => $item['memo'] ?? null,
-                        'name' => $item['name'] ?? $nonstock->firstWhere('id', $item['id'])->name,
-                        'unit' => $item['unit'] ?? $nonstock->firstWhere('id', $item['id'])->unit,
+                        'name' => $item['name'] ?? $line->name,
+                        'unit' => $item['unit'] ?? $line->unit,
+                        'amount' => $item['qty'],
+                        'price' => $item['price'],
+                        'subtotal' => $newTotal,
                     ]);
+
+                    // Re-link legacy expense records to their exact line.
+                    $expense->ref_class = NonStockInventory::class;
+                    $expense->ref_class_id = $line->id;
+                    $expense->debit = $newTotal;
+                    $expense->memo = $line->name;
+                    $expense->save();
+
+                    if ($delta !== 0) {
+                        $payable = $this->findReceiptPayable($head, $record);
+                        $payable->credit = (int) $payable->getRawOriginal('credit') + $delta;
+                        if ((int) $payable->credit < 0) {
+                            throw ValidationException::withMessages(['items' => 'Saldo hutang penerimaan menjadi negatif.']);
+                        }
+                        $payable->save();
+                    }
+
+                    Account::findOrFail($expense->account_id)->resetCurrentBalances();
+                    if (isset($payable)) {
+                        Account::findOrFail($payable->account_id)->resetCurrentBalances();
+                    }
                 }
             }
         }, 3);
         return $this->response->successResponse('OK', 'Detail penerimaan berhasil diperbarui.');
+    }
+
+    private function findNonStockExpense(JournalHead $head, NonStockInventory $line)
+    {
+        $query = AccountTransaction::where('journal_head_id', $head->id)
+            ->whereNotNull('debit')
+            ->lockForUpdate();
+
+        $linked = (clone $query)
+            ->where('ref_class', NonStockInventory::class)
+            ->where('ref_class_id', $line->id)
+            ->get();
+
+        if ($linked->count() === 1) return $linked->first();
+
+        if ($linked->count() > 1) {
+            throw ValidationException::withMessages(['items' => 'Terdapat beberapa jurnal biaya untuk baris yang sama.']);
+        }
+
+        // Legacy receipts referenced the header. Match only if the combination
+        // of original memo and amount identifies one unique posting and one line.
+        $amount = (int) $line->getRawOriginal('subtotal');
+        $legacy = (clone $query)
+            ->where('ref_class', JournalHead::class)
+            ->where('ref_class_id', $head->id)
+            ->where('memo', $line->name)
+            ->where('debit', $amount)
+            ->get();
+
+        $sameLines = NonStockInventory::where('journal_head_id', $head->id)
+            ->where('name', $line->name)
+            ->where('subtotal', $amount)
+            ->count();
+
+        if ($legacy->count() !== 1 || $sameLines !== 1) {
+            throw ValidationException::withMessages([
+                'items' => 'Jurnal biaya lama tidak dapat dicocokkan secara unik untuk '.$line->name.'. Perlu pemeriksaan manual.',
+            ]);
+        }
+
+        return $legacy->first();
+    }
+
+    private function findReceiptPayable(JournalHead $head, ReceiveJournal $record)
+    {
+        $matches = AccountTransaction::where('journal_head_id', $head->id)
+            ->where('ref_class', ReceiveJournal::class)
+            ->where('ref_class_id', $record->id)
+            ->whereNotNull('credit')
+            ->lockForUpdate()
+            ->get();
+
+        if ($matches->count() !== 1) {
+            throw ValidationException::withMessages([
+                'items' => 'Jurnal hutang vendor tidak ditemukan secara unik.',
+            ]);
+        }
+        return $matches->first();
     }
 
     public function deleteItem($id, $type, $itemId)
