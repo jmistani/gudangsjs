@@ -133,6 +133,11 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('journals/tickets', 'AccountController@tickets');
   Route::resource('journals', 'AccountController');
 
+  Route::get('admin/inventory-receives', 'AdminReceiveJournalController@index');
+  Route::get('admin/inventory-receives/{id}', 'AdminReceiveJournalController@show');
+  Route::put('admin/inventory-receives/{id}', 'AdminReceiveJournalController@update');
+  Route::delete('admin/inventory-receives/{id}', 'AdminReceiveJournalController@destroy');
+
   Route::get('inventory-receives/showPDF/{id}', 'ReceiveJournalController@showPDF');
   Route::get('inventory-receives/all', 'ReceiveJournalController@all');
   Route::resource('inventory-receives', 'ReceiveJournalController');
