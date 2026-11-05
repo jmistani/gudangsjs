@@ -118,7 +118,9 @@ class AdminReceiveJournalController extends Controller
         $data = $request->validate([
             'giver' => ['required', 'string', 'max:191'],
             'receiver' => ['required', 'string', 'max:191'],
-            'items' => ['required', 'array'],
+            'items' => ['required', 'array', 'min:1'],
+            'deleted_nonstock_ids' => ['sometimes', 'array'],
+            'deleted_nonstock_ids.*' => ['required', 'integer', 'distinct'],
             'items.*.type' => ['required', 'in:stok,non-stok'],
             'items.*.id' => ['required', 'integer'],
             'items.*.memo' => ['nullable', 'string', 'max:2000'],
@@ -136,7 +138,9 @@ class AdminReceiveJournalController extends Controller
             $nonstock = NonStockInventory::where('journal_head_id', $head->id)->lockForUpdate()->get();
             $expected = $stock->map(function ($x) { return 'stok:'.$x->id; })
                 ->concat($nonstock->map(function ($x) { return 'non-stok:'.$x->id; }))->sort()->values()->all();
-            $given = collect($data['items'])->map(function ($x) { return $x['type'].':'.$x['id']; })->sort()->values()->all();
+            $deletedIds = collect($data['deleted_nonstock_ids'] ?? []);
+            $given = collect($data['items'])->map(function ($x) { return $x['type'].':'.$x['id']; })
+                ->concat($deletedIds->map(function ($id) { return 'non-stok:'.$id; }))->sort()->values()->all();
             if ($expected !== $given) {
                 throw ValidationException::withMessages(['items' => 'Detail barang telah berubah. Muat ulang halaman.']);
             }
@@ -212,6 +216,29 @@ class AdminReceiveJournalController extends Controller
                         Account::findOrFail($payable->account_id)->resetCurrentBalances();
                     }
                 }
+            }
+
+            // Apply staged deletions in the SAME transaction as all field edits.
+            // If any posting cannot be reconciled, the entire save is rolled back.
+            foreach ($deletedIds as $deletedId) {
+                $line = $nonstock->firstWhere('id', $deletedId);
+                $expense = $this->findNonStockExpense($head, $line);
+                $payable = $this->findReceiptPayable($head, $record);
+                $newCredit = (int) $payable->getRawOriginal('credit')
+                    - (int) $line->getRawOriginal('subtotal');
+                if ($newCredit < 0) {
+                    throw ValidationException::withMessages([
+                        'items' => 'Jumlah hutang vendor tidak mencukupi untuk menghapus baris ini.',
+                    ]);
+                }
+                $expenseAccountId = $expense->account_id;
+                $payableAccountId = $payable->account_id;
+                $expense->delete();
+                $line->delete();
+                $payable->credit = $newCredit;
+                $payable->save();
+                Account::findOrFail($expenseAccountId)->resetCurrentBalances();
+                Account::findOrFail($payableAccountId)->resetCurrentBalances();
             }
         }, 3);
         return $this->response->successResponse('OK', 'Detail penerimaan berhasil diperbarui.');
