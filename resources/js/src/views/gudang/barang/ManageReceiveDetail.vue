@@ -48,7 +48,7 @@
         </div>
       </b-card>
 
-      <b-alert show variant="light-info" class="mb-1">Perubahan jumlah/harga non-stok akan memperbarui jurnal biaya dan hutang vendor. Penghapusan baris non-stok langsung disimpan dan tidak dapat dibatalkan melalui tombol Batal.</b-alert>
+      <b-alert show variant="light-info" class="mb-1">Perubahan jumlah/harga non-stok akan memperbarui jurnal biaya dan hutang vendor. Penghapusan baris non-stok hanya disimpan setelah klik Simpan Perubahan. Tombol Batal membuang semua perubahan.</b-alert>
       <div class="save-bar">
         <div><small class="text-muted d-block">Total Penerimaan</small><strong class="total-amount">{{ rupiah(totalAmount) }}</strong></div>
         <div class="save-actions">
@@ -69,7 +69,7 @@ import { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormText
 export default {
   name: 'ManageReceiveDetail',
   components: { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BRow, BSpinner },
-  data() { return { detail: null, loading: false, saving: false, error: '', itemSearch: '' } },
+  data() { return { detail: null, loading: false, saving: false, error: '', itemSearch: '', deletedNonstockIds: [] } },
   computed: {
     filteredItems() {
       const q = this.itemSearch.toLowerCase()
@@ -85,23 +85,19 @@ export default {
     message(e) { const data = e.response && e.response.data; return (data && data.message) || 'Terjadi kesalahan.' },
     async load() {
       this.loading = true; this.error = ''
-      try { const response = await axios.get('admin/inventory-receives/' + this.$route.params.id); this.detail = response.data.payload }
+      try { const response = await axios.get('admin/inventory-receives/' + this.$route.params.id); this.detail = response.data.payload; this.deletedNonstockIds = [] }
       catch (e) { this.error = this.message(e) }
       finally { this.loading = false }
     },
     async deleteItem(item) {
       if (this.saving || item.type !== 'non-stok' || this.detail.items.length <= 1) return
       const yes = await this.$bvModal.msgBoxConfirm(
-        'Hapus baris non-stok ' + (item.name || item.id) + '? Jurnal biaya akan dihapus dan hutang vendor dikurangi. Perubahan lain yang belum disimpan akan hilang.',
-        { title: 'Konfirmasi Hapus Baris', okTitle: 'Hapus', cancelTitle: 'Batal', okVariant: 'danger', centered: true },
+        'Tandai baris non-stok ' + (item.name || item.id) + ' untuk dihapus? Penghapusan baru berlaku setelah klik Simpan Perubahan.',
+        { title: 'Konfirmasi Hapus Baris', okTitle: 'Tandai Hapus', cancelTitle: 'Batal', okVariant: 'danger', centered: true },
       )
       if (!yes) return
-      this.saving = true; this.error = ''
-      try {
-        await axios.delete('admin/inventory-receives/' + this.detail.id + '/items/' + item.type + '/' + item.id)
-        await this.load()
-      } catch (e) { this.error = this.message(e) }
-      finally { this.saving = false }
+      this.deletedNonstockIds.push(item.id)
+      this.detail.items = this.detail.items.filter(x => !(x.type === 'non-stok' && x.id === item.id))
     },
     async save() {
       if (this.saving || !this.detail) return
@@ -115,6 +111,7 @@ export default {
           giver: this.detail.giver,
           receiver: this.detail.receiver,
           items: this.detail.items.map(x => ({ type: x.type, id: x.id, name: x.name, unit: x.unit, qty: Number(x.qty), price: Number(x.price), memo: x.memo || '' })),
+          deleted_nonstock_ids: this.deletedNonstockIds,
         })
         this.$router.push({ name: 'inventory-receive-manage' })
       } catch (e) { this.error = this.message(e); window.scrollTo(0, 0) }
