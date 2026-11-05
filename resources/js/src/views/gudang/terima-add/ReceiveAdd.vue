@@ -798,3 +798,486 @@ export default {
       this.receiveData.items[index].inventory = null
       this.receiveData.items[index].qty = 0
       this.receiveData.items[index].unit = ''
+      this.receiveData.items[index].price = 0
+    },
+    SyncVendorInput(value) {
+      this.receiveData.vendorInput = value
+    },
+    addNewItemInItemForm() {
+      //this.$refs.form.style.overflow = 'hidden'
+      this.receiveData.items.push(JSON.parse(JSON.stringify(this.itemFormBlankItem)))
+      this.$nextTick(() => {
+        this.trAddHeight(this.$refs.row[0].offsetHeight)
+        setTimeout(() => {
+          this.$refs.form.style.overflow = null
+        }, 400)
+      })
+    },
+    removeItem(index) {
+      this.receiveData.items.splice(index, 1)
+      this.trTrimHeight(this.$refs.row[0].offsetHeight)
+    },
+    initTrHeight() {
+      this.trSetHeight(null)
+      this.$nextTick(() => {
+        this.trSetHeight(this.$refs.form.scrollHeight)
+      })
+    },
+    receiveInventory() {
+      this.receiveData.total = this.dataMeta.total
+       store
+        .dispatch('app-inventory/receiveInventory',this.receiveData)
+        .then((response) => {
+          this.$toast({
+              component: ToastificationContent,
+              props: {
+                  title: "Data Tersimpan",
+                  icon: 'CheckCircleIcon',
+                  variant: 'success',
+              },
+          })
+          this.$router.push({ name:'inventory-list' })
+        })
+        .catch(() => {
+          this.$toast({
+              component: ToastificationContent,
+              props: {
+                  title: "Error Menyimpan Data",
+                  icon: 'AlertTriangleIcon',
+                  variant: 'danger',
+              },
+          })
+        })
+    },
+    updateItemForm(index) {
+        this.receiveData.items[index].unit = this.receiveData.items[index].inventory.unit
+        return true
+    },
+    sycnValueWithHidden() {
+        this.receiveData.items.inventoryHidden = this.receiveData.items.inventory
+    },
+  },
+  watch: {
+  },
+  setup() {
+    const INVENTORY_APP_STORE_MODULE_NAME = 'app-inventory'
+
+    // Register module
+    if (!store.hasModule(INVENTORY_APP_STORE_MODULE_NAME)) {
+      store.registerModule(INVENTORY_APP_STORE_MODULE_NAME, gudangStoreModule)
+    }
+    // UnRegister on leave
+    onUnmounted(() => {
+      if (store.hasModule(INVENTORY_APP_STORE_MODULE_NAME)) store.unregisterModule(INVENTORY_APP_STORE_MODULE_NAME)
+
+    })
+
+    const refInventoryOptions = ref([])
+    const refNonStockExists = ref(false)
+
+    const refVendorOptions = ref([])
+
+    const isAddNewVendorSidebarActive = ref(false)
+    const isAddNewInventorySidebarActive = ref(false)
+
+    const itemFormBlankItem = {
+        stock: "true",
+        inventory: null,
+        price: 0,
+        qty: 0,
+        unit: '',
+        subtotal: 0,
+        memo: '',
+        account: ''
+    }
+    const receiveData = ref({
+        id: '',
+        vendor: null,
+        receive_code: '',
+        post_date: '',
+        receiver: '',
+        // ? Set single Item in form for adding data
+        items: [JSON.parse(JSON.stringify(itemFormBlankItem))],
+        type: 99,
+        staff: '',
+        note: '',
+        paymentMethod: null,
+        payment: '',
+    })
+
+    const satuanOptions = ref([])
+    const refAccountOptions = ref([])
+    const refHelpText = ref('')
+    store.dispatch('app-inventory/formReceiveData')
+      .then((response) => {
+        refHelpText.value = response.data.payload.helptextreceive
+        satuanOptions.value = response.data.payload.satuan
+        refAccountOptions.value = response.data.payload.account
+
+      })
+    
+    const statusPembayaranOptions = [
+        "Bon / Hutang",
+        "Cash / Lunas"
+    ]
+
+    const paymentMethods = [
+        'Bank Account',
+        'PayPal',
+        'UPI Transfer',
+    ]
+
+    function fetchAllInventory() {
+        store
+            .dispatch('app-inventory/fetchInventoryOptions')
+            .then((response) => {
+                refInventoryOptions.value = response.data.payload
+            })
+            .catch(() => {
+                toast({
+                    component: ToastificationContent,
+                    props: {
+                        title: "Error fetching inventories",
+                        icon: 'AlertTriangleIcon',
+                        variant: 'danger',
+                    },
+                })
+            })
+    }
+
+    function fetchAllVendor()  {
+        store
+            .dispatch('app-inventory/fetchVendorOptions')
+            .then((response) => {
+                refVendorOptions.value = response.data.payload
+            })
+            .catch(() => {
+                toast({
+                    component: ToastificationContent,
+                    props: {
+                        title: "Error fetching vendors",
+                        icon: 'AlertTriangleIcon',
+                        variant: 'danger',
+                    },
+                })
+            })
+    }
+
+    const refetchInventoryData = () => {
+        fetchAllInventory()
+    }
+
+    const refetchVendorData = () => {
+        fetchAllVendor()
+    }
+
+    const subtotalRow = ref([])
+    const discount = ref(0)
+    const tax = ref(0)
+    
+
+    const dataMeta = computed(() => {
+        return {
+            numOfValidItems: receiveData.value.items.reduce((numofvalidrow, i) => numofvalidrow + (i.qty > 0 && i.price >0 && i.inventory != null && i.unit != '' ? 1:0), 0),
+            subtotalRow:  
+              receiveData.value.items.map((item) => {
+                return Number(item.qty * item.price)
+              })
+            ,
+            subtotal: receiveData.value.items.reduce((runningsubTotalCount, i) => runningsubTotalCount + (i.qty * i.price), 0),
+            discount: 0,
+            tax: 0,
+            total: receiveData.value.items.reduce((runningsubTotalCount, i) => runningsubTotalCount + (i.qty * i.price), 0)
+        }
+    })
+
+    const {
+      toast,
+      refInventoriesReceiving,
+
+    } = useInventoryAdd()
+
+    const {
+      refFormObserver,
+      getValidationState,
+      resetForm,
+    } = formValidation()
+    
+    return {
+      dataMeta,
+      refNonStockExists,
+      refInventoriesReceiving,
+      refInventoryOptions,
+      refAccountOptions,
+      refVendorOptions,
+      refHelpText,
+      itemFormBlankItem,
+      receiveData,
+      satuanOptions,
+      statusPembayaranOptions,
+      paymentMethods,
+
+      subtotalRow,
+      resetForm,
+      refFormObserver,
+      getValidationState,
+      isAddNewVendorSidebarActive,
+      isAddNewInventorySidebarActive,
+
+      refetchInventoryData,
+      refetchVendorData,
+      fetchAllVendor,
+      fetchAllInventory,
+    }
+  },
+}
+</script>
+
+<style lang="scss">
+@import '@core/scss/vue/libs/vue-select.scss';
+@import '@core/scss/vue/libs/vue-flatpicker.scss';
+@import '@core/scss/vue/libs/vue-wizard.scss';
+.helptext {
+  white-space: pre-line;
+}
+.receive-add-wrapper {
+  .add-new-vendor-header {
+    padding: $options-padding-y $options-padding-x;
+      color: $success;
+
+    &:hover {
+      background-color: rgba($success, 0.12);
+    }
+  }
+  .add-new-inventory-header {
+    padding: $options-padding-y $options-padding-x;
+      color: $primary;
+
+    &:hover {
+      background-color: rgba($success, 0.12);
+    }
+  }
+}
+.receive-add-card {
+  // background: url('../../../../../public/images/bg1.jpg');
+}
+/* Responsive layout improvements */
+.receive-add-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  .wizard-nav {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .receive-items-section {
+    overflow-x: hidden;
+  }
+
+  .receive-item-card {
+    width: 100%;
+    min-width: 0;
+    background: #fff;
+  }
+
+  .receive-item-card > .row {
+    min-width: 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .receive-total-wrapper {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .receive-total-title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .75rem;
+  }
+
+  .receive-total-title .form-control {
+    width: min(100%, 280px);
+  }
+
+  @media (max-width: 1199.98px) {
+    .receive-items-header {
+      display: none;
+    }
+
+    .receive-item-card {
+      padding: .75rem !important;
+    }
+
+    .receive-item-card > .row > [class*="col-"] {
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
+      padding: .35rem .25rem;
+    }
+
+    .receive-item-card > .row > [class*="col-"]::before {
+      display: block;
+      font-size: .75rem;
+      font-weight: 600;
+      margin-bottom: .25rem;
+      color: #6e6b7b;
+    }
+
+    .receive-item-card > .row > [class*="col-"]:nth-child(1)::before { content: "Nama"; }
+    .receive-item-card > .row > [class*="col-"]:nth-child(2)::before { content: "Jumlah"; }
+    .receive-item-card > .row > [class*="col-"]:nth-child(3)::before { content: "Satuan"; }
+    .receive-item-card > .row > [class*="col-"]:nth-child(4)::before { content: "Harga"; }
+    .receive-item-card > .row > [class*="col-"]:nth-child(5)::before { content: "Subtotal"; }
+
+    .receive-item-actions {
+      flex-direction: row !important;
+      justify-content: flex-end !important;
+      align-items: center;
+      width: 100%;
+      border-left: 0 !important;
+      border-top: 1px solid #ebe9f1;
+      padding: .5rem .25rem !important;
+      gap: 1rem;
+    }
+
+    .receive-total-title {
+      justify-content: space-between;
+    }
+
+    .receive-total-title .form-control {
+      width: 60%;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .wizard-tab-content {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .receive-number-date,
+    .receive-number-date .form-group,
+    .receive-number-date .form-control {
+      width: 100%;
+    }
+
+    .receive-total-wrapper {
+      max-width: none;
+    }
+
+    .receive-total-title {
+      display: block;
+    }
+
+    .receive-total-title .form-control {
+      width: 100%;
+      margin-top: .5rem;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .card-body {
+      padding-left: .75rem;
+      padding-right: .75rem;
+    }
+
+    .receive-item-card {
+      padding: .5rem !important;
+    }
+  }
+}
+
+</style>
+
+
+<style lang="scss" scoped>
+@import "~@core/scss/base/pages/app-inventory.scss";
+@import '~@core/scss/base/components/variables-dark';
+@import '~@core/scss/base/custom/custom.scss';
+
+.form-item-section {
+background-color:$product-details-bg;
+}
+
+.form-item-action-col {
+  width: 27px;
+}
+
+.repeater-form {
+  // overflow: hidden;
+  transition: .35s height;
+}
+
+.v-select {
+  &.item-selector-title,
+  &.payment-selector {
+    background-color: #fff;
+
+    .dark-layout & {
+      background-color: unset;
+    }
+  }
+}
+.select-option-capitalize {
+  text-transform: capitalize;
+}
+.dark-layout {
+  .form-item-section {
+    background-color: $theme-dark-body-bg;
+
+    .row .border {
+      background-color: $theme-dark-card-bg;
+    }
+
+  }
+}
+.bd-highlight {
+    background-color: rgba(86,61,124,0.15);
+    border: 1px solid rgba(86,61,124,0.15);
+}
+#style1.vue-numeric {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+#style1.vue-numeric-input.updown .numeric-input {
+  padding-right: 5px !important;
+  padding-left: 5px !important;
+}
+#style1.vue-numeric-input.updown .btn {
+  background: #6fbbff !important;
+}
+#style1.vue-numeric-input.updown .btn-increment {
+  height: 1.5rem;
+  width: 100%;
+  right: 0 !important;
+  left:0 !important;
+  top: 0 !important;
+  bottom: auto !important;
+}
+#style1.vue-numeric-input.updown .btn-decrement {
+  height: 1.5rem;
+  width: 100%;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: 0 !important;
+}
+.form-add-stock {
+  background: #F9F7F7 !important;
+}
+.form-add-nonstock {
+  background: #FCEDED !important;
+}
+</style></style>
