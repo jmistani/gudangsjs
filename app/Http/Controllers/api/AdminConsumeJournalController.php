@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\CompanyCoa;
 use App\Models\ConsumeJournal;
@@ -111,11 +112,14 @@ class AdminConsumeJournalController extends Controller
             ->orderBy('id')
             ->get();
 
-        $accountTransaction = AccountTransaction::with('account')
-            ->where('journal_head_id', $journalHead->id)
+        $accountTransaction = AccountTransaction::where('journal_head_id', $journalHead->id)
             ->whereNotNull('debit')
             ->orderBy('id')
             ->first();
+
+        $expenseAccount = $accountTransaction
+            ? Account::find($accountTransaction->account_id)
+            : null;
 
         return $this->response->successResponse([
             'id' => $consume->id,
@@ -124,12 +128,8 @@ class AdminConsumeJournalController extends Controller
             'post_date' => Carbon::parse($journalHead->getRawOriginal('post_date'))->format('Y-m-d'),
             'giver' => $consume->giver,
             'receiver' => $consume->receiver,
-            'account_code' => optional($accountTransaction && $accountTransaction->account
-                ? $accountTransaction->account
-                : null)->code,
-            'account_name' => optional($accountTransaction && $accountTransaction->account
-                ? $accountTransaction->account
-                : null)->name,
+            'account_code' => optional($expenseAccount)->code,
+            'account_name' => optional($expenseAccount)->name,
             'items' => $mutations->map(function ($mutation) {
                 return [
                     'mutation_id' => $mutation->id,
