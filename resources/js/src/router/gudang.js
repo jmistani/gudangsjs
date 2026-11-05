@@ -97,6 +97,22 @@ export default [
     },
   },
   {
+    path: '/inventory/receive/manage',
+    name: 'inventory-receive-manage',
+    component: () => import('@/views/gudang/barang/ManageReceive.vue'),
+    meta: {
+      requiresAuth: true,
+      pageTitle: 'Kelola Terima Barang',
+      breadcrumb: [
+        { text: 'Home', to: { name: 'home' } },
+        { text: 'Inventory Dashboard', to: { name: 'inventory-dashboard' } },
+        { text: 'Kelola Terima Barang', active: true },
+      ],
+      resource: 'inventory',
+      action: 'manage',
+    },
+  },
+  {
     path: '/inventory/consume/manage',
     name: 'inventory-consume-manage',
     component: () => import('@/views/gudang/barang/ManageConsume.vue'),
