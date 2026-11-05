@@ -176,6 +176,14 @@ class AdminConsumeJournalController extends Controller
                 ->lockForUpdate()
                 ->get();
 
+            $oldExpenseTransaction = AccountTransaction::where('journal_head_id', $journalHead->id)
+                ->whereNotNull('debit')
+                ->orderBy('id')
+                ->first();
+            $oldExpenseAccount = $oldExpenseTransaction
+                ? Account::find($oldExpenseTransaction->account_id)
+                : null;
+
             if ($mutations->isEmpty()) {
                 throw new \RuntimeException('Detail pengeluaran tidak ditemukan.');
             }
@@ -239,6 +247,10 @@ class AdminConsumeJournalController extends Controller
             DB::table('accounting_account_transactions')
                 ->where('journal_head_id', $journalHead->id)
                 ->delete();
+
+            if ($oldExpenseAccount) {
+                $oldExpenseAccount->resetCurrentBalances();
+            }
 
             $journalHead->code = $data['code'];
             $journalHead->post_date = Carbon::parse($data['post_date']);
@@ -330,6 +342,14 @@ class AdminConsumeJournalController extends Controller
                 ->lockForUpdate()
                 ->get();
 
+            $oldExpenseTransaction = AccountTransaction::where('journal_head_id', $journalHead->id)
+                ->whereNotNull('debit')
+                ->orderBy('id')
+                ->first();
+            $oldExpenseAccount = $oldExpenseTransaction
+                ? Account::find($oldExpenseTransaction->account_id)
+                : null;
+
             foreach ($mutations as $mutation) {
                 $inventory = Inventory::findOrFail($mutation->stockable_id);
                 $oldAmount = (int) $mutation->getRawOriginal('amount');
@@ -345,6 +365,10 @@ class AdminConsumeJournalController extends Controller
             DB::table('accounting_account_transactions')
                 ->where('journal_head_id', $journalHead->id)
                 ->delete();
+
+            if ($oldExpenseAccount) {
+                $oldExpenseAccount->resetCurrentBalances();
+            }
 
             $journalHead->delete();
             $consume->delete();
@@ -388,6 +412,14 @@ class AdminConsumeJournalController extends Controller
             ->lockForUpdate()
             ->get();
 
+        $oldExpenseTransaction = AccountTransaction::where('journal_head_id', $journalHead->id)
+            ->whereNotNull('debit')
+            ->orderBy('id')
+            ->first();
+        $oldExpenseAccount = $oldExpenseTransaction
+            ? Account::find($oldExpenseTransaction->account_id)
+            : null;
+
         foreach ($mutations as $mutation) {
             $inventory = Inventory::findOrFail($mutation->stockable_id);
             $inventory->in_stock -= (int) $mutation->getRawOriginal('amount');
@@ -399,6 +431,11 @@ class AdminConsumeJournalController extends Controller
         DB::table('accounting_account_transactions')
             ->where('journal_head_id', $journalHead->id)
             ->delete();
+
+        if ($oldExpenseAccount) {
+            $oldExpenseAccount->resetCurrentBalances();
+        }
+
         $journalHead->delete();
         $consume->delete();
 
