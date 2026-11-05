@@ -131,7 +131,7 @@
                       <!-- Header: Right Content -->
                       <b-col
                         cols="12"
-                        xl="3"
+                        xl="4"
                         class="mt-xl-0 mt-1 justify-content d-xl-flex d-block"
                       >
                         <div class="receive-number-date mt-md-0 mt-1">
@@ -165,7 +165,7 @@
                       </b-col>
                       <b-col
                         cols="12"
-                        xl="3"
+                        xl="4"
                         class="mt-xl-0 mt-1 justify-content d-xl-flex d-block"
                       >
                         <div class="receive-number-date mt-md-0 mt-1">
@@ -199,7 +199,7 @@
                       </b-col>
                       <b-col
                         cols="12"
-                        xl="3"
+                        xl="4"
                         class="mt-xl-0 mt-1 d-xl-flex d-block"
                       >
                         <div class="receive-number-date mt-md-0 mt-1">
@@ -237,7 +237,7 @@
                     <b-row class="pb-0">
                       <b-col cols="12">
                         <div class="flex-grow-1">
-                          <b-row class="flex-grow-1 px-0">
+                          <b-row class="flex-grow-1 px-0 receive-items-header">
                             <!-- Single Item Form Headers -->
                             <b-col
                               cols="12"
@@ -287,7 +287,7 @@
                       </b-col>
                     </b-row>
                   </b-card-body>
-                  <b-card-body class="receive-padding pb-0  form-add-stock">
+                  <b-card-body class="receive-padding pb-0 form-add-stock receive-items-section">
                     <div
                       ref="form"
                       class="repeater-form form-add-stock"
@@ -299,7 +299,7 @@
                         class="pb-1"
                       >
                         <b-col cols="12">
-                          <div class="d-flex border rounded py-0 px-0" border="1">
+                          <div class="d-flex border rounded py-0 px-0 receive-item-card" border="1">
                             <b-row class="flex-grow-1 px-0">
                               <!-- Single Item Form Headers -->
                               <b-col
@@ -476,7 +476,7 @@
                                 </p>
                               </b-col>
                             </b-row>
-                            <div class="d-flex flex-column justify-content-between border-left py-1 px-1">
+                            <div class="d-flex flex-column justify-content-between border-left py-1 px-1 receive-item-actions">
                               <feather-icon
                                 size="16"
                                 icon="XIcon"
@@ -559,8 +559,8 @@
                       <!-- Col: Total -->
                       <b-col
                         cols="12"
-                        md="10"
-                        class="mt-6 mx-0 d-flex justify-content-end"
+                        md="12"
+                        class="mt-4 mx-0 d-flex justify-content-end"
                       >
                         <div class="receive-total-wrapper">
 
@@ -798,348 +798,3 @@ export default {
       this.receiveData.items[index].inventory = null
       this.receiveData.items[index].qty = 0
       this.receiveData.items[index].unit = ''
-      this.receiveData.items[index].price = 0
-    },
-    SyncVendorInput(value) {
-      this.receiveData.vendorInput = value
-    },
-    addNewItemInItemForm() {
-      //this.$refs.form.style.overflow = 'hidden'
-      this.receiveData.items.push(JSON.parse(JSON.stringify(this.itemFormBlankItem)))
-      this.$nextTick(() => {
-        this.trAddHeight(this.$refs.row[0].offsetHeight)
-        setTimeout(() => {
-          this.$refs.form.style.overflow = null
-        }, 400)
-      })
-    },
-    removeItem(index) {
-      this.receiveData.items.splice(index, 1)
-      this.trTrimHeight(this.$refs.row[0].offsetHeight)
-    },
-    initTrHeight() {
-      this.trSetHeight(null)
-      this.$nextTick(() => {
-        this.trSetHeight(this.$refs.form.scrollHeight)
-      })
-    },
-    receiveInventory() {
-      this.receiveData.total = this.dataMeta.total
-       store
-        .dispatch('app-inventory/receiveInventory',this.receiveData)
-        .then((response) => {
-          this.$toast({
-              component: ToastificationContent,
-              props: {
-                  title: "Data Tersimpan",
-                  icon: 'CheckCircleIcon',
-                  variant: 'success',
-              },
-          })
-          this.$router.push({ name:'inventory-list' })
-        })
-        .catch(() => {
-          this.$toast({
-              component: ToastificationContent,
-              props: {
-                  title: "Error Menyimpan Data",
-                  icon: 'AlertTriangleIcon',
-                  variant: 'danger',
-              },
-          })
-        })
-    },
-    updateItemForm(index) {
-        this.receiveData.items[index].unit = this.receiveData.items[index].inventory.unit
-        return true
-    },
-    sycnValueWithHidden() {
-        this.receiveData.items.inventoryHidden = this.receiveData.items.inventory
-    },
-  },
-  watch: {
-  },
-  setup() {
-    const INVENTORY_APP_STORE_MODULE_NAME = 'app-inventory'
-
-    // Register module
-    if (!store.hasModule(INVENTORY_APP_STORE_MODULE_NAME)) {
-      store.registerModule(INVENTORY_APP_STORE_MODULE_NAME, gudangStoreModule)
-    }
-    // UnRegister on leave
-    onUnmounted(() => {
-      if (store.hasModule(INVENTORY_APP_STORE_MODULE_NAME)) store.unregisterModule(INVENTORY_APP_STORE_MODULE_NAME)
-
-    })
-
-    const refInventoryOptions = ref([])
-    const refNonStockExists = ref(false)
-
-    const refVendorOptions = ref([])
-
-    const isAddNewVendorSidebarActive = ref(false)
-    const isAddNewInventorySidebarActive = ref(false)
-
-    const itemFormBlankItem = {
-        stock: "true",
-        inventory: null,
-        price: 0,
-        qty: 0,
-        unit: '',
-        subtotal: 0,
-        memo: '',
-        account: ''
-    }
-    const receiveData = ref({
-        id: '',
-        vendor: null,
-        receive_code: '',
-        post_date: '',
-        receiver: '',
-        // ? Set single Item in form for adding data
-        items: [JSON.parse(JSON.stringify(itemFormBlankItem))],
-        type: 99,
-        staff: '',
-        note: '',
-        paymentMethod: null,
-        payment: '',
-    })
-
-    const satuanOptions = ref([])
-    const refAccountOptions = ref([])
-    const refHelpText = ref('')
-    store.dispatch('app-inventory/formReceiveData')
-      .then((response) => {
-        refHelpText.value = response.data.payload.helptextreceive
-        satuanOptions.value = response.data.payload.satuan
-        refAccountOptions.value = response.data.payload.account
-
-      })
-    
-    const statusPembayaranOptions = [
-        "Bon / Hutang",
-        "Cash / Lunas"
-    ]
-
-    const paymentMethods = [
-        'Bank Account',
-        'PayPal',
-        'UPI Transfer',
-    ]
-
-    function fetchAllInventory() {
-        store
-            .dispatch('app-inventory/fetchInventoryOptions')
-            .then((response) => {
-                refInventoryOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching inventories",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
-    }
-
-    function fetchAllVendor()  {
-        store
-            .dispatch('app-inventory/fetchVendorOptions')
-            .then((response) => {
-                refVendorOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching vendors",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
-    }
-
-    const refetchInventoryData = () => {
-        fetchAllInventory()
-    }
-
-    const refetchVendorData = () => {
-        fetchAllVendor()
-    }
-
-    const subtotalRow = ref([])
-    const discount = ref(0)
-    const tax = ref(0)
-    
-
-    const dataMeta = computed(() => {
-        return {
-            numOfValidItems: receiveData.value.items.reduce((numofvalidrow, i) => numofvalidrow + (i.qty > 0 && i.price >0 && i.inventory != null && i.unit != '' ? 1:0), 0),
-            subtotalRow:  
-              receiveData.value.items.map((item) => {
-                return Number(item.qty * item.price)
-              })
-            ,
-            subtotal: receiveData.value.items.reduce((runningsubTotalCount, i) => runningsubTotalCount + (i.qty * i.price), 0),
-            discount: 0,
-            tax: 0,
-            total: receiveData.value.items.reduce((runningsubTotalCount, i) => runningsubTotalCount + (i.qty * i.price), 0)
-        }
-    })
-
-    const {
-      toast,
-      refInventoriesReceiving,
-
-    } = useInventoryAdd()
-
-    const {
-      refFormObserver,
-      getValidationState,
-      resetForm,
-    } = formValidation()
-    
-    return {
-      dataMeta,
-      refNonStockExists,
-      refInventoriesReceiving,
-      refInventoryOptions,
-      refAccountOptions,
-      refVendorOptions,
-      refHelpText,
-      itemFormBlankItem,
-      receiveData,
-      satuanOptions,
-      statusPembayaranOptions,
-      paymentMethods,
-
-      subtotalRow,
-      resetForm,
-      refFormObserver,
-      getValidationState,
-      isAddNewVendorSidebarActive,
-      isAddNewInventorySidebarActive,
-
-      refetchInventoryData,
-      refetchVendorData,
-      fetchAllVendor,
-      fetchAllInventory,
-    }
-  },
-}
-</script>
-
-<style lang="scss">
-@import '@core/scss/vue/libs/vue-select.scss';
-@import '@core/scss/vue/libs/vue-flatpicker.scss';
-@import '@core/scss/vue/libs/vue-wizard.scss';
-.helptext {
-  white-space: pre-line;
-}
-.receive-add-wrapper {
-  .add-new-vendor-header {
-    padding: $options-padding-y $options-padding-x;
-      color: $success;
-
-    &:hover {
-      background-color: rgba($success, 0.12);
-    }
-  }
-  .add-new-inventory-header {
-    padding: $options-padding-y $options-padding-x;
-      color: $primary;
-
-    &:hover {
-      background-color: rgba($success, 0.12);
-    }
-  }
-}
-.receive-add-card {
-  // background: url('../../../../../public/images/bg1.jpg');
-}
-</style>
-
-
-<style lang="scss" scoped>
-@import "~@core/scss/base/pages/app-inventory.scss";
-@import '~@core/scss/base/components/variables-dark';
-@import '~@core/scss/base/custom/custom.scss';
-
-.form-item-section {
-background-color:$product-details-bg;
-}
-
-.form-item-action-col {
-  width: 27px;
-}
-
-.repeater-form {
-  // overflow: hidden;
-  transition: .35s height;
-}
-
-.v-select {
-  &.item-selector-title,
-  &.payment-selector {
-    background-color: #fff;
-
-    .dark-layout & {
-      background-color: unset;
-    }
-  }
-}
-.select-option-capitalize {
-  text-transform: capitalize;
-}
-.dark-layout {
-  .form-item-section {
-    background-color: $theme-dark-body-bg;
-
-    .row .border {
-      background-color: $theme-dark-card-bg;
-    }
-
-  }
-}
-.bd-highlight {
-    background-color: rgba(86,61,124,0.15);
-    border: 1px solid rgba(86,61,124,0.15);
-}
-#style1.vue-numeric {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-#style1.vue-numeric-input.updown .numeric-input {
-  padding-right: 5px !important;
-  padding-left: 5px !important;
-}
-#style1.vue-numeric-input.updown .btn {
-  background: #6fbbff !important;
-}
-#style1.vue-numeric-input.updown .btn-increment {
-  height: 1.5rem;
-  width: 100%;
-  right: 0 !important;
-  left:0 !important;
-  top: 0 !important;
-  bottom: auto !important;
-}
-#style1.vue-numeric-input.updown .btn-decrement {
-  height: 1.5rem;
-  width: 100%;
-  left: 0 !important;
-  right: 0 !important;
-  top: auto !important;
-  bottom: 0 !important;
-}
-.form-add-stock {
-  background: #F9F7F7 !important;
-}
-.form-add-nonstock {
-  background: #FCEDED !important;
-}
-</style></style>
