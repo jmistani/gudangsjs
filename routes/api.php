@@ -139,6 +139,14 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::resource('receive-journal', 'ReceiveJournalController');
 
   Route::get('inventory-consumes/showPDF/{id}', 'ConsumeJournalController@showPDF');
+
+  // Super Admin-only Keluar Barang management.
+  Route::get('admin/inventory-consumes', 'AdminConsumeJournalController@index');
+  Route::get('admin/inventory-consumes/{id}', 'AdminConsumeJournalController@show');
+  Route::put('admin/inventory-consumes/{id}', 'AdminConsumeJournalController@update');
+  Route::delete('admin/inventory-consumes/{id}', 'AdminConsumeJournalController@destroy');
+  Route::post('admin/inventory-consumes/bulk-delete', 'AdminConsumeJournalController@bulkDestroy');
+
   Route::get('inventory-consumes/all', 'ConsumeJournalController@all');
   Route::resource('inventory-consumes', 'ConsumeJournalController');
   Route::resource('consume-journal', 'ConsumeJournalController');
