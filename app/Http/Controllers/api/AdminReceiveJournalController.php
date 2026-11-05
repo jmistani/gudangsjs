@@ -237,11 +237,12 @@ class AdminReceiveJournalController extends Controller
         // Legacy receipts referenced the header. Match only if the combination
         // of original memo and amount identifies one unique posting and one line.
         $amount = (int) $line->getRawOriginal('subtotal');
-        $legacy = (clone $query)
-            ->where('ref_class', JournalHead::class)
+        $legacy = AccountTransaction::where('ref_class', JournalHead::class)
             ->where('ref_class_id', $head->id)
+            ->where('transaction_code', $head->code)
             ->where('memo', $line->name)
             ->where('debit', $amount)
+            ->lockForUpdate()
             ->get();
 
         $sameLines = NonStockInventory::where('journal_head_id', $head->id)
