@@ -9,6 +9,12 @@ export default [
     tagVariant: 'light-warning',
     children: [
       {
+        title: 'AI Command Center',
+        route: 'inventory-ai-command',
+        resource: 'inventory',
+        action: 'manage',
+      },
+      {
         title: 'Dashboard',
         route: 'inventory-dashboard',
         resource: 'inventory',
