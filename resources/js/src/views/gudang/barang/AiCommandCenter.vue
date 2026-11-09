@@ -1,37 +1,37 @@
 <template>
-  <b-card title="AI Command Center — Gudang SJS">
-    <b-alert show variant="info">Bahasa Indonesia adalah bahasa utama. English and mixed-language commands are also supported.</b-alert>
-    <b-form-group label="Perintah / Command">
-      <b-form-textarea v-model="prompt" rows="3" placeholder="Keluarkan 5 soda api oleh Hendra untuk cuci kain ekstraktor" />
-    </b-form-group>
-    <b-button variant="primary" :disabled="busy || !prompt.trim()" @click="interpret">Analisis Perintah</b-button>
-    <b-button variant="outline-secondary" class="ml-1" @click="reset">Batal / Reset</b-button>
-    <b-alert v-if="error" show variant="danger" class="mt-2">{{ error }}</b-alert>
-    <b-card v-if="preview" class="mt-3" title="Pratinjau Transaksi / Transaction Preview">
-      <b-table-simple small bordered>
-        <b-tbody>
-          <b-tr><b-th>Operasi</b-th><b-td>{{ preview.operation === 'stock_out' ? 'Barang Keluar' : 'Cek Stok' }}</b-td></b-tr>
-          <b-tr><b-th>Barang</b-th><b-td>{{ preview.item }} ({{ preview.code }})</b-td></b-tr>
-          <b-tr><b-th>Stok tersedia</b-th><b-td>{{ preview.available }} {{ preview.unit }}</b-td></b-tr>
+  <div class="ai-panel"><h3>AI Command Center — Gudang SJS</h3>
+    <div class="ai-notice">Bahasa Indonesia adalah bahasa utama. English and mixed-language commands are also supported.</div>
+    <div class="ai-field"><label for="ai-prompt">Perintah / Command</label>
+      <textarea id="ai-prompt" v-model="prompt" rows="3" class="ai-input" placeholder="Keluarkan 5 soda api oleh Hendra untuk cuci kain ekstraktor"></textarea>
+    </div>
+    <button type="button" class="ai-btn ai-primary" :disabled="busy || !prompt.trim()" @click="interpret">Analisis Perintah</button>
+    <button type="button" class="ai-btn ai-secondary" class="ml-1" @click="reset">Batal / Reset</button>
+    <div v-if="error" class="ai-error">{{ error }}</div>
+    <section v-if="preview" class="ai-preview"><h4>Pratinjau Transaksi / Transaction Preview</h4>
+      <table class="ai-table">
+        <tbody>
+          <tr><th>Operasi</th><td>{{ preview.operation === 'stock_out' ? 'Barang Keluar' : 'Cek Stok' }}</td></tr>
+          <tr><th>Barang</th><td>{{ preview.item }} ({{ preview.code }})</td></tr>
+          <tr><th>Stok tersedia</th><td>{{ preview.available }} {{ preview.unit }}</td></tr>
           <template v-if="preview.operation === 'stock_out'">
-            <b-tr><b-th>Jumlah keluar</b-th><b-td>{{ preview.quantity }} {{ preview.unit }}</b-td></b-tr>
-            <b-tr><b-th>Penerima</b-th><b-td>{{ preview.receiver }}</b-td></b-tr>
-            <b-tr><b-th>Tujuan</b-th><b-td>{{ preview.purpose }}</b-td></b-tr>
-            <b-tr><b-th>Sisa stok (perkiraan)</b-th><b-td>{{ preview.available - preview.quantity }} {{ preview.unit }}</b-td></b-tr>
+            <tr><th>Jumlah keluar</th><td>{{ preview.quantity }} {{ preview.unit }}</td></tr>
+            <tr><th>Penerima</th><td>{{ preview.receiver }}</td></tr>
+            <tr><th>Tujuan</th><td>{{ preview.purpose }}</td></tr>
+            <tr><th>Sisa stok (perkiraan)</th><td>{{ preview.available - preview.quantity }} {{ preview.unit }}</td></tr>
           </template>
-        </b-tbody>
-      </b-table-simple>
+        </tbody>
+      </table>
       <template v-if="preview.operation === 'stock_out'">
-        <b-form-group label="Akun biaya / Expense account (wajib)">
-          <b-form-select v-model="accountCode" :options="accountOptions" />
-        </b-form-group>
-        <b-alert show variant="warning">Periksa barang, jumlah, satuan, penerima, tujuan, dan akun biaya. Stok serta jurnal akuntansi hanya berubah setelah konfirmasi.</b-alert>
-        <b-button variant="success" :disabled="busy || !accountCode" @click="confirm">Konfirmasi &amp; Proses</b-button>
-        <b-button variant="outline-secondary" class="ml-1" @click="reset">Batal</b-button>
+        <div class="ai-field"><label for="ai-account">Akun biaya / Expense account (wajib)</label>
+          <select id="ai-account" v-model="accountCode" class="ai-input"><option v-for="option in accountOptions" :key="String(option.value)" :value="option.value" :disabled="option.disabled">{{ option.text }}</option></select>
+        </div>
+        <div class="ai-warning">Periksa barang, jumlah, satuan, penerima, tujuan, dan akun biaya. Stok serta jurnal akuntansi hanya berubah setelah konfirmasi.</div>
+        <button type="button" class="ai-btn ai-success" :disabled="busy || !accountCode" @click="confirm">Konfirmasi &amp; Proses</button>
+        <button type="button" class="ai-btn ai-secondary" class="ml-1" @click="reset">Batal</button>
       </template>
-    </b-card>
-    <b-alert v-if="success" show variant="success" class="mt-3">{{ success }}</b-alert>
-  </b-card>
+    </section>
+    <div v-if="success" class="ai-success-note">{{ success }}</div>
+  </div>
 </template>
 
 <script>
@@ -107,3 +107,25 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.ai-panel { padding: 22px; background: #252d42; color: #e7eaf2; border-radius: 10px; max-width: 850px; }
+.ai-panel h3 { margin: 0 0 16px; color: inherit; }
+.ai-panel h4 { color: inherit; }
+.ai-notice,.ai-warning,.ai-error,.ai-success-note { padding: 12px; border-radius: 6px; margin: 12px 0; }
+.ai-notice { background: #24445b; }
+.ai-warning { background: #5a482b; }
+.ai-error { background: #62333a; }
+.ai-success-note { background: #245b47; }
+.ai-field { margin: 16px 0; }
+.ai-field label { display: block; margin-bottom: 8px; }
+.ai-input { width: 100%; padding: 10px 12px; border: 1px solid #64708a; border-radius: 6px; background: #151d30; color: #fff; }
+.ai-btn { border: 0; padding: 9px 14px; border-radius: 6px; margin: 5px 8px 5px 0; cursor: pointer; }
+.ai-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ai-primary { background: #7367f0; color: white; }
+.ai-secondary { background: #47516a; color: white; }
+.ai-success { background: #28a879; color: white; }
+.ai-preview { margin-top: 20px; padding: 16px; border: 1px solid #59647c; border-radius: 8px; }
+.ai-table { width: 100%; border-collapse: collapse; }
+.ai-table th,.ai-table td { padding: 9px; border: 1px solid #59647c; text-align: left; }
+</style>
