@@ -100,6 +100,9 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
     'inventories/search',
     [\App\Http\Controllers\api\InventoryController::class, 'search']
   );
+  Route::get('ai-commands/accounts', 'AiCommandController@accounts');
+  Route::post('ai-commands/preview', 'AiCommandController@preview');
+  Route::post('ai-commands/execute', 'AiCommandController@execute');
   Route::get('inventories/all', 'InventoryController@all');
   Route::get('inventoriesEdit/{id}', 'InventoryController@inventoriesEdit');
   Route::post('inventories/tag/add', 'InventoryController@addTag');
