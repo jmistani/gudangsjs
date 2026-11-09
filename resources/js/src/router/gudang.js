@@ -1,6 +1,12 @@
 
 export default [
   {
+    path: '/inventory/ai-command',
+    name: 'inventory-ai-command',
+    component: () => import('@/views/gudang/barang/AiCommandCenter.vue'),
+    meta: { requiresAuth: true, pageTitle: 'AI Command Center', resource: 'inventory', action: 'manage' },
+  },
+  {
     path: '/inventory/dashboard',
     name: 'inventory-dashboard',
     component: () => import('@/views/gudang/barang/Dashboard.vue'),
