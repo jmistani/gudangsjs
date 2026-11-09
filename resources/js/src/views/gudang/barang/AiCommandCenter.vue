@@ -5,7 +5,7 @@
       <textarea id="ai-prompt" v-model="prompt" rows="3" class="ai-input" placeholder="Keluarkan 5 soda api oleh Hendra untuk cuci kain ekstraktor"></textarea>
     </div>
     <button type="button" class="ai-btn ai-primary" :disabled="busy || !prompt.trim()" @click="interpret">Analisis Perintah</button>
-    <button type="button" class="ai-btn ai-secondary" class="ml-1" @click="reset">Batal / Reset</button>
+    <button type="button" class="ai-btn ai-secondary" @click="reset">Batal / Reset</button>
     <div v-if="error" class="ai-error">{{ error }}</div>
     <section v-if="preview" class="ai-preview"><h4>Pratinjau Transaksi / Transaction Preview</h4>
       <table class="ai-table">
@@ -27,7 +27,7 @@
         </div>
         <div class="ai-warning">Periksa barang, jumlah, satuan, penerima, tujuan, dan akun biaya. Stok serta jurnal akuntansi hanya berubah setelah konfirmasi.</div>
         <button type="button" class="ai-btn ai-success" :disabled="busy || !accountCode" @click="confirm">Konfirmasi &amp; Proses</button>
-        <button type="button" class="ai-btn ai-secondary" class="ml-1" @click="reset">Batal</button>
+        <button type="button" class="ai-btn ai-secondary" @click="reset">Batal</button>
       </template>
     </section>
     <div v-if="success" class="ai-success-note">{{ success }}</div>
