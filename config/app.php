@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://gudangsjs.local'),
+    'url' => env('APP_URL', 'https://gudangsjsv2.serasijayasejati.com'),
 
     'asset_url' => env('ASSET_URL', null),
 
