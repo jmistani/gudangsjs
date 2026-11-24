@@ -25,7 +25,7 @@
 
       <b-card class="mb-2" no-body>
         <div class="items-heading">
-          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Jumlah dan harga non-stok dapat diubah; perubahan saldo biaya dan hutang diperbarui otomatis. Stok juga dapat dikoreksi jika belum memiliki mutasi berikutnya.</small></div>
+          <div><h5 class="mb-25">Daftar Barang Diterima</h5><small class="text-muted">{{ detail.items.length }} item • Jumlah dan harga dapat diubah; perubahan saldo biaya dan hutang diperbarui otomatis. Stok juga dapat dikoreksi jika belum memiliki mutasi berikutnya.</small></div>
           <b-form-input v-model.trim="itemSearch" placeholder="Cari nama atau kode barang..." class="item-search" />
         </div>
         <div class="item-list">
@@ -37,7 +37,7 @@
             <b-row v-if="entry.item.type === 'non-stok'" class="mb-1"><b-col cols="12" md="8"><b-form-group label="Nama Barang"><b-form-input v-model.trim="entry.item.name" maxlength="191" /></b-form-group></b-col><b-col cols="12" md="4"><b-form-group label="Satuan"><b-form-input v-model.trim="entry.item.unit" maxlength="191" /></b-form-group></b-col></b-row>
             <div class="item-values">
               <div><span class="value-label">Jumlah</span><b-form-input v-model.number="entry.item.qty" type="number" min="0.01" step="any"  :disabled="saving" /></div>
-              <div><span class="value-label">Harga Satuan (Rp)</span><b-form-input v-model.number="entry.item.price" type="number" min="0" step="1" :readonly="entry.item.type === 'stok'" :disabled="saving" /></div>
+              <div><span class="value-label">Harga Satuan (Rp)</span><b-form-input v-model.number="entry.item.price" type="number" min="0" step="1"  :disabled="saving" /></div>
               <div><span class="value-label">Subtotal</span><strong>{{ rupiah(Number(entry.item.qty || 0) * Number(entry.item.price || 0)) }}</strong></div>
             </div>
             <b-form-group label="Keterangan" class="mb-0">
@@ -49,11 +49,17 @@
       </b-card>
 
       <b-alert show variant="light-info" class="mb-1">Perubahan jumlah/harga non-stok akan memperbarui jurnal biaya dan hutang vendor. Penghapusan baris stok/non-stok hanya disimpan setelah klik Simpan Perubahan. Tombol Batal membuang semua perubahan.</b-alert>
+      <b-card v-if="approvalPayload" class="mb-2">
+        <p>Kode persetujuan dikirim ke email admin. Berlaku sesuai konfigurasi (default 1 jam).</p>
+        <b-form-input v-model.trim="otp" maxlength="6" placeholder="Masukkan 6 digit OTP" />
+        <b-button class="mt-1" variant="primary" :disabled="saving || !/^\d{6}$/.test(otp)" @click="confirmApproval">Konfirmasi Perubahan</b-button>
+        <b-button class="mt-1 ml-1" variant="outline-secondary" :disabled="saving" @click="approvalPayload = null; otp = ''">Batal Persetujuan</b-button>
+      </b-card>
       <div class="save-bar">
         <div><small class="text-muted d-block">Total Penerimaan</small><strong class="total-amount">{{ rupiah(totalAmount) }}</strong></div>
         <div class="save-actions">
           <b-button variant="outline-secondary" :to="{ name: 'inventory-receive-manage' }">Batal</b-button>
-          <b-button variant="primary" :disabled="saving || !detail.giver || !detail.receiver" @click="save">
+          <b-button variant="primary" :disabled="saving || !!approvalPayload || !detail.giver || !detail.receiver" @click="save">
             <b-spinner v-if="saving" small class="mr-50" /> {{ saving ? 'Menyimpan...' : 'Simpan Perubahan' }}
           </b-button>
         </div>
@@ -69,7 +75,7 @@ import { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormText
 export default {
   name: 'ManageReceiveDetail',
   components: { BAlert, BBadge, BButton, BCard, BCol, BFormGroup, BFormInput, BFormTextarea, BRow, BSpinner },
-  data() { return { detail: null, loading: false, saving: false, error: '', itemSearch: '', deletedNonstockIds: [], deletedStockIds: [] } },
+  data() { return { detail: null, loading: false, saving: false, error: '', itemSearch: '', deletedNonstockIds: [], deletedStockIds: [], approvalPayload: null, otp: '' } },
   computed: {
     filteredItems() {
       const q = this.itemSearch.toLowerCase()
@@ -100,22 +106,32 @@ export default {
       else this.deletedNonstockIds.push(item.id)
       this.detail.items = this.detail.items.filter(x => !(x.type === item.type && x.id === item.id))
     },
+    async confirmApproval() {
+      if (this.saving || !this.approvalPayload) return
+      this.saving = true; this.error = ''
+      try {
+        await axios.put('admin/inventory-receives/' + this.detail.id, { ...this.approvalPayload, otp: this.otp })
+        this.$router.push({ name: 'inventory-receive-manage' })
+      } catch (e) { this.error = this.message(e); window.scrollTo(0, 0) }
+      finally { this.saving = false }
+    },
     async save() {
       if (this.saving || !this.detail) return
-      if (this.detail.items.some(x => x.type === 'non-stok' && (!Number.isFinite(Number(x.qty)) || Number(x.qty) <= 0 || !Number.isInteger(Number(x.price)) || Number(x.price) < 0))) {
+      if (this.detail.items.some(x => (!Number.isFinite(Number(x.qty)) || Number(x.qty) <= 0 || !Number.isInteger(Number(x.price)) || Number(x.price) < 0))) {
         this.error = 'Jumlah harus lebih dari nol dan harga non-stok harus bilangan bulat tidak negatif.'
         return
       }
       this.saving = true; this.error = ''
       try {
-        await axios.put('admin/inventory-receives/' + this.detail.id, {
+        const payload = {
           giver: this.detail.giver,
           receiver: this.detail.receiver,
           items: this.detail.items.map(x => ({ type: x.type, id: x.id, name: x.name, unit: x.unit, qty: Number(x.qty), price: Number(x.price), memo: x.memo || '' })),
           deleted_nonstock_ids: this.deletedNonstockIds,
           deleted_stock_ids: this.deletedStockIds,
-        })
-        this.$router.push({ name: 'inventory-receive-manage' })
+        }
+        await axios.post('admin/inventory-receives/' + this.detail.id + '/approval', payload)
+        this.approvalPayload = JSON.parse(JSON.stringify(payload)); this.otp = ''
       } catch (e) { this.error = this.message(e); window.scrollTo(0, 0) }
       finally { this.saving = false }
     },
