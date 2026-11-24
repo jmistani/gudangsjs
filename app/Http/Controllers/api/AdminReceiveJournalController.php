@@ -136,11 +136,87 @@ class AdminReceiveJournalController extends Controller
         $expiry = max(60, (int) config('services.receive_approval.expiry', 3600));
         $cache->forget($key);
         $payload = $request->except(['otp']);
-        $summary = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        \Illuminate\Support\Facades\Mail::raw(
-            "Kode persetujuan: ".$otp."\nTransaksi: ".optional($record->journalhead)->code."\nPengguna ID: ".auth()->id()."\nBerlaku: ".$expiry." detik\nUsulan perubahan:\n".$summary,
-            function ($message) use ($email) { $message->to($email)->subject('Persetujuan koreksi penerimaan barang'); }
-        );
+        $head = $record->journalhead;
+        abort_unless($head, 409, 'Jurnal penerimaan tidak ditemukan.');
+        $request->validate([
+            'giver' => 'required|string|max:191',
+            'receiver' => 'required|string|max:191',
+            'items' => 'required|array|min:1',
+            'items.*.type' => 'required|in:stok,non-stok',
+            'items.*.id' => 'required|integer',
+            'items.*.qty' => 'required|numeric|gt:0',
+            'items.*.price' => 'required|integer|min:0',
+            'items.*.memo' => 'nullable|string|max:2000',
+            'items.*.name' => 'nullable|string|max:191',
+            'items.*.unit' => 'nullable|string|max:191',
+            'deleted_stock_ids' => 'sometimes|array',
+            'deleted_stock_ids.*' => 'integer|distinct',
+            'deleted_nonstock_ids' => 'sometimes|array',
+            'deleted_nonstock_ids.*' => 'integer|distinct',
+        ]);
+        $money = function ($value) { return 'Rp '.number_format($value, 0, ',', '.'); };
+        $changes = [];
+        $before = 0;
+        $after = 0;
+        foreach (['giver' => 'Vendor', 'receiver' => 'Diterima oleh'] as $field => $label) {
+            if ((string) $record->$field !== (string) $payload[$field]) {
+                $changes[] = $label.': '.$record->$field.' -> '.$payload[$field];
+            }
+        }
+        $seen = [];
+        foreach (['stok' => StockMutation::with('stockable')->where('journal_head_id', $head->id)->get(), 'non-stok' => NonStockInventory::where('journal_head_id', $head->id)->get()] as $type => $lines) {
+            foreach ($lines as $line) {
+                $keyLine = $type.':'.$line->id;
+                $oldQty = (float) $line->getRawOriginal('amount');
+                $oldPrice = (int) $line->getRawOriginal('price');
+                $oldTotal = (int) $line->getRawOriginal($type === 'stok' ? 'total' : 'subtotal');
+                $name = $type === 'stok' ? optional($line->stockable)->name : $line->name;
+                $unit = $type === 'stok' ? optional($line->stockable)->unit : $line->unit;
+                $before += $oldTotal;
+                $matches = collect($payload['items'])->filter(function ($item) use ($type, $line) {
+                    return $item['type'] === $type && (int) $item['id'] === (int) $line->id;
+                });
+                $deleted = in_array((int) $line->id, array_map('intval', $payload[$type === 'stok' ? 'deleted_stock_ids' : 'deleted_nonstock_ids'] ?? []), true);
+                abort_unless($matches->count() + (int) $deleted === 1, 422, 'Detail barang tidak cocok. Muat ulang halaman.');
+                $seen[] = $keyLine;
+                if ($deleted) {
+                    $changes[] = "HAPUS BARIS: ".$name." (".$type.")\nJumlah: ".$oldQty." ".$unit." -> 0\nHarga satuan: ".$money($oldPrice)."\nSubtotal: ".$money($oldTotal)." -> Rp 0";
+                    continue;
+                }
+                $item = $matches->first();
+                $newQty = (float) $item['qty'];
+                $newPrice = (int) $item['price'];
+                $newTotal = ($newQty == $oldQty && $newPrice === $oldPrice && $type === 'stok') ? $oldTotal : (int) round($newQty * $newPrice);
+                $after += $newTotal;
+                $details = [];
+                if ($newQty != $oldQty) $details[] = 'Jumlah: '.$oldQty.' -> '.$newQty.' '.$unit;
+                if ($newPrice !== $oldPrice) $details[] = 'Harga satuan: '.$money($oldPrice).' -> '.$money($newPrice);
+                if ($newTotal !== $oldTotal) $details[] = 'Subtotal: '.$money($oldTotal).' -> '.$money($newTotal);
+                $oldMemo = (string) ($type === 'stok' ? $line->description : $line->memo);
+                if ($oldMemo !== (string) ($item['memo'] ?? '')) $details[] = 'Keterangan: '.$oldMemo.' -> '.($item['memo'] ?? '');
+                if ($type === 'non-stok') {
+                    foreach (['name' => 'Nama', 'unit' => 'Satuan'] as $field => $label) {
+                        if (isset($item[$field]) && (string) $line->$field !== (string) $item[$field]) $details[] = $label.': '.$line->$field.' -> '.$item[$field];
+                    }
+                }
+                if ($details) $changes[] = $name.' ('.$type.')'."\n".implode("\n", $details);
+            }
+        }
+        $submitted = collect($payload['items'])->map(function ($item) { return $item['type'].':'.$item['id']; })->all();
+        foreach (['stok' => 'deleted_stock_ids', 'non-stok' => 'deleted_nonstock_ids'] as $type => $field) {
+            foreach ($payload[$field] ?? [] as $lineId) $submitted[] = $type.':'.$lineId;
+        }
+        sort($submitted); sort($seen);
+        abort_unless($submitted === $seen, 422, 'Detail barang tidak cocok. Muat ulang halaman.');
+        abort_unless(count($changes), 422, 'Tidak ada perubahan untuk disetujui.');
+        $body = "ERP Gudang SJS\nPERMINTAAN PERSETUJUAN PERUBAHAN PENERIMAAN\n\n"
+            .'Transaksi: '.$head->code."\nVendor: ".$record->giver."\nDiajukan oleh: ".(auth()->user()->name ?? auth()->id())." (ID ".auth()->id().")\n\n"
+            ."DETAIL PERUBAHAN (SEBELUM -> SESUDAH)\n".implode("\n\n", $changes)
+            ."\n\nTotal sebelum: ".$money($before)."\nTotal sesudah: ".$money($after)."\nSelisih: ".$money($after-$before)
+            ."\n\nKode persetujuan: ".$otp."\nBerlaku: ".($expiry/60)." menit\n\nBerikan kode hanya jika seluruh perubahan telah diperiksa dan disetujui.";
+        \Illuminate\Support\Facades\Mail::raw($body, function ($message) use ($email, $head) {
+            $message->to($email)->subject('Persetujuan perubahan penerimaan - '.$head->code);
+        });
         $cache->put($key, ['hash' => \Illuminate\Support\Facades\Hash::make($otp), 'digest' => $this->approvalDigest($request), 'attempts' => 0, 'expires' => time()+$expiry], $expiry);
         return $this->response->successResponse('OK', 'Kode persetujuan dikirim ke email admin.');
     }
