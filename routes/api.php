@@ -151,6 +151,7 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
   Route::get('inventory-consumes/showPDF/{id}', 'ConsumeJournalController@showPDF');
 
   // Super Admin-only Keluar Barang management.
+  Route::post('admin/inventory-consumes/approval', 'AdminConsumeJournalController@requestApproval')->middleware('throttle:5,1');
   Route::get('admin/inventory-consumes', 'AdminConsumeJournalController@index');
   Route::get('admin/inventory-consumes/{id}', 'AdminConsumeJournalController@show');
   Route::put('admin/inventory-consumes/{id}', 'AdminConsumeJournalController@update');
