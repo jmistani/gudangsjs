@@ -113,6 +113,57 @@ class AdminReceiveJournalController extends Controller
         ]);
     }
 
+    private function approvalKey($id): string
+    {
+        return 'receive-approval:'.auth()->id().':'.$id;
+    }
+
+    private function approvalDigest(Request $request): string
+    {
+        return hash('sha256', json_encode($request->except(['otp']), JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION));
+    }
+
+    public function requestApproval(Request $request, $id)
+    {
+        $this->authorizeAdmin();
+        $record = ReceiveJournal::with('journalhead')->findOrFail($id);
+        $email = config('services.receive_approval.email');
+        abort_unless(filter_var($email, FILTER_VALIDATE_EMAIL), 503, 'Email persetujuan admin belum dikonfigurasi.');
+        $key = $this->approvalKey($id);
+        $cache = \Illuminate\Support\Facades\Cache::store();
+        abort_unless($cache->add($key.':cooldown', true, 60), 429, 'Tunggu 60 detik sebelum meminta kode baru.');
+        $otp = (string) random_int(100000, 999999);
+        $expiry = max(60, (int) config('services.receive_approval.expiry', 3600));
+        $cache->forget($key);
+        $payload = $request->except(['otp']);
+        $summary = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        \Illuminate\Support\Facades\Mail::raw(
+            "Kode persetujuan: ".$otp."\nTransaksi: ".optional($record->journalhead)->code."\nPengguna ID: ".auth()->id()."\nBerlaku: ".$expiry." detik\nUsulan perubahan:\n".$summary,
+            function ($message) use ($email) { $message->to($email)->subject('Persetujuan koreksi penerimaan barang'); }
+        );
+        $cache->put($key, ['hash' => \Illuminate\Support\Facades\Hash::make($otp), 'digest' => $this->approvalDigest($request), 'attempts' => 0, 'expires' => time()+$expiry], $expiry);
+        return $this->response->successResponse('OK', 'Kode persetujuan dikirim ke email admin.');
+    }
+
+    private function consumeApproval(Request $request, $id): void
+    {
+        $request->validate(['otp' => ['required', 'digits:6']]);
+        $key = $this->approvalKey($id);
+        $cache = \Illuminate\Support\Facades\Cache::store();
+        $cache->lock($key.':lock', 15)->block(5, function () use ($cache, $key, $request) {
+            $entry = $cache->get($key);
+            abort_unless($entry && $entry['expires'] > time(), 422, 'Kode persetujuan tidak tersedia atau kedaluwarsa.');
+            abort_unless(hash_equals($entry['digest'], $this->approvalDigest($request)), 422, 'Usulan berubah. Minta kode baru.');
+            if (!\Illuminate\Support\Facades\Hash::check((string) $request->otp, $entry['hash'])) {
+                $entry['attempts']++;
+                if ($entry['attempts'] >= 3) $cache->forget($key);
+                else $cache->put($key, $entry, max(1, $entry['expires'] - time()));
+                abort(422, 'Kode persetujuan salah.');
+            }
+            $cache->forget($key);
+        });
+    }
+
     public function update(Request $request, $id)
     {
         $this->authorizeAdmin();
@@ -133,6 +184,7 @@ class AdminReceiveJournalController extends Controller
             'items.*.price' => ['required', 'integer', 'min:0'],
         ]);
 
+        $this->consumeApproval($request, $id);
         DB::transaction(function () use ($id, $data) {
             $record = ReceiveJournal::findOrFail($id);
             $head = $record->journalhead;
@@ -412,55 +464,7 @@ class AdminReceiveJournalController extends Controller
     public function deleteItem($id, $type, $itemId)
     {
         $this->authorizeAdmin();
-        if (!in_array($type, ['stok', 'non-stok'], true)) abort(404);
-        if ($type === 'stok') {
-            return response()->json([
-                'message' => 'Hapus baris stok masih dibatasi karena memengaruhi histori persediaan.',
-            ], 409);
-        }
-
-        DB::transaction(function () use ($id, $itemId) {
-            $record = ReceiveJournal::findOrFail($id);
-            $head = $record->journalhead;
-            if (!$head) abort(409, 'Jurnal penerimaan tidak ditemukan.');
-
-            $line = NonStockInventory::where('journal_head_id', $head->id)
-                ->lockForUpdate()
-                ->findOrFail($itemId);
-
-            $otherCount = StockMutation::where('journal_head_id', $head->id)->count()
-                + NonStockInventory::where('journal_head_id', $head->id)->count();
-
-            if ($otherCount <= 1) {
-                throw ValidationException::withMessages([
-                    'items' => 'Tidak dapat menghapus baris terakhir. Transaksi harus tetap memiliki barang.',
-                ]);
-            }
-
-            $expense = $this->findNonStockExpense($head, $line);
-            $payable = $this->findReceiptPayable($head, $record);
-            $newCredit = (int) $payable->getRawOriginal('credit')
-                - (int) $line->getRawOriginal('subtotal');
-
-            if ($newCredit < 0) {
-                throw ValidationException::withMessages([
-                    'items' => 'Jumlah hutang vendor tidak mencukupi untuk menghapus baris ini.',
-                ]);
-            }
-
-            $expenseAccountId = $expense->account_id;
-            $payableAccountId = $payable->account_id;
-
-            $expense->delete();
-            $line->delete();
-            $payable->credit = $newCredit;
-            $payable->save();
-
-            Account::findOrFail($expenseAccountId)->resetCurrentBalances();
-            Account::findOrFail($payableAccountId)->resetCurrentBalances();
-        }, 3);
-
-        return $this->response->successResponse('OK', 'Baris non-stok dan jurnal biayanya berhasil dihapus.');
+        abort(409, 'Gunakan Simpan Perubahan dengan kode persetujuan admin.');
     }
 
     public function destroy($id)
