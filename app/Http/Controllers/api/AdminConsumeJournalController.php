@@ -148,6 +148,90 @@ class AdminConsumeJournalController extends Controller
         ]);
     }
 
+
+    private function approvalSummary($action, array $payload)
+    {
+        $ids = $action === 'bulk' ? $payload['ids'] : [$payload['id']];
+        $lines = []; $before = 0; $after = 0;
+        foreach ($ids as $id) {
+            $record = ConsumeJournal::with('journalhead')->findOrFail($id);
+            $head = $record->journalhead;
+            abort_unless($head, 409, 'Jurnal tidak ditemukan.');
+            $lines[] = 'Transaksi: '.$head->code;
+            if ($action === 'edit') {
+                $expense = AccountTransaction::where('journal_head_id',$head->id)->whereNotNull('debit')->first();
+                $account = $expense ? Account::find($expense->account_id) : null;
+                foreach (['code'=>$head->code,'post_date'=>Carbon::parse($head->getRawOriginal('post_date'))->format('Y-m-d'),'giver'=>$record->giver,'receiver'=>$record->receiver,'account_code'=>optional($account)->code] as $field=>$old) {
+                    if ((string)$old !== (string)$payload[$field]) $lines[] = $field.': '.$old.' -> '.$payload[$field];
+                }
+            }
+            $mutations = StockMutation::with('stockable')->where('journal_head_id',$head->id)->orderBy('id')->get();
+            abort_if($mutations->isEmpty(),422,'Detail barang kosong.');
+            if ($action === 'edit') {
+                $given = collect($payload['items'])->pluck('mutation_id')->map(function($id){return (int)$id;})->sort()->values()->all();
+                abort_unless($given === $mutations->pluck('id')->sort()->values()->all(),422,'Detail barang tidak cocok.');
+            }
+            foreach ($mutations as $m) {
+                $qty = abs((float)$m->getRawOriginal('amount'));
+                $price = abs((int)$m->getRawOriginal('price'));
+                $total = abs((int)$m->getRawOriginal('total'));
+                $item = $action === 'edit' ? collect($payload['items'])->firstWhere('mutation_id',$m->id) : null;
+                $newQty = $item ? (float)$item['qty'] : 0;
+                $newTotal = (int)round($newQty*$price);
+                $before += $total; $after += $newTotal;
+                $lines[] = optional($m->stockable)->name.' (ID '.$m->id.'): '.$qty.' -> '.$newQty.' '.optional($m->stockable)->unit
+                    ."\nHarga historis: Rp ".number_format($price,0,',','.')."\nSubtotal: Rp ".number_format($total,0,',','.').' -> Rp '.number_format($newTotal,0,',','.')
+                    ."\nKeterangan: ".$m->description.' -> '.($item['memo'] ?? '-');
+            }
+        }
+        return implode("\n",$lines)."\nTotal sebelum: Rp ".number_format($before,0,',','.')."\nTotal sesudah: Rp ".number_format($after,0,',','.')."\nSelisih: Rp ".number_format($after-$before,0,',','.');
+    }
+
+    public function requestApproval(Request $request)
+    {
+        $this->authorizeSuperAdmin();
+        $data = $request->validate(['action'=>'required|in:edit,delete,bulk','payload'=>'required|array']);
+        $action = $data['action']; $payload = $data['payload'];
+        $rules = $action === 'bulk' ? ['ids'=>'required|array|min:1|max:100','ids.*'=>'required|integer|distinct'] : ['id'=>'required|integer'];
+        if ($action === 'edit') $rules += ['code'=>'required|string|max:100','post_date'=>'required|date','giver'=>'required|string|max:255','receiver'=>'required|string|max:255','account_code'=>'required|string|max:100','items'=>'required|array|min:1','items.*.mutation_id'=>'required|integer|distinct','items.*.qty'=>'required|integer|min:1','items.*.memo'=>'nullable|string|max:1000'];
+        validator($payload,$rules)->validate();
+        $summary = $this->approvalSummary($action,$payload);
+        $email = config('services.receive_approval.email');
+        abort_unless(filter_var($email,FILTER_VALIDATE_EMAIL),503,'Email admin belum dikonfigurasi.');
+        $cache = \Illuminate\Support\Facades\Cache::store();
+        $key = 'consume-approval:'.auth()->id();
+        $cache->lock($key.':lock',60)->block(5,function () use ($cache,$key,$action,$payload,$summary,$email) {
+            abort_unless($cache->add($key.':cooldown',true,60),429,'Tunggu 60 detik sebelum meminta OTP baru.');
+            $cache->forget($key);
+            $otp = (string)random_int(100000,999999);
+            $expiry = max(60,(int)config('services.receive_approval.expiry',3600));
+            \Illuminate\Support\Facades\Mail::raw("ERP Gudang SJS\nPersetujuan Keluar Barang: ".$action."\nPengaju ID: ".auth()->id()."\n\n".$summary."\n\nOTP: ".$otp."\nBerlaku ".($expiry/60)." menit. Berikan kode hanya jika perubahan disetujui.",function ($message) use ($email) {
+                $message->to($email)->subject('Persetujuan Keluar Barang');
+            });
+            $cache->put($key,['hash'=>\Illuminate\Support\Facades\Hash::make($otp),'digest'=>hash('sha256',json_encode([$action,$payload,$summary])),'attempts'=>0,'expires'=>time()+$expiry],$expiry);
+        });
+        return $this->response->successResponse('OK','OTP dikirim ke email admin.');
+    }
+
+    private function consumeApproval(Request $request,$action,array $payload)
+    {
+        $request->validate(['otp'=>'required|digits:6']);
+        $key = 'consume-approval:'.auth()->id();
+        $cache = \Illuminate\Support\Facades\Cache::store();
+        $cache->lock($key.':lock',30)->block(5,function () use ($cache,$key,$request,$action,$payload) {
+            $entry = $cache->get($key);
+            abort_unless($entry && $entry['expires'] > time(),422,'OTP kedaluwarsa atau belum diminta.');
+            abort_unless(hash_equals($entry['digest'],hash('sha256',json_encode([$action,$payload,$this->approvalSummary($action,$payload)]))),422,'Data berubah. Minta OTP baru.');
+            if (!\Illuminate\Support\Facades\Hash::check((string)$request->otp,$entry['hash'])) {
+                $entry['attempts']++;
+                if ($entry['attempts'] >= 3) $cache->forget($key);
+                else $cache->put($key,$entry,max(1,$entry['expires']-time()));
+                abort(422,'OTP salah.');
+            }
+            $cache->forget($key);
+        });
+    }
+
     public function update(Request $request, $id)
     {
         $this->authorizeSuperAdmin();
@@ -160,10 +244,11 @@ class AdminConsumeJournalController extends Controller
             'account_code' => ['required', 'string', 'max:100'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.mutation_id' => ['required', 'integer'],
-            'items.*.qty' => ['required', 'numeric', 'gt:0'],
+            'items.*.qty' => ['required', 'integer', 'gt:0'],
             'items.*.memo' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $this->consumeApproval($request, 'edit', ['id'=>(int)$id] + $request->except('otp'));
         DB::transaction(function () use ($data, $id) {
             $consume = ConsumeJournal::findOrFail($id);
             $journalHead = $consume->journalhead;
@@ -326,10 +411,11 @@ class AdminConsumeJournalController extends Controller
         return $this->response->successResponse('OK', 'Data pengeluaran berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $this->authorizeSuperAdmin();
 
+        $this->consumeApproval($request, 'delete', ['id'=>(int)$id]);
         DB::transaction(function () use ($id) {
             $consume = ConsumeJournal::findOrFail($id);
             $journalHead = $consume->journalhead;
@@ -390,6 +476,7 @@ class AdminConsumeJournalController extends Controller
             'ids.*' => ['integer'],
         ]);
 
+        $this->consumeApproval($request, 'bulk', ['ids'=>$data['ids']]);
         DB::transaction(function () use ($data) {
             foreach ($data['ids'] as $id) {
                 $this->deleteRecord((int) $id);
