@@ -135,6 +135,13 @@
       </div>
     </b-card>
 
+    <b-modal v-model="approvalVisible" title="Persetujuan Admin" centered hide-footer>
+      <p>Kode OTP dikirim ke email admin. Periksa rincian perubahan dalam email sebelum menyetujui.</p>
+      <b-alert v-if="approvalError" show variant="danger">{{ approvalError }}</b-alert>
+      <b-form-input v-model.trim="otp" maxlength="6" placeholder="Masukkan 6 digit OTP" />
+      <b-button class="mt-1" variant="primary" :disabled="approvalBusy || !/^\d{6}$/.test(otp)" @click="confirmApproval">Konfirmasi</b-button>
+      <b-button class="mt-1 ml-1" :disabled="approvalBusy" @click="approvalVisible = false">Batal</b-button>
+    </b-modal>
     <b-modal
       v-model="detailVisible"
       size="xl"
@@ -148,11 +155,11 @@
         <b-spinner variant="primary" />
       </div>
 
-      <b-alert v-else-if="detailError" show variant="danger">
+      <b-alert v-if="!detailLoading && detailError" show variant="danger">
         {{ detailError }}
       </b-alert>
 
-      <ValidationObserver v-else ref="detailObserver" v-slot="{ invalid }">
+      <ValidationObserver v-if="!detailLoading && detail.id" ref="detailObserver" v-slot="{ invalid }">
         <b-form @submit.prevent="saveDetail">
           <b-row>
             <b-col cols="12" md="6" lg="3">
@@ -216,7 +223,7 @@
                 <b-form-group label="Jumlah">
                   <vue-numeric
                     v-model="item.qty"
-                    :precision="2"
+                    :precision="0"
                     :minus="false"
                     class="form-control"
                   />
@@ -326,6 +333,11 @@ export default {
 
   data() {
     return {
+      approvalVisible: false,
+      approvalBusy: false,
+      approvalError: '',
+      pendingApproval: null,
+      otp: '',
       records: [],
       selectedIds: [],
       accountOptions: [],
@@ -496,125 +508,80 @@ export default {
       }
     },
 
-    async saveDetail() {
-      if (this.saving || !this.detail.id) return
-
-      const confirmed = await this.confirm(
-        'Simpan perubahan?',
-        'Jumlah/keterangan dan informasi transaksi akan diperbarui dan saldo stok akan dihitung ulang.',
-        'Simpan',
-      )
-
-      if (!confirmed) return
-
-      this.saving = true
-
+    async requestApproval(action, payload) {
+      if (this.approvalBusy) return
+      this.approvalBusy = true
+      this.approvalError = ''
       try {
-        await axios.put(`admin/inventory-consumes/${this.detail.id}`, {
-          code: this.detail.code,
-          post_date: this.detail.post_date,
-          giver: this.detail.giver,
-          receiver: this.detail.receiver,
-          account_code: this.detail.account_code,
-          items: this.detail.items.map(item => ({
-            mutation_id: item.mutation_id,
-            qty: Number(item.qty),
-            memo: item.memo || '',
-          })),
-        })
+        const snapshot = JSON.parse(JSON.stringify(payload))
+        await axios.post('admin/inventory-consumes/approval', { action, payload: snapshot })
+        this.pendingApproval = { action, payload: snapshot }
+        this.otp = ''
+        this.approvalVisible = true
+      } catch (error) {
+        const message = this.errorMessageFrom(error, 'Gagal meminta OTP.')
+        if (this.detailVisible) this.detailError = message
+        else this.errorMessage = message
+      } finally { this.approvalBusy = false }
+    },
 
-        this.$toast({
-          variant: 'success',
-          title: 'Berhasil',
-          text: 'Data Keluar Barang berhasil diperbarui.',
-        })
-
+    async confirmApproval() {
+      if (this.approvalBusy || !this.pendingApproval) return
+      this.approvalBusy = true
+      this.approvalError = ''
+      const { action, payload } = this.pendingApproval
+      try {
+        if (action === 'edit') {
+          const { id, ...data } = payload
+          await axios.put(`admin/inventory-consumes/${id}`, { ...data, otp: this.otp })
+        } else if (action === 'delete') {
+          await axios.delete(`admin/inventory-consumes/${payload.id}`, { data: { otp: this.otp } })
+        } else {
+          await axios.post('admin/inventory-consumes/bulk-delete', { ids: payload.ids, otp: this.otp })
+        }
+        this.approvalVisible = false
+        this.pendingApproval = null
+        this.otp = ''
         this.detailVisible = false
+        this.selectedIds = []
         await this.loadRecords(this.page)
       } catch (error) {
-        this.detailError = this.errorMessageFrom(error, 'Gagal menyimpan perubahan.')
-      } finally {
-        this.saving = false
-      }
+        this.approvalError = this.errorMessageFrom(error, 'Gagal mengonfirmasi perubahan.')
+      } finally { this.approvalBusy = false }
+    },
+
+    async saveDetail() {
+      if (!this.detail.id) return
+      await this.requestApproval('edit', {
+        id: Number(this.detail.id),
+        code: this.detail.code,
+        post_date: this.detail.post_date,
+        giver: this.detail.giver,
+        receiver: this.detail.receiver,
+        account_code: this.detail.account_code,
+        items: this.detail.items.map(item => ({
+          mutation_id: item.mutation_id,
+          qty: Number(item.qty),
+          memo: item.memo || '',
+        })),
+      })
     },
 
     async deleteRecord(record) {
-      const confirmed = await this.confirm(
-        'Hapus transaksi?',
-        `Transaksi ${record.code || record.id} akan dihapus dan saldo stok/accounting akan disesuaikan kembali.`,
-        'Hapus',
-      )
-
-      if (!confirmed) return
-
-      try {
-        await axios.delete(`admin/inventory-consumes/${record.id}`)
-        this.selectedIds = this.selectedIds.filter(id => id !== record.id)
-
-        this.$toast({
-          variant: 'success',
-          title: 'Berhasil',
-          text: 'Transaksi berhasil dihapus.',
-        })
-
-        await this.loadRecords(this.page)
-      } catch (error) {
-        this.errorMessage = this.errorMessageFrom(error, 'Gagal menghapus transaksi.')
+      if (await this.confirm('Hapus transaksi?', 'Minta persetujuan admin untuk menghapus transaksi ini?', 'Minta OTP')) {
+        await this.requestApproval('delete', { id: Number(record.id) })
       }
     },
 
     async deleteSelected() {
       if (!this.selectedIds.length) return
-
-      const confirmed = await this.confirm(
-        'Hapus transaksi terpilih?',
-        `Sebanyak ${this.selectedIds.length} transaksi akan dihapus.`,
-        'Hapus Semua',
-      )
-
-      if (!confirmed) return
-
-      try {
-        await axios.post('admin/inventory-consumes/bulk-delete', {
-          ids: this.selectedIds,
-        })
-
-        this.$toast({
-          variant: 'success',
-          title: 'Berhasil',
-          text: 'Transaksi terpilih berhasil dihapus.',
-        })
-
-        this.selectedIds = []
-        await this.loadRecords(this.page)
-      } catch (error) {
-        this.errorMessage = this.errorMessageFrom(error, 'Gagal menghapus transaksi terpilih.')
+      if (await this.confirm('Hapus transaksi terpilih?', 'Minta persetujuan admin untuk seluruh transaksi terpilih?', 'Minta OTP')) {
+        await this.requestApproval('bulk', { ids: this.selectedIds.map(Number) })
       }
     },
 
     async deleteDetail() {
-      if (!this.detail.id) return
-
-      const confirmed = await this.confirm(
-        'Hapus transaksi ini?',
-        `Transaksi ${this.detail.code || this.detail.id} akan dihapus permanen dari daftar aktif.`,
-        'Hapus',
-      )
-
-      if (!confirmed) return
-
-      try {
-        await axios.delete(`admin/inventory-consumes/${this.detail.id}`)
-        this.detailVisible = false
-        this.$toast({
-          variant: 'success',
-          title: 'Berhasil',
-          text: 'Transaksi berhasil dihapus.',
-        })
-        await this.loadRecords(this.page)
-      } catch (error) {
-        this.detailError = this.errorMessageFrom(error, 'Gagal menghapus transaksi.')
-      }
+      if (this.detail.id) await this.deleteRecord(this.detail)
     },
 
     confirm(title, message, okTitle) {
@@ -648,6 +615,9 @@ export default {
       const response = error && error.response
       if (response && response.status === 403) {
         return 'Akses ditolak. Halaman ini hanya dapat digunakan oleh Super Admin.'
+      }
+      if (response && response.data && response.data.errors) {
+        return Object.values(response.data.errors).flat().join(' ')
       }
       if (response && response.data && response.data.message) {
         return response.data.message
