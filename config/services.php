@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'receive_approval' => [
+        'email' => env('RECEIVE_APPROVAL_EMAIL'),
+        'expiry' => env('RECEIVE_APPROVAL_OTP_EXPIRY', 3600),
+    ],
+
 
     /*
     |--------------------------------------------------------------------------
