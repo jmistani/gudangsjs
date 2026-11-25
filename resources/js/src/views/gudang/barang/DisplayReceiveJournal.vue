@@ -113,11 +113,6 @@ export default {
           throw new Error('ID penerimaan barang tidak ditemukan.')
         }
 
-        const token = localStorage.getItem('accessToken')
-        if (!token || token === 'null' || token === 'undefined') {
-          throw new Error('Token login tidak ditemukan. Silakan login kembali.')
-        }
-
         // Axios, unlike a direct iframe URL, can send the JWT Bearer header.
         const response = await axios.get(
           `/inventory-receives/showPDF/${encodeURIComponent(id)}`,
@@ -125,7 +120,6 @@ export default {
             responseType: 'blob',
             headers: {
               Accept: 'application/pdf',
-              Authorization: `Bearer ${token}`,
             },
           },
         )
