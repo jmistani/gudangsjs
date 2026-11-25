@@ -29,9 +29,9 @@ class AdminConsumeJournalController extends Controller
         $user = auth()->user();
 
         if (!$user || !$user->roles()
-            ->whereRaw('LOWER(name) IN (?, ?)', ['super-admin', 'super admin'])
+            ->whereRaw('LOWER(name) IN (?, ?, ?)', ['super-admin', 'super admin', 'staff-gudang'])
             ->exists()) {
-            abort(403, 'Akses hanya untuk Super Admin.');
+            abort(403, 'Akses hanya untuk Super Admin dan Staff Gudang.');
         }
     }
 
