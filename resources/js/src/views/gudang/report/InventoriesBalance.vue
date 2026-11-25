@@ -72,7 +72,7 @@
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import formValidation from '@core/comp-functions/forms/form-validation'
 import {BForm, BFormGroup, BFormCheckbox, BCard, BCardBody, BButtonGroup, BButton, BRow, BCol,
-    BAvatar, BTable, BButtonToolbar, BFormDatepicker, BFormInvalidFeedback} from 'bootstrap-vue'
+  BAvatar, BTable, BButtonToolbar, BFormDatepicker, BFormInvalidFeedback} from 'bootstrap-vue'
 import { required } from '@validations'
 import { ref } from '@vue/composition-api'
 import VueHtml2pdf from 'vue-html2pdf'
@@ -80,98 +80,98 @@ import Print from 'vue-iframe-print'
 import axios from 'axios'
 
 export default {
-   components: {
-      BForm,
-      BTable,
-      BCard,
-      BCardBody,
-      BButtonGroup,
-      BAvatar,
-      BRow,
-      BCol,
-      BButton,
-      VueHtml2pdf,
-      BButtonToolbar,
-      BFormDatepicker,
-      BFormCheckbox,
-      BFormInvalidFeedback,
-      ValidationProvider,
-      ValidationObserver,
-      required,
-      BFormGroup,
-   },
-   data() {
-      return {
-            per_date: null,
-            bygroup: 1,
-            reportURL: '',
-            printObj: {
-              id: "printDiv",
-              popTitle: 'vue-iframe-print',
-              extraCss: '',
-              extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
-            },
-            tableData: [
-            { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
-            { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
-            { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' }
-            ],
-         tableColumns: [
-            {key:'nama', label:'Nama'},
-            {key:'email', label:'Email'},
-            {key:'telp', label:'Telp'}
-          ],
-         reportContent: '',
-      }
-   },
-   directives:{
-      'print': Print,
-   },
-   mounted() {
-      this.reportURL = ''
-   },
-   methods: {
-      formatDate (date) {
-         return moment(date).format('DD-MM-YYYY')
+  components: {
+    BForm,
+    BTable,
+    BCard,
+    BCardBody,
+    BButtonGroup,
+    BAvatar,
+    BRow,
+    BCol,
+    BButton,
+    VueHtml2pdf,
+    BButtonToolbar,
+    BFormDatepicker,
+    BFormCheckbox,
+    BFormInvalidFeedback,
+    ValidationProvider,
+    ValidationObserver,
+    required,
+    BFormGroup,
+  },
+  data() {
+    return {
+      per_date: null,
+      bygroup: 1,
+      reportURL: '',
+      printObj: {
+        id: "printDiv",
+        popTitle: 'vue-iframe-print',
+        extraCss: '',
+        extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
       },
-        /*
+      tableData: [
+        { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
+        { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' },
+        { nama:'john sen', email:'tebenk@gmail.com', telp:'08129298888' }
+      ],
+      tableColumns: [
+        {key:'nama', label:'Nama'},
+        {key:'email', label:'Email'},
+        {key:'telp', label:'Telp'}
+      ],
+      reportContent: '',
+    }
+  },
+  directives:{
+    'print': Print,
+  },
+  mounted() {
+    this.reportURL = ''
+  },
+  methods: {
+    formatDate (date) {
+      return moment(date).format('DD-MM-YYYY')
+    },
+    /*
             Generate Report using refs and calling the
             refs function generatePdf()
         */
-        generateReport () {
-            this.$refs.html2Pdf.generatePdf()
-        },
-         print() {
-            var prtContent = document.getElementById("reportContent");
-            var iFrameBody = this.$refs.reportContent.contentWindow.document
-//            doc.fromHTML(iFrameBody, 15, vOffset)
-
-            var WinPrint = window.open(this.reportURL, '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
-//            WinPrint.document.close();
-            WinPrint.focus();
-            setTimeout(function(){mywindow.print();},10);
-            WinPrint.close();
-         },
-         printFrame(id) {
-            var frm = document.getElementById(id).contentWindow;
-            frm.focus();// focus on contentWindow is needed on some ie versions
-            frm.print();
-            return false;
-         },
-         // generatereport() {
-         //    this.reportURL = `http://localhost/api/inventory/report/inventory-balance/${this.per_date}`
-         // }
+    generateReport () {
+      this.$refs.html2Pdf.generatePdf()
     },
+    print() {
+      var prtContent = document.getElementById("reportContent");
+      var iFrameBody = this.$refs.reportContent.contentWindow.document
+      //            doc.fromHTML(iFrameBody, 15, vOffset)
+
+      var WinPrint = window.open(this.reportURL, '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+      //            WinPrint.document.close();
+      WinPrint.focus();
+      setTimeout(function(){mywindow.print();},10);
+      WinPrint.close();
+    },
+    printFrame(id) {
+      var frm = document.getElementById(id).contentWindow;
+      frm.focus();// focus on contentWindow is needed on some ie versions
+      frm.print();
+      return false;
+    },
+    // generatereport() {
+    //    this.reportURL = `http://localhost/api/inventory/report/inventory-balance/${this.per_date}`
+    // }
+  },
   setup(props, { emit }) {
 
-   const prefilledForm = ref({
-        per_date: null,
-        bygroup: 1
+    const prefilledForm = ref({
+      per_date: null,
+      bygroup: 1
     })
 
     const blankForm = ref({
-        per_date: null,
-        bygroup: 1
+      per_date: null,
+      bygroup: 1
     })
 
     const refReport = ref(JSON.parse(JSON.stringify(prefilledForm.value)))
@@ -184,15 +184,16 @@ export default {
     }
     const onSubmit = () => {
       //check for expired token here
-      refReportURL.value = `https://gudangsjs.local/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
+      //refReportURL.value = `https://gudangsjs.local/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
+      refReportURL.value = `https://gudangsjsv2.serasijayasejati.com/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
     }
 
 
-   const {
-         refFormObserver,
-         getValidationState,
-         resetForm,
-      } = formValidation(resetReportForm,clearReportForm)
+    const {
+      refFormObserver,
+      getValidationState,
+      resetForm,
+    } = formValidation(resetReportForm,clearReportForm)
 
     return {
       refReport,
@@ -205,7 +206,7 @@ export default {
       resetForm,
     }
 
-    }
+  }
 
 }
 </script>
