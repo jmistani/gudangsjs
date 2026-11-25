@@ -70,6 +70,10 @@
             :to="{name:'display-inventory-receive',params:{id:data.item.second_reference_id}}">Penerimaan</b-link>
           <span v-else>{{ data.item.description || '-' }}</span>
         </template>
+        <template #cell(pemakai)="data">
+          <span v-if="!isAdjustment(data.item) && !isSummary(data.item) && (isType(data.item,'ConsumeJournal') || isType(data.item,'ReceiveJournal'))">{{ data.item.receiver || '—' }}</span>
+          <span v-else>—</span>
+        </template>
         <template #cell(jurnal)="data">{{ data.item.journal_code || '-' }}</template>
       </b-table>
 
@@ -108,6 +112,7 @@ export default {
         { key: 'harga', label: 'Harga', tdClass: 'text-right' },
         { key: 'nilai', label: 'Total Nilai', tdClass: 'text-right' },
         { key: 'keterangan', label: 'Keterangan' },
+        { key: 'pemakai', label: 'Pemakai / Penerima' },
         { key: 'jurnal', label: 'Kode Jurnal' },
       ],
     }
