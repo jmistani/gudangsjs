@@ -28,8 +28,8 @@ class AdminReceiveJournalController extends Controller
     private function authorizeAdmin()
     {
         $user = auth()->user();
-        if (!$user || !$user->roles()->whereRaw('LOWER(name) IN (?, ?)', ['super-admin', 'super admin'])->exists()) {
-            abort(403, 'Hanya Super Admin dapat mengelola penerimaan barang.');
+        if (!$user || !$user->roles()->whereRaw('LOWER(name) IN (?, ?, ?)', ['super-admin', 'super admin', 'staff-gudang'])->exists()) {
+            abort(403, 'Akses hanya untuk Super Admin dan Staff Gudang.');
         }
     }
 
