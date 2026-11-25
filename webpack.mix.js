@@ -52,8 +52,7 @@ mix
                     loaders: {
                         loader: 'file-loader',
                         options: {
-                            name: 'images/[name].[hash:8].[ext]',
-                            context: path.resolve(__dirname, 'resources/js/src/assets/images'),
+                            name: '[name].[hash:8].[ext]',
                             publicPath: '/images/',
                             outputPath: 'images/'
                         }
