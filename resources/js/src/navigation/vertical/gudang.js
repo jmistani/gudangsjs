@@ -8,12 +8,7 @@ export default [
     icon: 'TrelloIcon',
     tagVariant: 'light-warning',
     children: [
-      {
-        title: 'AI Command Center',
-        route: 'inventory-ai-command',
-        resource: 'inventory',
-        action: 'manage',
-      },
+
       {
         title: 'Dashboard',
         route: 'inventory-dashboard',
@@ -31,6 +26,18 @@ export default [
         route: 'inventory-receive-add',
         resource: 'inventory',
         action: 'receive',
+      },
+      {
+        title: 'Kelola Terima Barang',
+        route: 'inventory-receive-manage',
+        resource: 'inventory',
+        action: 'receive',
+      },
+      {
+        title: 'Kelola Keluar Barang',
+        route: 'inventory-consume-manage',
+        resource: 'inventory',
+        action: 'checkout',
       },
       {
         title: 'Keluar Barang',
