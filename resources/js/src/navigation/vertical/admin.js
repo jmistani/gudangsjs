@@ -22,12 +22,7 @@ export default [{
             resource: 'account',
             action: 'manage',
         },
-        {
-            title: 'Kelola Terima Barang',
-            route: 'inventory-receive-manage',
-            resource: 'inventory',
-            action: 'manage',
-        },
+
         {
             title: 'Grup Barang',
             route: 'setting-inventory-group',
@@ -40,12 +35,7 @@ export default [{
             resource: 'inventory',
             action: 'manage',
         },
-        {
-            title: 'Kelola Keluar Barang',
-            route: 'inventory-consume-manage',
-            resource: 'inventory',
-            action: 'manage',
-        },
+
         // {
         //     title: 'Daftar Barang',
         //     route: 'inventory-list',
