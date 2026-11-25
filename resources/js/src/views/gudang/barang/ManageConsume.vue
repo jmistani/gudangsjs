@@ -616,7 +616,7 @@ export default {
     errorMessageFrom(error, fallback) {
       const response = error && error.response
       if (response && response.status === 403) {
-        return 'Akses ditolak. Halaman ini hanya dapat digunakan oleh Super Admin.'
+        return 'Akses ditolak. Halaman ini hanya dapat digunakan oleh Super Admin dan Staff Gudang.'
       }
       if (response && response.data && response.data.errors) {
         return Object.values(response.data.errors).flat().join(' ')
