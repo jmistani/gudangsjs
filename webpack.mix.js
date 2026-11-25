@@ -52,8 +52,10 @@ mix
                     loaders: {
                         loader: 'file-loader',
                         options: {
-                            name: 'images/[path][name].[ext]',
-                            context: '../vuexy-vuejs-bootstrap-vue-template/src/assets/images'
+                            name: 'images/[name].[hash:8].[ext]',
+                            context: path.resolve(__dirname, 'resources/js/src/assets/images'),
+                            publicPath: '/images/',
+                            outputPath: 'images/'
                         }
                     }
                 }
