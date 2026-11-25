@@ -190,6 +190,7 @@
               <b-form-group label="Akun Biaya">
                 <v-select
                   v-model="selectedAccount"
+                  class="expense-account-select"
                   :options="accountOptions"
                   label="name"
                   :clearable="false"
@@ -288,6 +289,7 @@
 import axios from '@axios'
 import { ValidationObserver } from 'vee-validate'
 import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
 import VueNumeric from 'vue-numeric'
 import {
   BAlert,
@@ -784,4 +786,15 @@ export default {
     color: #8b7ff6;
   }
 }
+</style>
+<style lang="scss">
+.dark-layout .expense-account-select {
+  .vs__dropdown-toggle { background: #283046; border-color: #404656; }
+  .vs__selected, .vs__search, .vs__search::placeholder { color: #b4b7bd; }
+  .vs__open-indicator, .vs__clear { fill: #b4b7bd; }
+  .vs__dropdown-menu { background: #283046; border-color: #404656; }
+  .vs__dropdown-option { color: #b4b7bd; }
+  .vs__dropdown-option--highlight { background: #7367f0; color: #fff; }
+}
+.expense-account-select .vs__dropdown-toggle { min-height: 38px; }
 </style>
