@@ -115,18 +115,12 @@ export default {
       this.errorMessage = ''
 
       try {
-        const token = localStorage.getItem('accessToken')
-        if (!token || token === 'null' || token === 'undefined') {
-          throw new Error('Token login tidak ditemukan. Silakan login kembali.')
-        }
-
         const response = await axios.get(
           `/inventory-consumes/showPDF/${encodeURIComponent(id)}`,
           {
             responseType: 'blob',
             headers: {
               Accept: 'application/pdf, application/json',
-              Authorization: `Bearer ${token}`,
             },
           },
         )
