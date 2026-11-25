@@ -37,7 +37,7 @@
                </b-col>
                <b-col md="12">
                   <b-form-group>
-                     <b-button  type=submit pill size="md" variant="primary">Tampilkan</b-button>
+                     <b-button type="submit" pill size="md" variant="primary" :disabled="reportLoading">{{ reportLoading ? 'Memuat...' : 'Tampilkan' }}</b-button>
                   </b-form-group>
                </b-col>
             </b-row>
@@ -50,14 +50,17 @@
                <b-button-toolbar class="d-flex justify-content-center" aria-label="Inventory Consume">
                   <!-- <b-button variant="info" v-print="printObj">Print</b-button> -->
                   <b-button-group class="mx-0">
-                     <b-button  size="sm" class="mb-0" pill variant="primary" @click="printFrame('printDiv')">Print</b-button>
+                     <b-button  size="sm" class="mb-0" pill variant="primary" :disabled="!reportReady" @click="printFrame('printDiv')">Print</b-button>
                         <b-button  size="sm" class="mb-0" pill variant="outline-primary" @click="$router.go(-1)">Kembali</b-button>
                   </b-button-group>
                </b-button-toolbar>
             </div>
         </b-col>
      </b-row>
+      <b-alert v-if="reportError" show variant="danger">{{ reportError }}</b-alert>
       <iframe
+         v-if="refReportURL"
+         @load="reportReady = true"
          id="printDiv"
          ref="reportContent"
          :src="refReportURL"
@@ -71,16 +74,17 @@
 
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import formValidation from '@core/comp-functions/forms/form-validation'
-import {BForm, BFormGroup, BFormCheckbox, BCard, BCardBody, BButtonGroup, BButton, BRow, BCol,
+import {BAlert, BForm, BFormGroup, BFormCheckbox, BCard, BCardBody, BButtonGroup, BButton, BRow, BCol,
   BAvatar, BTable, BButtonToolbar, BFormDatepicker, BFormInvalidFeedback} from 'bootstrap-vue'
 import { required } from '@validations'
-import { ref } from '@vue/composition-api'
+import { ref, onBeforeUnmount } from '@vue/composition-api'
 import VueHtml2pdf from 'vue-html2pdf'
 import Print from 'vue-iframe-print'
-import axios from 'axios'
+import axios from '@axios'
 
 export default {
   components: {
+    BAlert,
     BForm,
     BTable,
     BCard,
@@ -182,10 +186,38 @@ export default {
     const clearReportForm = () => {
       refReport.value = JSON.parse(JSON.stringify(blankForm.value))
     }
-    const onSubmit = () => {
-      //check for expired token here
-      //refReportURL.value = `https://gudangsjs.local/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
-      refReportURL.value = `https://gudangsjsv2.serasijayasejati.com/api/inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`
+    const reportLoading = ref(false)
+    const reportError = ref('')
+    const reportReady = ref(false)
+    let version = 0
+    const clearURL = () => {
+      if (refReportURL.value) URL.revokeObjectURL(refReportURL.value)
+      refReportURL.value = ''
+      reportReady.value = false
+    }
+    onBeforeUnmount(() => { version += 1; clearURL() })
+    const onSubmit = async () => {
+      const current = ++version
+      clearURL()
+      reportLoading.value = true
+      reportError.value = ''
+      try {
+        const response = await axios.get(`inventory/report/inventory-balance/${refReport.value.per_date}/${refReport.value.bygroup}`, {
+          responseType: 'text',
+          headers: { Accept: 'text/html' },
+        })
+        if (current !== version) return
+        const html = response.data
+        if (typeof html !== 'string' || !String(response.headers['content-type'] || '').includes('text/html') || !/<(?:html|!doctype html)/i.test(html)) throw new Error('Respons server bukan HTML laporan.')
+        if (/auth-login-form|name=["'](?:password|login-password)["']/i.test(html)) throw new Error('Sesi login berakhir. Silakan login kembali.')
+        refReportURL.value = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }))
+      } catch (error) {
+        if (current !== version) return
+        const status = error.response && error.response.status
+        reportError.value = status === 401 ? 'Silakan login kembali.' : status === 403 ? 'Anda tidak memiliki izin membuka laporan.' : error.message || 'Gagal memuat laporan.'
+      } finally {
+        if (current === version) reportLoading.value = false
+      }
     }
 
 
@@ -198,6 +230,9 @@ export default {
     return {
       refReport,
       refReportURL,
+      reportLoading,
+      reportError,
+      reportReady,
       onSubmit,
       required,
 
