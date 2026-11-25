@@ -1,11 +1,6 @@
 
 export default [
-  {
-    path: '/inventory/ai-command',
-    name: 'inventory-ai-command',
-    component: () => import('@/views/gudang/barang/AiCommandCenter.vue'),
-    meta: { requiresAuth: true, pageTitle: 'AI Command Center', resource: 'inventory', action: 'manage' },
-  },
+
   {
     path: '/inventory/dashboard',
     name: 'inventory-dashboard',
@@ -115,7 +110,7 @@ export default [
         { text: 'Detail', active: true },
       ],
       resource: 'inventory',
-      action: 'manage',
+      action: 'receive',
     },
   },
   {
@@ -131,7 +126,7 @@ export default [
         { text: 'Kelola Terima Barang', active: true },
       ],
       resource: 'inventory',
-      action: 'manage',
+      action: 'receive',
     },
   },
   {
@@ -147,7 +142,7 @@ export default [
         { text: 'Keluar Barang', active: true },
       ],
       resource: 'inventory',
-      action: 'manage',
+      action: 'checkout',
     },
   },
   {
