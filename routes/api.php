@@ -100,9 +100,6 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
     'inventories/search',
     [\App\Http\Controllers\api\InventoryController::class, 'search']
   );
-  Route::get('ai-commands/accounts', 'AiCommandController@accounts');
-  Route::post('ai-commands/preview', 'AiCommandController@preview');
-  Route::post('ai-commands/execute', 'AiCommandController@execute');
   Route::get('inventories/all', 'InventoryController@all');
   Route::get('inventoriesEdit/{id}', 'InventoryController@inventoriesEdit');
   Route::post('inventories/tag/add', 'InventoryController@addTag');
@@ -150,7 +147,7 @@ Route::group(['namespace' => 'api', 'middleware' => 'auth:api'], function() {
 
   Route::get('inventory-consumes/showPDF/{id}', 'ConsumeJournalController@showPDF');
 
-  // Super Admin-only Keluar Barang management.
+  // Super Admin and Staff Gudang; changes require email OTP.
   Route::post('admin/inventory-consumes/approval', 'AdminConsumeJournalController@requestApproval')->middleware('throttle:5,1');
   Route::get('admin/inventory-consumes', 'AdminConsumeJournalController@index');
   Route::get('admin/inventory-consumes/{id}', 'AdminConsumeJournalController@show');
