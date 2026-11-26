@@ -630,39 +630,21 @@
                     <b-col cols="4" v-if="item.stock != 'true'" class="align-bottom">
                       {{item.inventory}}                         
                     </b-col>
-                    <b-col cols="8">
-                      <ValidationProvider
-                            #default="validationContext"
-                            ref="receive-add-nonstock-account"
-                            name="receive-add-nonstock-account"
-                            :rules="{ requiredAccount: true }"
-                      >
-                        <v-select
-                          v-if="item.stock != 'true'"
-                          :id="`inventory-receive-inventory-nonstock-account-${index}`"
-                          :ref="`inventory-receive-inventory-nonstock-account-${index}`"
-                          v-model="item.account"
-                          :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                          :options="refAccountOptions"
-                          :reduce="refAccountOptions => refAccountOptions.name"
-                          label="name"
-                          :clearable="false"
-                          class="mb-0 item-selector-title"
-                          placeholder="Select Item"
-                        >
-                        </v-select>
-                        <b-form-input
-                          rules="required"
-                          :id="`inventory-receive-inventory-nonstock-account-input-${index}`"
-                          :ref="`inventory-receive-inventory-nonstock-account-input-${index}`"
-                          v-model="item.account"
-                          style="display:none;"
-                          :state="getValidationState(validationContext)"
-                        />
-                        <b-form-invalid-feedback class="text-custom-error" :state="validationContext.errors.length > 0 ? false:null">
-                          {{ validationContext.errors[0] }}
-                        </b-form-invalid-feedback>
-                      </ValidationProvider> 
+                    <b-col cols="8" v-if="item.stock !== 'true'">
+                      <v-select
+                        :id="`inventory-receive-inventory-nonstock-account-${index}`"
+                        v-model="item.account"
+                        :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                        :options="refAccountOptions"
+                        :reduce="account => account.name"
+                        label="name"
+                        :clearable="false"
+                        class="mb-0 item-selector-title"
+                        placeholder="Pilih akun biaya"
+                      />
+                      <div v-if="expenseValidationAttempted && !isExpenseAccountValid(item)" class="text-danger mt-25">
+                        Masukkan jurnal biaya yang valid untuk barang ini.
+                      </div>
                     </b-col>
                   </b-row>
               </b-card-body>
@@ -748,6 +730,7 @@ export default {
   data() {
     return {
       
+      expenseValidationAttempted: false,
       flatpickrConfig: {
         dateFormat: "d.m.Y",
       }
@@ -789,22 +772,15 @@ export default {
         })
       })
     },
+    isExpenseAccountValid(item) {
+      return typeof item.account === 'string' && item.account.trim() !== '' &&
+        this.refAccountOptions.some(account => account.name === item.account)
+    },
     validationFormBiaya() {
-      return new Promise((resolve, reject) => {
-        if(this.refNonStockExists) {
-            this.$refs.BiayaRules.validate().then(success => {
-              if (success) {
-                resolve(true)
-              } else {
-                reject()
-              }
-            })
-        }
-        else
-        {
-          resolve(true)
-        }
-      })
+      this.expenseValidationAttempted = true
+      return Promise.resolve(this.receiveData.items.every(item =>
+        item.stock === 'true' || this.isExpenseAccountValid(item)
+      ))
     },
     updatesubtotal(index) {
       this.receiveData.items[index].subtotal = this.receiveData.items[index].qty * this.receiveData.items[index].price
@@ -840,6 +816,10 @@ export default {
       })
     },
     receiveInventory() {
+      if (!this.receiveData.items.every(item => item.stock === "true" || this.isExpenseAccountValid(item))) {
+        this.expenseValidationAttempted = true
+        return
+      }
       this.receiveData.total = this.dataMeta.total
        store
         .dispatch('app-inventory/receiveInventory',this.receiveData)
