@@ -342,14 +342,21 @@
                                       v-model="item.inventory"
                                       :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
                                       :options="refInventoryOptions"
+                                      :filterable="false"
+                                      :loading="inventorySearching"
+                                      @search="searchInventory"
+                                      @open="resetInventorySearch"
                                       label="name"
                                       :clearable="false"
                                       class="mb-0 item-selector-title"
-                                      placeholder="Select Item"
+                                      placeholder="Ketik nama / kode barang (min. 2 huruf)"
                                       @input="updateItemForm(index)"
                                     >
-                                      <template #option="{ name }">
-                                        {{ name | titlecase }}
+                                      <template #no-options>
+                                        {{ inventorySearchError || (inventorySearching ? 'Mencari barang...' : inventoryKeyword.length < 2 ? 'Ketik minimal 2 karakter' : 'Barang tidak ditemukan') }}
+                                      </template>
+                                      <template #option="{ name, code }">
+                                        {{ name | titlecase }} <small class="text-muted">({{ code }})</small>
                                       </template>
                                       <template #list-header>
                                         <li
@@ -680,6 +687,7 @@ import { heightTransition } from '@core/mixins/ui/transition'
 import Ripple from 'vue-ripple-directive'
 import { FormWizard, TabContent } from 'vue-form-wizard'
 import store from '@/store'
+import axios from '@axios'
 import {
   BRow, BCol, BCard, BCardBody, BButton, BCardText, BForm, BFormGroup, BFormInput, BInputGroup,
   BInputGroupPrepend, BFormTextarea, BFormCheckbox, VBToggle, BFormInvalidFeedback,
@@ -746,7 +754,6 @@ export default {
   mixins: [heightTransition],
   mounted() {
     this.fetchAllVendor()
-    this.fetchAllInventory()
     this.initTrHeight()
   },
   created() {
@@ -927,23 +934,37 @@ export default {
         'UPI Transfer',
     ]
 
-    function fetchAllInventory() {
-        store
-            .dispatch('app-inventory/fetchInventoryOptions')
-            .then((response) => {
-                refInventoryOptions.value = response.data.payload
-            })
-            .catch(() => {
-                toast({
-                    component: ToastificationContent,
-                    props: {
-                        title: "Error fetching inventories",
-                        icon: 'AlertTriangleIcon',
-                        variant: 'danger',
-                    },
-                })
-            })
+    const inventorySearching = ref(false)
+    const inventorySearchError = ref('')
+    const inventoryKeyword = ref('')
+    let inventoryTimer = null
+    let inventoryVersion = 0
+    function searchInventory(value) {
+      const keyword = String(value || '').trim()
+      inventoryKeyword.value = keyword
+      const version = ++inventoryVersion
+      clearTimeout(inventoryTimer)
+      refInventoryOptions.value = []
+      inventorySearchError.value = ''
+      inventorySearching.value = keyword.length >= 2
+      if (keyword.length < 2) return
+      inventoryTimer = setTimeout(async () => {
+        try {
+          const response = await axios.get('inventories/search', { params: { q: keyword } })
+          if (version !== inventoryVersion) return
+          refInventoryOptions.value = response.data.payload || []
+        } catch (error) {
+          if (version === inventoryVersion) inventorySearchError.value = 'Gagal mencari barang. Silakan coba lagi.'
+        } finally {
+          if (version === inventoryVersion) inventorySearching.value = false
+        }
+      }, 300)
     }
+    const resetInventorySearch = () => searchInventory('')
+    onUnmounted(() => {
+      ++inventoryVersion
+      clearTimeout(inventoryTimer)
+    })
 
     function fetchAllVendor()  {
         store
@@ -964,7 +985,7 @@ export default {
     }
 
     const refetchInventoryData = () => {
-        fetchAllInventory()
+        resetInventorySearch()
     }
 
     const refetchVendorData = () => {
@@ -1027,7 +1048,11 @@ export default {
       refetchInventoryData,
       refetchVendorData,
       fetchAllVendor,
-      fetchAllInventory,
+      searchInventory,
+      resetInventorySearch,
+      inventorySearching,
+      inventorySearchError,
+      inventoryKeyword,
     }
   },
 }
