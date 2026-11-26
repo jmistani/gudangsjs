@@ -343,6 +343,8 @@
                                       :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
                                       :options="refInventoryOptions"
                                       :filterable="false"
+                                      append-to-body
+                                      :calculate-position="positionInventoryDropdown"
                                       :loading="inventorySearching"
                                       @search="searchInventory"
                                       @open="resetInventorySearch"
@@ -763,6 +765,13 @@ export default {
     window.removeEventListener('resize', this.initTrHeight)
   },
   methods: {
+    positionInventoryDropdown(dropdown, component, { width, top, left }) {
+      dropdown.classList.add("receive-inventory-dropdown")
+      dropdown.style.width = width
+      dropdown.style.top = top
+      dropdown.style.left = left
+      return () => dropdown.classList.remove("receive-inventory-dropdown")
+    },
     validationFormDetail() {
       return new Promise((resolve, reject) => {
         this.$refs.DetailRules.validate().then(success => {
@@ -1115,7 +1124,7 @@ export default {
   }
 
   .receive-items-section {
-    overflow-x: hidden;
+    overflow: visible;
   }
 
   .receive-item-card {
@@ -1341,4 +1350,35 @@ background-color:$product-details-bg;
 .form-add-nonstock {
   background: #FCEDED !important;
 }
-</style></style>
+</style>
+
+<style lang="scss">
+.receive-inventory-dropdown.vs__dropdown-menu {
+  z-index: 2000;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #d8d6de;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,.18);
+}
+.receive-inventory-dropdown .vs__dropdown-option {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+  padding: 10px 14px;
+}
+.receive-inventory-dropdown .vs__no-options { padding: 12px; }
+.receive-inventory-dropdown .add-new-inventory-header { padding: 10px 14px; cursor: pointer; }
+.dark-layout .receive-inventory-dropdown.vs__dropdown-menu {
+  background: #283046;
+  border-color: #404656;
+  color: #b4b7bd;
+}
+.dark-layout .receive-inventory-dropdown .vs__dropdown-option { color: #b4b7bd; }
+.receive-inventory-dropdown .vs__dropdown-option--highlight,
+.dark-layout .receive-inventory-dropdown .vs__dropdown-option--highlight {
+  background: #7367f0;
+  color: #fff;
+}
+</style>
